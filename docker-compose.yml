@@ -1,0 +1,44 @@
+# Define a versão do Docker Compose
+version: '3.8'
+
+# Define a lista de serviços (containers)
+services:
+  # Serviço do Backend (NestJS)
+  nest-app:
+    # 'build' agora é um objeto para mais controle
+    build:
+      # 'context' é o caminho para a pasta do backend, a partir daqui
+      context: ./backend
+      # Especifica o nome do Dockerfile a ser usado
+      dockerfile: Dockerfile
+    # Nome do container para fácil identificação
+    container_name: nest_app
+    ports:
+      # Mapeia a porta 3000 do host para a 3000 do container
+      - '3000:3000'
+    volumes:
+      # Mapeia o código do backend para o /app dentro do container
+      - ./backend:/app
+      - /app/node_modules
+
+  # Serviço do Frontend (React)
+  react-app:
+    build:
+      # 'context' é o caminho para a pasta do frontend
+      context: ./frontend
+      # Especifica o Dockerfile para o ambiente de desenvolvimento do React
+      dockerfile: Dockerfile.react.dev
+    container_name: react_app
+    ports:
+      # IMPORTANTE: A porta padrão do Vite (React) é 5173.
+      # Mapeamos a porta 5173 do container para a 3001 no seu computador.
+      - '3001:5173'
+    volumes:
+      # Mapeia o código do frontend para o /app dentro do seu container
+      - ./frontend:/app
+      - /app/node_modules
+    # Garante que o container do NestJS inicie ANTES do container do React
+    depends_on:
+      - nest-app
+
+
