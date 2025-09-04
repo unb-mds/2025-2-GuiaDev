@@ -8,7 +8,7 @@ services:
     # 'build' agora é um objeto para mais controle
     build:
       # 'context' é o caminho para a pasta do backend, a partir daqui
-      context: ./backend
+      context: ./backend/backend-nest
       # Especifica o nome do Dockerfile a ser usado
       dockerfile: Dockerfile
     # Nome do container para fácil identificação
@@ -18,7 +18,7 @@ services:
       - '3000:3000'
     volumes:
       # Mapeia o código do backend para o /app dentro do container
-      - ./backend:/app
+      - ./backend/backend-nest:/app
       - /app/node_modules
 
   # Serviço do Frontend (React)
@@ -27,7 +27,7 @@ services:
       # 'context' é o caminho para a pasta do frontend
       context: ./frontend
       # Especifica o Dockerfile para o ambiente de desenvolvimento do React
-      dockerfile: Dockerfile.react.dev
+      dockerfile: Dockerfile
     container_name: react_app
     ports:
       # IMPORTANTE: A porta padrão do Vite (React) é 5173.
