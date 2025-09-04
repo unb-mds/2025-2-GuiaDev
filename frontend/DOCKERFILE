@@ -1,25 +1,23 @@
 # Usa uma imagem base leve do Node.js
 FROM node:20-alpine
 
-# Instala o pnpm globalmente, que é mais rápido e eficiente
-RUN npm install -g pnpm
-
-# Define o diretório de trabalho
+# Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia os arquivos de dependência primeiro para otimizar o cache do Docker.
-# 'pnpm-lock.yaml' garante que todos que trabalham no projeto usem exatamente as mesmas versões de todas as dependências.
-COPY package.json pnpm-lock.yaml ./
+# Copia os arquivos de definição de dependências para NPM
+# O 'package-lock.json' é o arquivo de lock do NPM, crucial para builds consistentes.
+COPY package.json package-lock.json ./
 
-# Instala as dependências usando pnpm
-RUN pnpm install
+# Instala as dependências usando NPM.
+# 'npm ci' é otimizado para ambientes de automação como o Docker.
+RUN npm ci
 
-# Copia o resto do código da aplicação
+# Copia o resto do código da sua aplicação
 COPY . .
 
-# Expõe a porta que o Vite (servidor de dev do React) usa por padrão
-EXPOSE 3000
+# Expõe a porta que o Vite (servidor de dev do React) usa
+EXPOSE 5173
 
-# Comando para iniciar o servidor de desenvolvimento
-# O '--host' é CRUCIAL para que o servidor seja acessível de fora do container Docker
-CMD ["pnpm", "run", "dev", "--", "--host"]
+# Comando para iniciar o servidor de desenvolvimento com NPM
+# O '--host' é ESSENCIAL para que o servidor seja acessível de fora do container
+CMD ["npm", "run", "dev", "--", "--host"]
