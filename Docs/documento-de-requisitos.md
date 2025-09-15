@@ -213,6 +213,7 @@ RNF004 (acertividade): O sistema deve exibir recomendações quando algum usuár
 - [] 🔴 Essencial
 - [] 🟡 Importante
 - [] 🟢 Desejável
+
 RNF005 (consistência): Deve ser capaz de processar repositórios simulados e retornar resultados consistentes.
 #### PRIORIDADE:
 - [] 🔴 Essencial
@@ -226,6 +227,7 @@ RNF006 (Performance): O tempo de carregamento da página deve demorar no máximo
 - [] 🔴 Essencial
 - [] 🟡 Importante
 - [] 🟢 Desejável
+
 RNF007 (performance de varredura): A execução dos bots no GitHub deve demorar no máximo 2 minutos para processar os repositórios.
 #### PRIORIDADE:
 - [] 🔴 Essencial
@@ -247,6 +249,7 @@ RNF009 (acesso web): O portal deve rodar em diferentes navegadores, exemplos: Go
 - [] 🔴 Essencial
 - [] 🟡 Importante
 - [] 🟢 Desejável
+
 RNF010 (adaptação): A interface deve se adaptar a cada desktop conforme o tamanho da tela, exemplos: tablets e celulares.
 #### PRIORIDADE:
 - [] 🔴 Essencial
@@ -260,6 +263,7 @@ RNF011 (controle de versões): O código do sistema deve estar versionado no Git
 - [] 🔴 Essencial
 - [] 🟡 Importante
 - [] 🟢 Desejável
+
 RNF012 (modularização): A estrutura dos arquivos JSON deve ser modular, facilitando a manutenção e evolução futura dos sistema.
 #### PRIORIDADE:
 - [] 🔴 Essencial
@@ -273,6 +277,7 @@ RNF013 (updates): O sistema deve ser projetado para suportar expansão futura, c
 - [] 🔴 Essencial
 - [] 🟡 Importante
 - [] 🟢 Desejável
+
 RNF014 (atualização de checklist): Deve ser possível adicionar novos checklist sem necessidade de reescrever o sistema inteiros.
 #### PRIORIDADE:
 - [] 🔴 Essencial
