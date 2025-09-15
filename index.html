@@ -299,41 +299,6 @@
             margin: 1rem 0;
         }
 
-        .file-upload {
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px dashed rgba(59, 130, 246, 0.3);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload:hover {
-            border-color: rgba(59, 130, 246, 0.5);
-            background: rgba(59, 130, 246, 0.15);
-        }
-
-        .file-upload input {
-            display: none;
-        }
-
-        .upload-btn {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-        }
-
         @media (max-width: 768px) {
             .container {
                 grid-template-columns: 1fr;
@@ -397,9 +362,10 @@
                     <ul>
                         <li><strong>Editor Markdown Avançado:</strong> Interface intuitiva com preview em tempo real</li>
                         <li><strong>Templates Personalizáveis:</strong> Modelos prontos para diferentes tipos de documentação</li>
-                        <li><strong>Colaboração em Equipe:</strong> Ferramentas para revisão e comentários</li>
-                        <li><strong>Versionamento:</strong> Controle completo de versões dos documentos</li>
-                        <li><strong>Integração Git:</strong> Sincronização automática com repositórios</li>
+                        <li><strong>Colaboração em Equipe:</strong> Sistema de compartilhamento e comentários</li>
+                        <li><strong>Versionamento:</strong> Controle de versões integrado com Supabase</li>
+                        <li><strong>Integração Git:</strong> Export para repositórios e sync automático</li>
+                        <li><strong>Type Safety:</strong> TypeScript em todo o stack para maior confiabilidade</li>
                     </ul>
                     
                     <h3>🎯 Objetivos do Projeto</h3>
@@ -408,35 +374,32 @@
                         <li>Reduzir o tempo necessário para criar documentação de qualidade</li>
                         <li>Padronizar a estrutura e formato dos documentos técnicos</li>
                         <li>Facilitar a colaboração entre desenvolvedores e technical writers</li>
-                        <li>Manter a documentação sempre atualizada e sincronizada com o código</li>
+                        <li>Manter a documentação sempre atualizada e sincronizada</li>
+                        <li>Oferecer uma experiência developer-friendly com type safety</li>
+                    </ul>
+                    
+                    <h3>🛠️ Stack Tecnológica</h3>
+                    <ul>
+                        <li><strong>Frontend:</strong> React 18 + TypeScript + Vite</li>
+                        <li><strong>Backend:</strong> NestJS com TypeScript</li>
+                        <li><strong>Database:</strong> PostgreSQL via Supabase</li>
+                        <li><strong>Deploy:</strong> Vercel (front) + Railway/Render (back)</li>
                     </ul>
                 </div>
             </div>
             
             <div id="sprints-section" class="content-section" style="display: none;">
-                <h2>📅 Documentação por Sprint</h2>
-                
-                <div class="file-upload">
-                    <h3>Upload de Documentos de Sprint</h3>
-                    <p>Selecione os arquivos .md das suas sprints para carregar automaticamente</p>
-                    <input type="file" id="sprint-files" multiple accept=".md" />
-                    <button class="upload-btn" onclick="document.getElementById('sprint-files').click()">
-                        Escolher Arquivos .md
-                    </button>
-                </div>
+                <h2>📅 Documentação do Projeto</h2>
                 
                 <div class="sprint-selector">
-                    <h3>🏃‍♂️ Selecionar Sprint</h3>
+                    <h3>📋 Documentos Disponíveis</h3>
                     <div class="sprint-buttons" id="sprint-buttons">
-                        <button class="sprint-btn active" data-sprint="sprint-1">Sprint 1</button>
-                        <button class="sprint-btn" data-sprint="sprint-2">Sprint 2</button>
-                        <button class="sprint-btn" data-sprint="sprint-3">Sprint 3</button>
-                        <button class="sprint-btn" data-sprint="sprint-4">Sprint 4</button>
+                        <!-- Botões serão gerados automaticamente baseados nos arquivos configurados -->
                     </div>
                 </div>
                 
                 <div id="sprint-content" class="markdown-content">
-                    <div class="loading">Carregando documentação da sprint...</div>
+                    <div class="loading">Carregando documentação...</div>
                 </div>
             </div>
             
@@ -444,250 +407,187 @@
                 <h2>🏗️ Arquitetura do Sistema</h2>
                 <div class="markdown-content">
                     <h3>Visão Geral</h3>
-                    <p>O TechWrite Platform segue uma arquitetura moderna baseada em microserviços, garantindo escalabilidade e manutenibilidade.</p>
+                    <p>O TechWrite Platform utiliza uma arquitetura moderna e simplificada, priorizando produtividade e facilidade de manutenção.</p>
                     
-                    <h3>Componentes Principais</h3>
+                    <h3>Stack Tecnológica</h3>
                     <ul>
                         <li><strong>Frontend:</strong> React 18 + TypeScript + Vite</li>
                         <li><strong>Backend API:</strong> NestJS (Node.js framework)</li>
                         <li><strong>Banco de Dados:</strong> PostgreSQL via Supabase</li>
                         <li><strong>Autenticação:</strong> Supabase Auth (JWT + OAuth)</li>
                         <li><strong>Storage:</strong> Supabase Storage para arquivos</li>
+                        <li><strong>ORM:</strong> Prisma para type-safe database access</li>
                     </ul>
                     
-                    <h3>Fluxo de Dados</h3>
-                    <p>A aplicação segue o padrão RESTful para comunicação entre frontend e backend, com WebSockets para atualizações em tempo real durante a colaboração.</p>
+                    <h3>Vantagens da Stack Escolhida</h3>
+                    <ul>
+                        <li><strong>NestJS:</strong> Arquitetura modular, decorators, injeção de dependência</li>
+                        <li><strong>Supabase:</strong> Backend-as-a-Service com PostgreSQL real-time</li>
+                        <li><strong>TypeScript:</strong> Type safety em todo o stack</li>
+                        <li><strong>Simplicidade:</strong> Sem complexidade desnecessária de websockets ou AWS</li>
+                    </ul>
+                    
+                    <h3>Comunicação API</h3>
+                    <p>A aplicação utiliza REST API com endpoints bem definidos. Para funcionalidades real-time futuras, podemos utilizar Supabase Realtime (baseado em PostgreSQL LISTEN/NOTIFY).</p>
+                    
+                    <h3>Deploy e Hosting</h3>
+                    <ul>
+                        <li><strong>Frontend:</strong> Vercel ou Netlify</li>
+                        <li><strong>Backend:</strong> Railway, Render ou Digital Ocean</li>
+                        <li><strong>Database:</strong> Supabase (hosting gerenciado)</li>
+                    </ul>
                 </div>
             </div>
             
             <div id="api-section" class="content-section" style="display: none;">
                 <h2>🔌 API Reference</h2>
                 <div class="markdown-content">
-                    <h3>Endpoints Principais</h3>
+                    <h3>Base URL</h3>
+                    <pre><code>https://api.techwrite.com/v1</code></pre>
                     
-                    <h4>Autenticação</h4>
-                    <pre><code>POST /api/auth/login
-POST /api/auth/register
-POST /api/auth/refresh</code></pre>
+                    <h3>Autenticação</h3>
+                    <p>Utilizamos Supabase Auth com JWT tokens. Inclua o token no header:</p>
+                    <pre><code>Authorization: Bearer {your-jwt-token}</code></pre>
                     
-                    <h4>Documentos</h4>
-                    <pre><code>GET    /api/documents
-POST   /api/documents
-PUT    /api/documents/:id
-DELETE /api/documents/:id</code></pre>
+                    <h4>Endpoints de Auth</h4>
+                    <pre><code>POST /auth/register    # Registro de usuário
+POST /auth/login       # Login
+POST /auth/logout      # Logout
+GET  /auth/profile     # Perfil do usuário</code></pre>
                     
-                    <h4>Templates</h4>
-                    <pre><code>GET  /api/templates
-POST /api/templates</code></pre>
+                    <h3>Documentos</h3>
+                    <pre><code>GET    /documents           # Listar documentos
+POST   /documents           # Criar documento
+GET    /documents/:id       # Buscar documento
+PUT    /documents/:id       # Atualizar documento
+DELETE /documents/:id       # Deletar documento
+POST   /documents/:id/share # Compartilhar documento</code></pre>
                     
-                    <p>Para mais detalhes sobre cada endpoint, consulte a documentação completa da API.</p>
+                    <h3>Templates</h3>
+                    <pre><code>GET  /templates        # Listar templates
+POST /templates        # Criar template
+GET  /templates/:id    # Buscar template</code></pre>
+                    
+                    <h3>Projetos/Sprints</h3>
+                    <pre><code>GET    /projects           # Listar projetos
+POST   /projects           # Criar projeto
+GET    /projects/:id       # Buscar projeto
+PUT    /projects/:id       # Atualizar projeto
+GET    /projects/:id/sprints # Listar sprints do projeto
+POST   /projects/:id/sprints # Criar sprint</code></pre>
+                    
+                    <h3>Upload de Arquivos</h3>
+                    <pre><code>POST /upload/markdown  # Upload de arquivos .md
+POST /upload/images    # Upload de imagens
+GET  /files/:id        # Download de arquivo</code></pre>
+                    
+                    <h3>Exemplo de Resposta</h3>
+                    <pre><code>{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "title": "Documento de Sprint",
+    "content": "# Sprint 1...",
+    "created_at": "2025-01-15T10:00:00Z",
+    "updated_at": "2025-01-15T10:00:00Z",
+    "author": {
+      "id": "uuid",
+      "name": "João Silva",
+      "email": "joao@email.com"
+    }
+  },
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10
+  }
+}</code></pre>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // Estado da aplicação
-        let sprintData = {
-            'sprint-1': {
-                title: 'Sprint 1 - Configuração Inicial',
-                content: `# Sprint 1 - Configuração Inicial do Projeto
+        // ====================================
+        // CONFIGURAÇÃO DOS ARQUIVOS MARKDOWN
+        // ====================================
+        // EDITE AQUI: Adicione os caminhos dos seus arquivos .md
+        const markdownFiles = [
+            // Exemplo de como adicionar:
+            // { path: 'docs/sprint-1.md', name: 'Sprint 1' },
+            {path: 'Docs/Milestones/Sprint-01/nestjs.md', name: 'Sprint 01 - Estudo Nest'},
+            {path: 'Docs/Milestones/Sprint-01/React.md', name: 'Sprint 01 - Estudo React'},
+            {path: 'Docs/Milestones/Sprint-02/documento-de-requisitos.md', name: 'Sprint 02 - Levantamento de Requisitos'},
+            {path: 'Docs/Milestones/Sprint-02/estudo_arquitetura.md', name: 'Sprint 02 - Decisões Arquiteturais'},
+     
+        ];
 
-## Objetivos da Sprint
-- Configuração do ambiente de desenvolvimento
-- Definição da arquitetura base
-- Criação dos primeiros protótipos
+        // Estado da aplicação (vazio inicialmente)
+        let sprintData = {};
 
-## Tarefas Realizadas
-- [x] Setup do repositório Git
-- [x] Configuração do ambiente Docker
-- [x] Criação da estrutura base do projeto
-- [x] Implementação do sistema de autenticação básico
-
-## Tecnologias Utilizadas
-- React.js 18
-- Node.js 18
-- PostgreSQL 14
-- Docker & Docker Compose
-
-## Desafios Encontrados
-Durante esta sprint, enfrentamos alguns desafios relacionados à configuração do ambiente de desenvolvimento, principalmente com a integração entre os containers Docker.
-
-## Próximos Passos
-- Implementar CRUD básico de documentos
-- Criar interface de usuário inicial
-- Configurar pipeline CI/CD`
-            },
-            'sprint-2': {
-                title: 'Sprint 2 - Interface de Usuário',
-                content: `# Sprint 2 - Desenvolvimento da Interface de Usuário
-
-## Objetivos da Sprint
-- Criar interface moderna e responsiva
-- Implementar editor Markdown
-- Desenvolver sistema de navegação
-
-## Tarefas Realizadas
-- [x] Design system e componentes base
-- [x] Editor Markdown com preview
-- [x] Sistema de roteamento
-- [x] Responsividade mobile
-
-## Funcionalidades Implementadas
-- Editor de texto rico com suporte a Markdown
-- Preview em tempo real
-- Toolbar com ações rápidas
-- Sistema de salvamento automático
-
-## Métricas de Qualidade
-- Performance Score: 95/100
-- Accessibility Score: 98/100
-- SEO Score: 92/100
-
-## Feedback dos Usuários
-O feedback inicial dos usuários foi muito positivo, especialmente em relação à facilidade de uso do editor Markdown.`
-            },
-            'sprint-3': {
-                title: 'Sprint 3 - Funcionalidades Avançadas',
-                content: `# Sprint 3 - Implementação de Funcionalidades Avançadas
-
-## Objetivos da Sprint
-- Sistema de templates personalizáveis
-- Colaboração em tempo real
-- Integração com Git
-
-## Tarefas Realizadas
-- [x] Templates dinâmicos
-- [x] WebSocket para colaboração
-- [x] Git integration
-- [x] Sistema de comentários
-
-## Arquitetura de Colaboração
-Implementamos um sistema robusto de colaboração que permite:
-- Edição simultânea por múltiplos usuários
-- Sincronização em tempo real
-- Controle de conflitos automático
-
-## Integração Git
-- Commit automático de alterações
-- Branch management
-- Pull request integration`
-            },
-            'sprint-4': {
-                title: 'Sprint 4 - Otimização e Deploy',
-                content: `# Sprint 4 - Deploy e Finalização
-
-## Objetivos da Sprint
-- Deploy em produção (Vercel + Railway)
-- Otimização de performance
-- Monitoramento e observabilidade
-- Documentação final
-
-## Tarefas Realizadas
-- [x] Deploy do frontend na Vercel
-- [x] Deploy do backend no Railway
-- [x] Configuração de domínios personalizados
-- [x] SSL certificates e HTTPS
-- [x] Monitoramento com Sentry
-- [x] Analytics com Vercel Analytics
-- [x] Backup automatizado do Supabase
-
-## Infraestrutura Final
-- **Frontend:** Vercel (auto-deploy via GitHub)
-- **Backend:** Railway (Docker + auto-scaling)
-- **Database:** Supabase (PostgreSQL managed)
-- **Storage:** Supabase Storage
-- **CDN:** Vercel Edge Network
-- **Monitoring:** Sentry + Railway metrics
-
-## Configuração de Deploy
-
-### Frontend (Vercel)
-\`\`\`json
-{
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "buildCommand": "npm run build"
-      }
-    }
-  ],
-  "env": {
-    "VITE_SUPABASE_URL": "your-supabase-url",
-    "VITE_SUPABASE_ANON_KEY": "your-anon-key"
-  }
-}
-\`\`\`
-
-### Backend (Railway)
-\`\`\`dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "run", "start:prod"]
-\`\`\`
-
-## Métricas de Performance
-- **Frontend Load Time:** < 1.5s (FCP)
-- **Backend Response Time:** < 200ms (média)
-- **Database Queries:** < 50ms (otimizadas)
-- **Uptime:** 99.9% (SLA)
-
-## Observabilidade
-- **Error Tracking:** Sentry integration
-- **Performance Monitoring:** Railway metrics
-- **Database Monitoring:** Supabase dashboard
-- **Real User Monitoring:** Vercel Analytics
-
-## Backup e Segurança
-- **Database Backups:** Daily automated (Supabase)
-- **Environment Variables:** Encrypted storage
-- **API Rate Limiting:** Implementado no NestJS
-- **CORS:** Configurado para domains específicos
-
-## Resultados Finais
-✅ **Aplicação em produção** servindo usuários reais
-✅ **Performance otimizada** com load times < 2s
-✅ **Type safety** 100% em todo o stack
-✅ **Zero downtime deployment** configurado
-✅ **Monitoramento completo** implementado
-
-## URLs de Produção
-- **App:** https://techwrite-app.vercel.app
-- **API:** https://techwrite-api.up.railway.app
-- **Docs:** https://docs.techwrite.com`
+        // Função para carregar arquivos markdown
+        async function loadMarkdownFiles() {
+            const sprintButtons = document.getElementById('sprint-buttons');
+            sprintButtons.innerHTML = ''; // Limpa botões existentes
+            
+            if (markdownFiles.length === 0) {
+                document.getElementById('sprint-content').innerHTML = `
+                    <div class="error">
+                        <h3>Nenhum arquivo configurado</h3>
+                        <p>Para adicionar documentação:</p>
+                        <ol>
+                            <li>Coloque seus arquivos .md na pasta do projeto</li>
+                            <li>Adicione os caminhos no array <code>markdownFiles</code> no código</li>
+                            <li>Exemplo: <code>{ path: 'docs/sprint-1.md', name: 'Sprint 1' }</code></li>
+                        </ol>
+                        <p>Após configurar, os botões aparecerão automaticamente aqui.</p>
+                    </div>
+                `;
+                return;
             }
-        };
-
-        // Gerenciamento de navegação
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Remove active de todos os itens
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                // Adiciona active ao item clicado
-                item.classList.add('active');
-                
-                // Esconde todas as seções
-                document.querySelectorAll('[id$="-section"]').forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                // Mostra a seção correspondente
-                const sectionId = item.dataset.section + '-section';
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.style.display = 'block';
+            
+            for (const file of markdownFiles) {
+                try {
+                    const response = await fetch(file.path);
+                    if (response.ok) {
+                        const content = await response.text();
+                        const fileKey = file.path.replace(/[^a-zA-Z0-9]/g, '-');
+                        
+                        // Adiciona ao sprintData
+                        sprintData[fileKey] = {
+                            title: file.name,
+                            content: content
+                        };
+                        
+                        // Cria botão
+                        const btn = document.createElement('button');
+                        btn.className = 'sprint-btn';
+                        btn.dataset.sprint = fileKey;
+                        btn.textContent = file.name;
+                        
+                        btn.addEventListener('click', (e) => {
+                            document.querySelectorAll('.sprint-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            loadSprintContent(fileKey);
+                        });
+                        
+                        sprintButtons.appendChild(btn);
+                        
+                    } else {
+                        console.warn(`Não foi possível carregar: ${file.path}`);
+                    }
+                } catch (error) {
+                    console.error(`Erro ao carregar ${file.path}:`, error);
                 }
-            });
-        });
+            }
+            
+            // Carrega o primeiro arquivo automaticamente
+            if (Object.keys(sprintData).length > 0) {
+                const firstKey = Object.keys(sprintData)[0];
+                document.querySelector(`[data-sprint="${firstKey}"]`)?.classList.add('active');
+                loadSprintContent(firstKey);
+            }
+        }
 
         // Gerenciamento de sprints
         function loadSprintContent(sprintId) {
@@ -714,64 +614,33 @@ CMD ["npm", "run", "start:prod"]
             });
         }
 
-        // Event listeners para botões de sprint
-        document.querySelectorAll('.sprint-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // Remove active de todos os botões
-                document.querySelectorAll('.sprint-btn').forEach(b => b.classList.remove('active'));
-                // Adiciona active ao botão clicado
-                btn.classList.add('active');
+        // Gerenciamento de navegação
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
                 
-                // Carrega conteúdo da sprint
-                loadSprintContent(btn.dataset.sprint);
-            });
-        });
-
-        // Upload de arquivos
-        document.getElementById('sprint-files').addEventListener('change', (e) => {
-            const files = e.target.files;
-            
-            Array.from(files).forEach(file => {
-                if (file.name.endsWith('.md')) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const content = event.target.result;
-                        const fileName = file.name.replace('.md', '');
-                        
-                        // Adiciona/atualiza dados da sprint
-                        sprintData[fileName] = {
-                            title: `${fileName.toUpperCase()} - ${file.name}`,
-                            content: content
-                        };
-                        
-                        // Cria botão para nova sprint se não existir
-                        const existingBtn = document.querySelector(`[data-sprint="${fileName}"]`);
-                        if (!existingBtn) {
-                            const sprintButtons = document.getElementById('sprint-buttons');
-                            const newBtn = document.createElement('button');
-                            newBtn.className = 'sprint-btn';
-                            newBtn.dataset.sprint = fileName;
-                            newBtn.textContent = fileName.toUpperCase();
-                            
-                            newBtn.addEventListener('click', (e) => {
-                                document.querySelectorAll('.sprint-btn').forEach(b => b.classList.remove('active'));
-                                newBtn.classList.add('active');
-                                loadSprintContent(fileName);
-                            });
-                            
-                            sprintButtons.appendChild(newBtn);
-                        }
-                        
-                        console.log(`Arquivo ${file.name} carregado com sucesso!`);
-                    };
-                    reader.readAsText(file);
+                // Remove active de todos os itens
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                // Adiciona active ao item clicado
+                item.classList.add('active');
+                
+                // Esconde todas as seções
+                document.querySelectorAll('[id$="-section"]').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Mostra a seção correspondente
+                const sectionId = item.dataset.section + '-section';
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.style.display = 'block';
                 }
             });
         });
 
-        // Carrega conteúdo inicial
+        // Carrega arquivos markdown na inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            loadSprintContent('sprint-1');
+            loadMarkdownFiles();
         });
 
         // Configuração do marked para sintaxe highlighting
