@@ -87,96 +87,97 @@ processos**.
 
 Estes são os requisitos para a sua aplicação servidora.
 
-    RF-B01 (API de Análise): O sistema deve expor um endpoint de API (ex: POST /api/analysis) que recebe a URL de um repositório GitHub e dispara o processo de análise.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-B01 (API de Análise): O sistema deve expor um endpoint de API (ex: POST /api/analysis) que recebe a URL de um repositório GitHub e dispara o processo de análise.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-B02 (Persistência de Dados): O sistema deve usar o Prisma para salvar os resultados da análise (repositório, arquivos encontrados, pontuações, recomendações) no banco de dados.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-B02 (Persistência de Dados): O sistema deve usar o Prisma para salvar os resultados da análise (repositório, arquivos encontrados, pontuações, recomendações) no banco de dados.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-B03 (API de Consulta): O sistema deve expor endpoints para consultar os dados salvos (ex: GET /api/reports para listar todas as análises, GET /api/reports/:id para ver um resultado específico).
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-B03 (API de Consulta): O sistema deve expor endpoints para consultar os dados salvos (ex: GET /api/reports para listar todas as análises, GET /api/reports/:id para ver um resultado específico).
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-B04 (Lógica de Negócio - Scanner): O sistema deve conter a lógica para clonar um repositório, varrer seus arquivos e identificar a documentação relevante.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-B04 (Lógica de Negócio - Scanner): O sistema deve conter a lógica para clonar um repositório, varrer seus arquivos e identificar a documentação relevante.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-B05 (Lógica de Negócio - IA): O sistema deve se comunicar com a API de um serviço de IA externo, enviando o conteúdo dos documentos e processando a resposta (pontuação e recomendações).
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-B05 (Lógica de Negócio - IA): O sistema deve se comunicar com a API de um serviço de IA externo, enviando o conteúdo dos documentos e processando a resposta (pontuação e recomendações).
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-B06 (Processamento em Segundo Plano): O sistema deve ser capaz de executar a análise (que pode ser demorada) em segundo plano (asynchronous job/task) para não bloquear a API. O endpoint inicial pode retornar um 202 Accepted e o frontend pode consultar o status depois.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-B06 (Processamento em Segundo Plano): O sistema deve ser capaz de executar a análise (que pode ser demorada) em segundo plano (asynchronous job/task) para não bloquear a API. O endpoint inicial pode retornar um 202 Accepted e o frontend pode consultar o status depois.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-B07 (Gerenciamento de Conteúdo): O sistema deve expor endpoints CRUD (Create, Read, Update, Delete) para gerenciar o conteúdo educacional (os guias e tutoriais).
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-B07 (Gerenciamento de Conteúdo): O sistema deve expor endpoints CRUD (Create, Read, Update, Delete) para gerenciar o conteúdo educacional (os guias e tutoriais).
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 ### Módulo 2: Frontend (Portal com React)
 
 Estes são os requisitos para a sua aplicação cliente (o que roda no navegador).
 
-    RF-F01 (Comunicação com API): O portal deve se comunicar exclusivamente com a API do backend (NestJS) para buscar e enviar todos os dados dinâmicos.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-F01 (Comunicação com API): O portal deve se comunicar exclusivamente com a API do backend (NestJS) para buscar e enviar todos os dados dinâmicos.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-F02 (Submissão de Análise): O portal deve fornecer um formulário onde o usuário pode inserir a URL de um repositório GitHub e enviá-la para o endpoint POST /api/analysis.PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-F02 (Submissão de Análise): O portal deve fornecer um formulário onde o usuário pode inserir a URL de um repositório GitHub e enviá-la para o endpoint POST /api/analysis.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-F03 (Visualização de Resultados): O portal deve chamar a API (GET /api/reports) e renderizar a lista de análises concluídas e seus dashboards de resultados.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-F03 (Visualização de Resultados): O portal deve chamar a API (GET /api/reports) e renderizar a lista de análises concluídas e seus dashboards de resultados.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-F04 (Exibição em Tempo Real): O portal deve ser capaz de atualizar o status de uma análise em andamento, consultando a API periodicamente ou usando tecnologias em tempo real como WebSockets (um requisito mais avançado).
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-F04 (Exibição em Tempo Real): O portal deve ser capaz de atualizar o status de uma análise em andamento, consultando a API periodicamente ou usando tecnologias em tempo real como WebSockets (um requisito mais avançado).
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-F05 (Visualização do Guia): O portal deve buscar os dados do conteúdo educacional da API e renderizar os guias, passos e animações.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-F05 (Visualização do Guia): O portal deve buscar os dados do conteúdo educacional da API e renderizar os guias, passos e animações.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
-    RF-F06 (Autenticação de Usuário): O portal deve permitir que usuários se cadastrem e façam login. As requisições para a API deverão ser autenticadas (ex: via JWT). Essa arquitetura torna a autenticação um passo natural.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-F06 (Autenticação de Usuário): O portal deve permitir que usuários se cadastrem e façam login. As requisições para a API deverão ser autenticadas (ex: via JWT). Essa arquitetura torna a autenticação um passo natural.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 ### Módulo 3: Worker / Tarefas Agendadas (Ainda pode usar GitHub Actions)
 
 O papel da GitHub Action muda. Em vez de ser o "backend", ela se torna um simples "cliente" ou "trigger" para o seu backend real.
 
-    RF-W01 (Disparo de Tarefas): O sistema deve ter um mecanismo para acionar análises recorrentes de repositórios pré-configurados. Isso pode ser uma GitHub Action rodando com cron que simplesmente faz uma chamada para o endpoint POST /api/analysis do seu backend.
-    PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+RF-W01 (Disparo de Tarefas): O sistema deve ter um mecanismo para acionar análises recorrentes de repositórios pré-configurados. Isso pode ser uma GitHub Action rodando com cron que simplesmente faz uma chamada para o endpoint POST /api/analysis do seu backend.
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 ## Requisitos não-funcionais
 
@@ -185,95 +186,95 @@ O papel da GitHub Action muda. Em vez de ser o "backend", ela se torna um simple
 Esta seção descreve os requisitos não-funcionais associados à facilidade de uso da interface com o usuário, material de treinamento e documentação do sistema.
 
 RNF001 (Interface amigável): O portal deve ter uma interface intuitiva e fácil de entendimento, interface simples, com destaque para os guia e recomendações.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 
 RNF002 (facilidade de acesso)O sistema deve ser fácil de utilização: pelo menos 80% dos usuários devem conseguir utilizá-lo sem necessidade de treinamento.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 **Acessibilidade**
 
 RNF003 (inclusão): O portal deve seguir padrões WCAG, incluindo contraste adequado, navegação por teclado e suporte a leitores de telas para pessoas PCD.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 **3. Confiabilidade**
 
 RNF004 (acertividade): O sistema deve exibir recomendações quando algum usuário pesquisar algo dentro do portal, recomendações corretas em pelo menos 95% das varreduras realizadas em repositórios.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 RNF005 (consistência): Deve ser capaz de processar repositórios simulados e retornar resultados consistentes.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 **4. Desempenho**
 
 RNF006 (Performance): O tempo de carregamento da página deve demorar no máximo 3 segundos.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 RNF007 (performance de varredura): A execução dos bots no GitHub deve demorar no máximo 2 minutos para processar os repositórios.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 **5. Segurança**
 
 RNF008 (): Toda comunicação entre o usuário e o servidor deve ser feito via protocolo seguro HTTPS.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 **6. Portabilidade**
 
 RNF009 (acesso web): O portal deve rodar em diferentes navegadores, exemplos: Google Chrome, Firefox, Edge, Opera… etc.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 RNF010 (adaptação): A interface deve se adaptar a cada desktop conforme o tamanho da tela, exemplos: tablets e celulares.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 **7. Manutenibilidade**
 
 RNF011 (controle de versões): O código do sistema deve estar versionado no GitHub com documentação clara e atualizada.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 RNF012 (modularização): A estrutura dos arquivos JSON deve ser modular, facilitando a manutenção e evolução futura dos sistema.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 
 **8. Escalabilidade**
 
 RNF013 (updates): O sistema deve ser projetado para suportar expansão futura, como inclusão de novos tipos de análises de documentos.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
 RNF014 (atualização de checklist): Deve ser possível adicionar novos checklist sem necessidade de reescrever o sistema inteiros.
-PRIORIDADE:
-    - [ ] 🔴 Essencial
-    - [ ] 🟡 Importante
-    - [ ] 🟢 Desejável
+#### PRIORIDADE:
+- [] 🔴 Essencial
+- [] 🟡 Importante
+- [] 🟢 Desejável
