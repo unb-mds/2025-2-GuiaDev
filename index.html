@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechWrite Platform - Documentação</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: rgba(15, 15, 35, 0.9);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 2rem;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .logo h1 {
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section h3 {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-left-color: #3b82f6;
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border-left-color: #60a5fa;
+        }
+
+        .main-content {
+            padding: 3rem;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .content-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .content-header p {
+            font-size: 1.125rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .sprint-selector {
+            background: rgba(15, 15, 35, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .sprint-selector h3 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sprint-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .sprint-btn {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sprint-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .sprint-btn:hover::before {
+            left: 100%;
+        }
+
+        .sprint-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .sprint-btn.active {
+            background: linear-gradient(135deg, #059669, #10b981);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .content-section {
+            background: rgba(15, 15, 35, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+            color: #60a5fa;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .markdown-content h1 {
+            font-size: 2rem;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .markdown-content h2 {
+            font-size: 1.5rem;
+        }
+
+        .markdown-content h3 {
+            font-size: 1.25rem;
+        }
+
+        .markdown-content p {
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        .markdown-content ul, .markdown-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content li {
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .markdown-content code {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            color: #60a5fa;
+        }
+
+        .markdown-content pre {
+            background: #1a1a2e;
+            padding: 1.5rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .markdown-content pre code {
+            background: none;
+            padding: 0;
+            color: #e2e8f0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #94a3b8;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .file-upload {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px dashed rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            }
+            
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .content-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">TW</div>
+                <h1>TechWrite</h1>
+            </div>
+            
+            <nav>
+                <div class="nav-section">
+                    <h3>Documentação</h3>
+                    <a href="#" class="nav-item active" data-section="home">Início</a>
+                    <a href="#" class="nav-item" data-section="sprints">Documentos</a>
+                    <a href="#" class="nav-item" data-section="architecture">Arquitetura</a>
+                    <a href="#" class="nav-item" data-section="api">API Reference</a>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Recursos</h3>
+                    <a href="#" class="nav-item" data-section="guides">Guias</a>
+                    <a href="#" class="nav-item" data-section="examples">Exemplos</a>
+                    <a href="#" class="nav-item" data-section="faq">FAQ</a>
+                </div>
+            </nav>
+        </div>
+        
+        <main class="main-content">
+            <div class="content-header">
+                <h1>TechWrite Platform</h1>
+                <p>Plataforma completa para escrita técnica em projetos de software. Acompanhe o desenvolvimento através das sprints e documentação detalhada.</p>
+            </div>
+            
+            <div id="home-section" class="content-section">
+                <h2>🚀 Bem-vindo ao TechWrite Platform</h2>
+                <div class="markdown-content">
+                    <p>Esta plataforma foi desenvolvida para facilitar a criação, organização e manutenção de documentação técnica em projetos de software. Aqui você encontrará:</p>
+                    
+                    <h3>📋 Funcionalidades Principais</h3>
+                    <ul>
+                        <li><strong>Editor Markdown Avançado:</strong> Interface intuitiva com preview em tempo real</li>
+                        <li><strong>Templates Personalizáveis:</strong> Modelos prontos para diferentes tipos de documentação</li>
+                        <li><strong>Colaboração em Equipe:</strong> Ferramentas para revisão e comentários</li>
+                        <li><strong>Versionamento:</strong> Controle completo de versões dos documentos</li>
+                        <li><strong>Integração Git:</strong> Sincronização automática com repositórios</li>
+                    </ul>
+                    
+                    <h3>🎯 Objetivos do Projeto</h3>
+                    <p>O TechWrite Platform visa resolver os principais desafios na criação de documentação técnica:</p>
+                    <ul>
+                        <li>Reduzir o tempo necessário para criar documentação de qualidade</li>
+                        <li>Padronizar a estrutura e formato dos documentos técnicos</li>
+                        <li>Facilitar a colaboração entre desenvolvedores e technical writers</li>
+                        <li>Manter a documentação sempre atualizada e sincronizada com o código</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="sprints-section" class="content-section" style="display: none;">
+                <h2>📅 Documentação por Sprint</h2>
+                
+                <div class="file-upload">
+                    <h3>Upload de Documentos de Sprint</h3>
+                    <p>Selecione os arquivos .md das suas sprints para carregar automaticamente</p>
+                    <input type="file" id="sprint-files" multiple accept=".md" />
+                    <button class="upload-btn" onclick="document.getElementById('sprint-files').click()">
+                        Escolher Arquivos .md
+                    </button>
+                </div>
+                
+                <div class="sprint-selector">
+                    <h3>🏃‍♂️ Selecionar Sprint</h3>
+                    <div class="sprint-buttons" id="sprint-buttons">
+                        <button class="sprint-btn active" data-sprint="sprint-1">Sprint 1</button>
+                        <button class="sprint-btn" data-sprint="sprint-2">Sprint 2</button>
+                        <button class="sprint-btn" data-sprint="sprint-3">Sprint 3</button>
+                        <button class="sprint-btn" data-sprint="sprint-4">Sprint 4</button>
+                    </div>
+                </div>
+                
+                <div id="sprint-content" class="markdown-content">
+                    <div class="loading">Carregando documentação da sprint...</div>
+                </div>
+            </div>
+            
+            <div id="architecture-section" class="content-section" style="display: none;">
+                <h2>🏗️ Arquitetura do Sistema</h2>
+                <div class="markdown-content">
+                    <h3>Visão Geral</h3>
+                    <p>O TechWrite Platform segue uma arquitetura moderna baseada em microserviços, garantindo escalabilidade e manutenibilidade.</p>
+                    
+                    <h3>Componentes Principais</h3>
+                    <ul>
+                        <li><strong>Frontend:</strong> React 18 + TypeScript + Vite</li>
+                        <li><strong>Backend API:</strong> NestJS (Node.js framework)</li>
+                        <li><strong>Banco de Dados:</strong> PostgreSQL via Supabase</li>
+                        <li><strong>Autenticação:</strong> Supabase Auth (JWT + OAuth)</li>
+                        <li><strong>Storage:</strong> Supabase Storage para arquivos</li>
+                    </ul>
+                    
+                    <h3>Fluxo de Dados</h3>
+                    <p>A aplicação segue o padrão RESTful para comunicação entre frontend e backend, com WebSockets para atualizações em tempo real durante a colaboração.</p>
+                </div>
+            </div>
+            
+            <div id="api-section" class="content-section" style="display: none;">
+                <h2>🔌 API Reference</h2>
+                <div class="markdown-content">
+                    <h3>Endpoints Principais</h3>
+                    
+                    <h4>Autenticação</h4>
+                    <pre><code>POST /api/auth/login
+POST /api/auth/register
+POST /api/auth/refresh</code></pre>
+                    
+                    <h4>Documentos</h4>
+                    <pre><code>GET    /api/documents
+POST   /api/documents
+PUT    /api/documents/:id
+DELETE /api/documents/:id</code></pre>
+                    
+                    <h4>Templates</h4>
+                    <pre><code>GET  /api/templates
+POST /api/templates</code></pre>
+                    
+                    <p>Para mais detalhes sobre cada endpoint, consulte a documentação completa da API.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let sprintData = {
+            'sprint-1': {
+                title: 'Sprint 1 - Configuração Inicial',
+                content: `# Sprint 1 - Configuração Inicial do Projeto
+
+## Objetivos da Sprint
+- Configuração do ambiente de desenvolvimento
+- Definição da arquitetura base
+- Criação dos primeiros protótipos
+
+## Tarefas Realizadas
+- [x] Setup do repositório Git
+- [x] Configuração do ambiente Docker
+- [x] Criação da estrutura base do projeto
+- [x] Implementação do sistema de autenticação básico
+
+## Tecnologias Utilizadas
+- React.js 18
+- Node.js 18
+- PostgreSQL 14
+- Docker & Docker Compose
+
+## Desafios Encontrados
+Durante esta sprint, enfrentamos alguns desafios relacionados à configuração do ambiente de desenvolvimento, principalmente com a integração entre os containers Docker.
+
+## Próximos Passos
+- Implementar CRUD básico de documentos
+- Criar interface de usuário inicial
+- Configurar pipeline CI/CD`
+            },
+            'sprint-2': {
+                title: 'Sprint 2 - Interface de Usuário',
+                content: `# Sprint 2 - Desenvolvimento da Interface de Usuário
+
+## Objetivos da Sprint
+- Criar interface moderna e responsiva
+- Implementar editor Markdown
+- Desenvolver sistema de navegação
+
+## Tarefas Realizadas
+- [x] Design system e componentes base
+- [x] Editor Markdown com preview
+- [x] Sistema de roteamento
+- [x] Responsividade mobile
+
+## Funcionalidades Implementadas
+- Editor de texto rico com suporte a Markdown
+- Preview em tempo real
+- Toolbar com ações rápidas
+- Sistema de salvamento automático
+
+## Métricas de Qualidade
+- Performance Score: 95/100
+- Accessibility Score: 98/100
+- SEO Score: 92/100
+
+## Feedback dos Usuários
+O feedback inicial dos usuários foi muito positivo, especialmente em relação à facilidade de uso do editor Markdown.`
+            },
+            'sprint-3': {
+                title: 'Sprint 3 - Funcionalidades Avançadas',
+                content: `# Sprint 3 - Implementação de Funcionalidades Avançadas
+
+## Objetivos da Sprint
+- Sistema de templates personalizáveis
+- Colaboração em tempo real
+- Integração com Git
+
+## Tarefas Realizadas
+- [x] Templates dinâmicos
+- [x] WebSocket para colaboração
+- [x] Git integration
+- [x] Sistema de comentários
+
+## Arquitetura de Colaboração
+Implementamos um sistema robusto de colaboração que permite:
+- Edição simultânea por múltiplos usuários
+- Sincronização em tempo real
+- Controle de conflitos automático
+
+## Integração Git
+- Commit automático de alterações
+- Branch management
+- Pull request integration`
+            },
+            'sprint-4': {
+                title: 'Sprint 4 - Otimização e Deploy',
+                content: `# Sprint 4 - Deploy e Finalização
+
+## Objetivos da Sprint
+- Deploy em produção (Vercel + Railway)
+- Otimização de performance
+- Monitoramento e observabilidade
+- Documentação final
+
+## Tarefas Realizadas
+- [x] Deploy do frontend na Vercel
+- [x] Deploy do backend no Railway
+- [x] Configuração de domínios personalizados
+- [x] SSL certificates e HTTPS
+- [x] Monitoramento com Sentry
+- [x] Analytics com Vercel Analytics
+- [x] Backup automatizado do Supabase
+
+## Infraestrutura Final
+- **Frontend:** Vercel (auto-deploy via GitHub)
+- **Backend:** Railway (Docker + auto-scaling)
+- **Database:** Supabase (PostgreSQL managed)
+- **Storage:** Supabase Storage
+- **CDN:** Vercel Edge Network
+- **Monitoring:** Sentry + Railway metrics
+
+## Configuração de Deploy
+
+### Frontend (Vercel)
+\`\`\`json
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "npm run build"
+      }
+    }
+  ],
+  "env": {
+    "VITE_SUPABASE_URL": "your-supabase-url",
+    "VITE_SUPABASE_ANON_KEY": "your-anon-key"
+  }
+}
+\`\`\`
+
+### Backend (Railway)
+\`\`\`dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "start:prod"]
+\`\`\`
+
+## Métricas de Performance
+- **Frontend Load Time:** < 1.5s (FCP)
+- **Backend Response Time:** < 200ms (média)
+- **Database Queries:** < 50ms (otimizadas)
+- **Uptime:** 99.9% (SLA)
+
+## Observabilidade
+- **Error Tracking:** Sentry integration
+- **Performance Monitoring:** Railway metrics
+- **Database Monitoring:** Supabase dashboard
+- **Real User Monitoring:** Vercel Analytics
+
+## Backup e Segurança
+- **Database Backups:** Daily automated (Supabase)
+- **Environment Variables:** Encrypted storage
+- **API Rate Limiting:** Implementado no NestJS
+- **CORS:** Configurado para domains específicos
+
+## Resultados Finais
+✅ **Aplicação em produção** servindo usuários reais
+✅ **Performance otimizada** com load times < 2s
+✅ **Type safety** 100% em todo o stack
+✅ **Zero downtime deployment** configurado
+✅ **Monitoramento completo** implementado
+
+## URLs de Produção
+- **App:** https://techwrite-app.vercel.app
+- **API:** https://techwrite-api.up.railway.app
+- **Docs:** https://docs.techwrite.com`
+            }
+        };
+
+        // Gerenciamento de navegação
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active de todos os itens
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                // Adiciona active ao item clicado
+                item.classList.add('active');
+                
+                // Esconde todas as seções
+                document.querySelectorAll('[id$="-section"]').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Mostra a seção correspondente
+                const sectionId = item.dataset.section + '-section';
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.style.display = 'block';
+                }
+            });
+        });
+
+        // Gerenciamento de sprints
+        function loadSprintContent(sprintId) {
+            const sprintContent = document.getElementById('sprint-content');
+            const data = sprintData[sprintId];
+            
+            if (data) {
+                sprintContent.innerHTML = `
+                    <h3>${data.title}</h3>
+                    <div class="markdown-content">${marked.parse(data.content)}</div>
+                `;
+            } else {
+                sprintContent.innerHTML = `
+                    <div class="error">
+                        Documentação não encontrada para esta sprint. 
+                        Por favor, carregue o arquivo .md correspondente.
+                    </div>
+                `;
+            }
+            
+            // Highlight code blocks
+            sprintContent.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        // Event listeners para botões de sprint
+        document.querySelectorAll('.sprint-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Remove active de todos os botões
+                document.querySelectorAll('.sprint-btn').forEach(b => b.classList.remove('active'));
+                // Adiciona active ao botão clicado
+                btn.classList.add('active');
+                
+                // Carrega conteúdo da sprint
+                loadSprintContent(btn.dataset.sprint);
+            });
+        });
+
+        // Upload de arquivos
+        document.getElementById('sprint-files').addEventListener('change', (e) => {
+            const files = e.target.files;
+            
+            Array.from(files).forEach(file => {
+                if (file.name.endsWith('.md')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const content = event.target.result;
+                        const fileName = file.name.replace('.md', '');
+                        
+                        // Adiciona/atualiza dados da sprint
+                        sprintData[fileName] = {
+                            title: `${fileName.toUpperCase()} - ${file.name}`,
+                            content: content
+                        };
+                        
+                        // Cria botão para nova sprint se não existir
+                        const existingBtn = document.querySelector(`[data-sprint="${fileName}"]`);
+                        if (!existingBtn) {
+                            const sprintButtons = document.getElementById('sprint-buttons');
+                            const newBtn = document.createElement('button');
+                            newBtn.className = 'sprint-btn';
+                            newBtn.dataset.sprint = fileName;
+                            newBtn.textContent = fileName.toUpperCase();
+                            
+                            newBtn.addEventListener('click', (e) => {
+                                document.querySelectorAll('.sprint-btn').forEach(b => b.classList.remove('active'));
+                                newBtn.classList.add('active');
+                                loadSprintContent(fileName);
+                            });
+                            
+                            sprintButtons.appendChild(newBtn);
+                        }
+                        
+                        console.log(`Arquivo ${file.name} carregado com sucesso!`);
+                    };
+                    reader.readAsText(file);
+                }
+            });
+        });
+
+        // Carrega conteúdo inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSprintContent('sprint-1');
+        });
+
+        // Configuração do marked para sintaxe highlighting
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            }
+        });
+    </script>
+</body>
+</html>
