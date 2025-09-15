@@ -1,5 +1,7 @@
 # Estudo de Modelos de Arquitetura de Software
 
+## Autor: Hugo Freitas
+
 ## Descrição
 Foi realizada uma pesquisa e análise comparativa entre diferentes modelos de arquitetura de software, com o objetivo de avaliar qual seria o mais adequado ao projeto.  
 Os modelos estudados foram: **Monolito**, **Microserviços**, **SOA** e **Serverless**.  
