@@ -5,6 +5,26 @@ O objetivo é facilitar a criação, organização e manutenção de documentaç
 
 ---
 
+## 📝 Sumário
+
+- [Portal para escrita técnica em software](#-portal-para-escrita-técnica-em-software) 
+    - [👥 Equipe](#-equipe)
+    - [🚀 Visão Geral](#-visão-geral)
+    - [🎯 Objetivos do Projeto](#-objetivos-do-projeto)
+    - [🛠️ Tecnologias utilizadas](#️-tecnologias-utilizadas)
+    - [🏗️ Arquitetura do Sistema](#️-arquitetura-do-sistema)
+    - [✨ Inicialização](#-inicialização-e-configuração)
+    - [📚 Documentação](#-documentação)
+    - [📎 Links úteis](#-links-úteis)
+
+## 👥 Equipe 
+Squad 03-MDS 2025/2-FCTE/UnB
+
+| [![Filipe](https://github.com/filipeBG-07.png?size=100)](https://github.com/filipeBG-07) | [![Hugo](https://github.com/HugoFreitass.png?size=100)](https://github.com/HugoFreitass) | [![Phill](https://github.com/Phill-Chill.png?size=100)](https://github.com/Phill-Chill) | [![João](https://github.com/JoaoGSantana10.png?size=100)](https://github.com/JoaoGSantana10) | [![Pedro](https://github.com/PedroGTG.png?size=100)](https://github.com/PedroGTG) | [![Bruno](https://github.com/BGrangeiro.png?size=100)](https://github.com/BGrangeiro) |
+|---|---|---|---|---|---|
+| [Filipe](https://github.com/filipeBG-07) | [Hugo](https://github.com/HugoFreitass) | [Phill](https://github.com/Phill-Chill) | [João](https://github.com/JoaoGS) | [Pedro](https://github.com/PedroGTG) | [Bruno](https://github.com/BGrangeiro) |
+
+
 ## 🚀 Visão Geral
 
 O portal foi projetado para apoiar **equipes de desenvolvimento** e **escritores técnicos** na elaboração de documentação clara, padronizada e colaborativa.
@@ -19,8 +39,8 @@ O portal foi projetado para apoiar **equipes de desenvolvimento** e **escritores
 
 ---
 
-## 🛠️ Stack Tecnológica
-- **Frontend:** React 18 + TypeScript + Vite  
+## 🛠️ Tecnologias utilizadas
+- **Frontend:** React + TypeScript + Vite  
 - **Backend:** NestJS com TypeScript  
 - **Banco de Dados:** PostgreSQL via Supabase  
 - **Deploy:** Vercel (frontend) + Railway/Render (backend)  
@@ -37,8 +57,20 @@ A arquitetura prioriza **produtividade, colaboração e manutenção**:
 - **TypeScript:** segurança de tipos em toda a aplicação  
 - **Prisma ORM:** acesso seguro e tipado ao banco de dados  
 
-### Deploy
-- **Frontend:** Vercel 
-- **Backend:** Railway
-- **Database:** Supabase
+
+## ✨ Inicialização e configuração
+
+
+
+## 📚 Documentação
+
+**Acesse a documentação completa do projeto aqui:** [clique aqui](https://unb-mds.github.io/2025-2-Portal-para-escrita-tecnica-em-software/)
+
+## 📎 Links úteis
+
+**Story map e Activity flow:** [clique aqui](https://www.figma.com/design/Ses2U0uY5fJ4i1vn8cAF8w/MDS---GRUPO-03?node-id=0-1&p=f&t=JVrFpCNAFC0Fmbp2-0)
+
+**Protótipo:**: 
+
+**Arquitetura:** 
 
