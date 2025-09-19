@@ -20,7 +20,7 @@ O objetivo é facilitar a criação, organização e manutenção de documentaç
 ## 👥 Equipe 
 Squad 03-MDS 2025/2-FCTE/UnB
 
-| [![Filipe](https://github.com/filipeBG-07.png?size=100)](https://github.com/filipeBG-07) | [![Hugo](https://github.com/HugoFreitass.png?size=100)](https://github.com/HugoFreitass) | [![Phill](https://github.com/Phill-Chill.png?size=100)](https://github.com/Phill-Chill) | [![João](https://github.com/JoaoGSantana10.png?size=100)](https://github.com/JoaoGSantana10) | [![Pedro](https://github.com/PedroGTG.png?size=100)](https://github.com/PedroGTG) | [![Bruno](https://github.com/BGrangeiro.png?size=100)](https://github.com/BGrangeiro) |
+| [![Filipe](https://avatars.githubusercontent.com/u/174053010?s=400&u=783a5f3ac74a2694131b66a4dd2c5082f092b570&v=4)](https://github.com/filipeBG-07) | [![Hugo](https://avatars.githubusercontent.com/u/130880914?v=4)](https://github.com/HugoFreitass) | [![Phill](https://avatars.githubusercontent.com/u/164696319?v=4)](https://github.com/Phill-Chill) | [![João](https://avatars.githubusercontent.com/u/185989079?v=4)](https://github.com/JoaoGSantana10) | [![Pedro](https://avatars.githubusercontent.com/u/192148248?v=4)](https://github.com/PedroGTG) | [![Bruno](https://avatars.githubusercontent.com/u/197856263?v=4)](https://github.com/BGrangeiro) |
 |---|---|---|---|---|---|
 | [Filipe](https://github.com/filipeBG-07) | [Hugo](https://github.com/HugoFreitass) | [Phill](https://github.com/Phill-Chill) | [João](https://github.com/JoaoGS) | [Pedro](https://github.com/PedroGTG) | [Bruno](https://github.com/BGrangeiro) |
 
