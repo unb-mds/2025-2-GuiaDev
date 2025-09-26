@@ -1,0 +1,26 @@
+.header{
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-color: rgba(37, 99, 235, 0.6);
+    z-index: 1000;
+    border-bottom: 2px solid #2563eb;
+}
+
+.header h1{
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 1.6rem 0 0 0;
+    padding: 0;
+}
+
+.logo{
+    height: 58px;
+    margin: 0;
+    padding: 1.3rem 0.5rem 0 1.5rem;
+}
