@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
 import * as bcrypt from 'bcrypt';
 import { CreateUserBody } from "src/dtos/create-user.dto";
-// import { randomUUID } from "crypto";
 
 @Injectable()
 export class authService{
@@ -15,7 +14,6 @@ export class authService{
 
         const user = await this.prisma.user.create({
         data: {
-            // id: randomUUID(),
             name,
             lastName,
             email,
@@ -24,6 +22,14 @@ export class authService{
         });
 
         return user;
+    }
+
+    async login(){//
+
+    }
+
+    getUser(){
+        return 'Você fez um get na rota auth/get'
     }
 
 }
