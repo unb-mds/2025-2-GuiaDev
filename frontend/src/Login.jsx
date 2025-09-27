@@ -22,11 +22,11 @@ return(
                 <h1>
                     Bem-Vindo ao <span>GuiaDev</span>
                 </h1>
-                <p style={{ marginTop: "-1em" }}><strong>Sua plataforma completa para desenvolvimento profissional</strong></p>
+                <p style={{ marginTop: "-0.5em" }}><strong>Sua plataforma completa para desenvolvimento profissional</strong></p>
                 <ul>
-                    <li>🚀 Acelere seu aprendizado</li>
-                    <li>🤝 Conecte-se com devs</li>
-                    <li>📘 Recursos exclusivos</li>
+                    <li><strong>🚀 Acelere seu aprendizado</strong></li>
+                    <li><strong>👥 Conecte-se com devs</strong></li>
+                    <li><strong>📖 Recursos exclusivos</strong></li>
                 </ul>
             </div>
             

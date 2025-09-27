@@ -36,27 +36,40 @@
     justify-content: center;
 }
 
-.left-side h1 {
+.content-left h1 {
     font-size: 2.5rem;
     font-weight: bold;
     margin-bottom: 1rem;
 }
 
-.left-side h1 span {
-    color: #ff4d4d;
+.content-left h1 span {
+    color: rgb(102, 126, 234, 100%);
+    color: rgb(118, 75, 162, 100%);
 }
 
-.left-side p {
+.content-left p {
     font-size: 1.1rem;
     margin-bottom: 2rem;
     color: #e0e0e0;
 }
 
-.left-side ul {
+.content-left ul {
     list-style: none;
     padding: 0;
     font-size: 1rem;
     line-height: 2rem;
+    color: #e0e0e0;
+    font-weight: bold;
+    margin-top: -1rem;
+}
+
+.content-left ul li {
+    background-color: rgb(59, 130, 246, 100%);
+    border-radius: 8px;
+    border-color: #3B82F6;
+    padding: 1rem 1rem;
+    margin-bottom: 2rem;
+    display: flex;
 }
 
 /*lado direito agora */
@@ -211,7 +224,7 @@ form input {
         flex-direction: column;
         align-items: stretch;
     }
-    .left-side {
+    .content-left {
         padding: 2rem;
         text-align: center;
     }
@@ -222,5 +235,5 @@ form input {
         width: 100%;
         max-width: 480px;
     }
-    
+
 }
