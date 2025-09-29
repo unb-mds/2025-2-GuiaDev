@@ -56,4 +56,26 @@ export class GithubService {
             published_at: release.published_at,
         }));
     }
+
+    private GithubUrl(url: string){
+        const regex = /github\.com\/([^/]+)\/([^/]+)/;
+        const match = url.match(regex);
+
+        if(!match){
+            throw Error('URL invaldia');
+        }
+        return{
+            owner: match[1],
+            repo: match[2],
+        };
+    }
+
+    async AnalyzeRepo(url: string){
+        const { owner, repo } = this.GithubUrl(url);
+        const commits = await this.getCommits(owner, repo);
+        const issues = await this.getIssues(owner, repo);
+        const releases = await this.getReleases(owner, repo);
+
+        return{ commits, issues, releases };
+    }
 }
