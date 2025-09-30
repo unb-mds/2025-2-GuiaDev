@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { GithubService } from './github.service';
 
 @Controller('github')
@@ -18,5 +18,10 @@ export class GithubController {
     @Get('releases/:owner/:repo')
     async getReleases(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getReleases(owner,repo);
+    }
+
+    @Post('analyze')
+    async analyzeRepo(@Body('url') url: string) {
+        return this.githubService.AnalyzeRepo(url);
     }
 }
