@@ -64,7 +64,7 @@ A arquitetura prioriza **produtividade, colaboração e manutenção**:
 
 ## 📚 Documentação
 
-**Acesse a documentação completa do projeto aqui:** [clique aqui](https://unb-mds.github.io/2025-2-Portal-para-escrita-tecnica-em-software/)
+**Acesse a documentação completa do projeto aqui:** [clique aqui](https://unb-mds.github.io/2025-2-GuiaDev/)
 
 ## 📎 Links úteis
 

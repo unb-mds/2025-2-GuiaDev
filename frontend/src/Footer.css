@@ -1,0 +1,19 @@
+footer {
+    background: rgba(37, 99, 235, 0.6);
+    color: #fff;
+    padding: 3rem 0;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
