@@ -21,7 +21,9 @@ export class authService{
         },
         });
 
-        return user;
+        // Exclude password from returned user object
+        const { password: _password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
     }
 
     async login(){//
