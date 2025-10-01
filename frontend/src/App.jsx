@@ -1,19 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Login from './Login' // importando o Login
+import { useState, useEffect } from "react";
+import "./App.css"; 
+import Login from "./Login"; 
+import SideBar from "./components/Sidebar/Sidebar.jsx"; 
+import BoxRepo from "./components/BoxRepo/Boxrepo.jsx"; 
+import Header from "./Header.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
+ 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
 
+  useEffect(() => {
+
+    if (window.location.pathname.toLowerCase() === "/main") {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
+
+
+  
+
+
+  if (!isLoggedIn) {
+    return (
+      <div className="App">
+        {/* Passa a função de sucesso para o Login */}
+        <Login onLoginSuccess={handleLoginSuccess} />
+      </div>
+    );
+  }
+
+ 
   return (
     <>
-      <div className="App">
-        <Login />
+     <Header/>
+      <div className="Main">
+     
+        <SideBar />
+        <div className="Boxrepo">
+          <BoxRepo />
+        </div>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

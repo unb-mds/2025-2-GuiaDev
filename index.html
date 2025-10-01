@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechWrite Platform - Documentação</title>
+    <title>GuiaDev</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -325,8 +325,8 @@
     <div class="container">
         <div class="sidebar">
             <div class="logo">
-                <div class="logo-icon">TW</div>
-                <h1>TechWrite</h1>
+                <div class="logo-icon">&lt;/&gt;</div>
+                <h1>GuiaDev</h1>
             </div>
             
             <nav>
@@ -349,16 +349,16 @@
         
         <main class="main-content">
             <div class="content-header">
-                <h1>TechWrite Platform</h1>
+                <h1>GuiaDev</h1>
                 <p>Plataforma completa para escrita técnica em projetos de software. Acompanhe o desenvolvimento através das sprints e documentação detalhada.</p>
             </div>
             
             <div id="home-section" class="content-section">
-                <h2>🚀 Bem-vindo ao TechWrite Platform</h2>
+                <h2>🚀 Bem-vindo ao GuiaDev</h2>
                 <div class="markdown-content">
                     <p>Esta plataforma foi desenvolvida para facilitar a criação, organização e manutenção de documentação técnica em projetos de software. Aqui você encontrará:</p>
                     
-                    <h3>📋 Funcionalidades Principais</h3>
+                    <!-- <h3>📋 Funcionalidades Principais</h3>
                     <ul>
                         <li><strong>Editor Markdown Avançado:</strong> Interface intuitiva com preview em tempo real</li>
                         <li><strong>Templates Personalizáveis:</strong> Modelos prontos para diferentes tipos de documentação</li>
@@ -366,21 +366,20 @@
                         <li><strong>Versionamento:</strong> Controle de versões integrado com Supabase</li>
                         <li><strong>Integração Git:</strong> Export para repositórios e sync automático</li>
                         <li><strong>Type Safety:</strong> TypeScript em todo o stack para maior confiabilidade</li>
-                    </ul>
+                    </ul> -->
                     
                     <h3>🎯 Objetivos do Projeto</h3>
-                    <p>O TechWrite Platform visa resolver os principais desafios na criação de documentação técnica:</p>
+                    <p>O GuiaDev visa resolver os principais desafios na criação de documentação técnica:</p>
                     <ul>
                         <li>Reduzir o tempo necessário para criar documentação de qualidade</li>
                         <li>Padronizar a estrutura e formato dos documentos técnicos</li>
                         <li>Facilitar a colaboração entre desenvolvedores e technical writers</li>
                         <li>Manter a documentação sempre atualizada e sincronizada</li>
-                        <li>Oferecer uma experiência developer-friendly com type safety</li>
                     </ul>
                     
                     <h3>🛠️ Stack Tecnológica</h3>
                     <ul>
-                        <li><strong>Frontend:</strong> React 18 + TypeScript + Vite</li>
+                        <li><strong>Frontend:</strong> React + JavaScript + Vite</li>
                         <li><strong>Backend:</strong> NestJS com TypeScript</li>
                         <li><strong>Database:</strong> PostgreSQL via Supabase</li>
                         <li><strong>Deploy:</strong> Vercel (front) + Railway/Render (back)</li>
@@ -407,15 +406,13 @@
                 <h2>🏗️ Arquitetura do Sistema</h2>
                 <div class="markdown-content">
                     <h3>Visão Geral</h3>
-                    <p>O TechWrite Platform utiliza uma arquitetura moderna e simplificada, priorizando produtividade e facilidade de manutenção.</p>
+                    <p>O GuiaDev utiliza uma arquitetura simples, priorizando produtividade e facilidade de manutenção.</p>
                     
                     <h3>Stack Tecnológica</h3>
                     <ul>
-                        <li><strong>Frontend:</strong> React 18 + TypeScript + Vite</li>
+                        <li><strong>Frontend:</strong> React + JavaScript + Vite</li>
                         <li><strong>Backend API:</strong> NestJS (Node.js framework)</li>
                         <li><strong>Banco de Dados:</strong> PostgreSQL via Supabase</li>
-                        <li><strong>Autenticação:</strong> Supabase Auth (JWT + OAuth)</li>
-                        <li><strong>Storage:</strong> Supabase Storage para arquivos</li>
                         <li><strong>ORM:</strong> Prisma para type-safe database access</li>
                     </ul>
                     
@@ -442,9 +439,9 @@
             <div id="api-section" class="content-section" style="display: none;">
                 <h2>🔌 API Reference</h2>
                 <div class="markdown-content">
-                    <h3>Base URL</h3>
+                    <!-- <h3>Base URL</h3>
                     <pre><code>https://api.techwrite.com/v1</code></pre>
-                    
+                     -->
                     <h3>Autenticação</h3>
                     <p>Utilizamos Supabase Auth com JWT tokens. Inclua o token no header:</p>
                     <pre><code>Authorization: Bearer {your-jwt-token}</code></pre>
@@ -463,11 +460,11 @@ PUT    /documents/:id       # Atualizar documento
 DELETE /documents/:id       # Deletar documento
 POST   /documents/:id/share # Compartilhar documento</code></pre>
                     
-                    <h3>Templates</h3>
+                    <!-- <h3>Templates</h3>
                     <pre><code>GET  /templates        # Listar templates
 POST /templates        # Criar template
 GET  /templates/:id    # Buscar template</code></pre>
-                    
+                     -->
                     <h3>Projetos/Sprints</h3>
                     <pre><code>GET    /projects           # Listar projetos
 POST   /projects           # Criar projeto
@@ -476,11 +473,11 @@ PUT    /projects/:id       # Atualizar projeto
 GET    /projects/:id/sprints # Listar sprints do projeto
 POST   /projects/:id/sprints # Criar sprint</code></pre>
                     
-                    <h3>Upload de Arquivos</h3>
+                    <!-- <h3>Upload de Arquivos</h3>
                     <pre><code>POST /upload/markdown  # Upload de arquivos .md
 POST /upload/images    # Upload de imagens
 GET  /files/:id        # Download de arquivo</code></pre>
-                    
+                     -->
                     <h3>Exemplo de Resposta</h3>
                     <pre><code>{
   "success": true,
@@ -519,6 +516,11 @@ GET  /files/:id        # Download de arquivo</code></pre>
             {path: 'Docs/Milestones/Sprint-01/React.md', name: 'Sprint 01 - Estudo React'},
             {path: 'Docs/Milestones/Sprint-02/documento-de-requisitos.md', name: 'Sprint 02 - Levantamento de Requisitos'},
             {path: 'Docs/Milestones/Sprint-02/estudo_arquitetura.md', name: 'Sprint 02 - Decisões Arquiteturais'},
+            {path: 'Docs/Milestones/Sprint-03/sprint-03.md', name: 'Sprint 03'},
+            {path: 'Docs/Milestones/Sprint-04/Revisão Geral Sprint 04.md', name: 'Sprint 04'},
+            {path: 'Docs/Milestones/Sprint-04/padrão_commits.md', name: 'Sprint 04 - Padrão de Commits'},
+            {path: 'Docs/Milestones/Sprint-04/revisão_de_documento_da_R1.md', name: 'Sprint 04 - Revisão Release 1'},
+            
      
         ];
 
