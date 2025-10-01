@@ -70,7 +70,7 @@ A arquitetura prioriza **produtividade, colaboração e manutenção**:
 
 **Story map e Activity flow:** [clique aqui](https://www.figma.com/design/Ses2U0uY5fJ4i1vn8cAF8w/MDS---GRUPO-03?node-id=0-1&p=f&t=JVrFpCNAFC0Fmbp2-0)
 
-**Protótipo:**: 
+**Protótipo:**: [clique aqui](https://www.figma.com/design/NSQw0YsJVA1PZDF9cclfxQ/Alta-Fidelidade?node-id=0-1&p=f&t=0bIOylbBO4zvvhBF-0)
 
-**Arquitetura:** 
+**Arquitetura:** [clique aqui](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/Docs/Diagrama%20modelo%20C4.pdf)
 
