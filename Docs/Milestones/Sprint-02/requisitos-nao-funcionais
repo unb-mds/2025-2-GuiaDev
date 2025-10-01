@@ -1,50 +1,55 @@
-# Requisitos não funcionais para: Portal de Escrita Técnica em Software
+# Requisitos Não Funcionais — Portal de Escrita Técnica em Software
 
-## Principais características de Requisitos não funcionais:
+## Principais características de Requisitos Não Funcionais
 
-- Usabilidade ( interface intuitiva, facilidade de uso, acessibilidade);
-- Confiabilidade ( tolerância a falhas, backup, disponibilidade);
-- Desempenho (tempo de resposta, capacidade de usuários simultâneos);
-- Segurança ( proteção de dados, autenticação, autorização);
-- Portabilidade ( rodar em diferente máquinas, rodar em diferentes sistemas, navegadores);
-- Manutenibilidade (facilidade de atualizar, modularidade de código).
+- Usabilidade (interface intuitiva, facilidade de uso, acessibilidade)  
+- Confiabilidade (tolerância a falhas, backup, disponibilidade)  
+- Desempenho (tempo de resposta, capacidade de usuários simultâneos)  
+- Segurança (proteção de dados, autenticação, autorização)  
+- Portabilidade (rodar em diferentes máquinas, sistemas, navegadores)  
+- Manutenibilidade (facilidade de atualizar, modularidade de código)  
 
-### Requisitos Não Funcionais — Portal para Escrita Técnica em Software
+---
 
-**1. Usabilidade**
+## Detalhamento dos Requisitos Não Funcionais
 
-- O portal deve ter uma interface intuitiva e fácil de entendimento, interface simples, com destaque para os guia e recomendações.
-- O sistema deve ser fácil de utilização: pelo menos 80% dos usuários devem conseguir utilizá-lo sem necessidade de treinamento.
+### 1. Usabilidade
 
-**2. Acessibilidade**
+- O portal deve ter uma interface intuitiva e fácil de entendimento, simples, com destaque para guias e recomendações.  
+- Pelo menos 80% dos usuários devem conseguir utilizá-lo sem necessidade de treinamento.
 
-- O portal deve seguir padrões WCAG, incluindo contraste adequado, navegação por teclado e suporte a leitores de telas para pessoas PCD.
+### 2. Acessibilidade
 
-**3. Confiabilidade**
+- O portal deve seguir padrões WCAG, incluindo:
+  - Contraste adequado
+  - Navegação por teclado
+  - Suporte a leitores de tela para pessoas PCD
 
-- O sistema deve exibir recomendações quando algum usuário pesquisar algo dentro do portal, recomendações corretas em pelo menos 95% das varreduras realizadas em repositórios.
-- Deve ser capaz de processar repositórios simulados e retornar resultados consistentes.
+### 3. Confiabilidade
 
-**4. Desempenho**
+- O sistema deve exibir recomendações corretas em pelo menos 95% das varreduras realizadas em repositórios.  
+- Deve processar repositórios simulados e retornar resultados consistentes.
 
-- O tempo de carregamento da página deve demorar no máximo 3 segundos.
-- A execução dos bots no GitHub deve demorar no máximo 2 minutos para processar os repositórios.
+### 4. Desempenho
 
-**5. Segurança**
+- Tempo de carregamento da página: máximo 3 segundos  
+- Execução dos bots no GitHub: máximo 2 minutos para processar os repositórios
 
-- Toda comunicação entre o usuário e o servidor deve ser feito via protocolo seguro HTTPS.
+### 5. Segurança
 
-**6. Portabilidade**
+- Toda comunicação entre usuário e servidor deve ser via protocolo seguro HTTPS
 
-- O portal deve rodar em diferentes navegadores, exemplos: Google Chrome, Firefox, Edge, Opera… etc.
-- A interface deve se adaptar a cada desktop conforme o tamanho da tela, exemplos: tablets e celulares.
+### 6. Portabilidade
 
-**7. Manutenibilidade**
+- O portal deve rodar em diferentes navegadores (Chrome, Firefox, Edge, Opera, etc.)  
+- A interface deve se adaptar a desktops, tablets e celulares
 
-- O código do sistema deve estar versionado no GitHub com documentação clara e atualizada.
-- A estrutura dos arquivos JSON deve ser modular, facilitando a manutenção e evolução futura dos sistema.
+### 7. Manutenibilidade
 
-**8. Escalabilidade**
+- Código versionado no GitHub, com documentação clara e atualizada  
+- Estrutura de arquivos modular (JSON), facilitando manutenção e evolução futura
 
-- O sistema deve ser projetado para suportar expansão futura, como inclusão de novos tipos de análises de documentos.
-- Deve ser possível adicionar novos checklist sem necessidade de reescrever o sistema inteiros.
+### 8. Escalabilidade
+
+- Suporte à inclusão de novos tipos de análises de documentos  
+- Possibilidade de adicionar novos checklists sem reescrever o sistema inteiro
