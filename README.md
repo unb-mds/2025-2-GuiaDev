@@ -59,7 +59,42 @@ A arquitetura prioriza **produtividade, colaboração e manutenção**:
 
 
 ## ✨ Inicialização e configuração
+> 🚀 Executando com Docker
 
+Guia rápido para iniciar o ambiente de desenvolvimento.
+
+### 1. Preparar o Ambiente
+
+Crie o arquivo de configuração do backend a partir do exemplo:
+```bash
+cp backend-nest/.env.example backend-nest/.env
+```
+> **Nota:** Se necessário, ajuste as variáveis no arquivo `backend-nest/.env`.
+
+### 2. Iniciar a Aplicação
+
+Use o comando abaixo na raiz do projeto para construir e iniciar os contêineres:
+```bash
+docker-compose up --build
+```
+e só para inicia-lo posteriormente:
+```bash
+docker-compose up
+```
+Caso queira verificar os contâiner rodando:
+```bash
+docker ps
+```
+Após a inicialização:
+- **Frontend:** `http://localhost:3001`
+- **Backend:** `http://localhost:3000`
+
+### 3. Remover o contâiner
+
+Para remover os contêineres, execute:
+```bash
+docker-compose down
+```
 
 
 ## 📚 Documentação
@@ -70,7 +105,7 @@ A arquitetura prioriza **produtividade, colaboração e manutenção**:
 
 **Story map e Activity flow:** [clique aqui](https://www.figma.com/design/Ses2U0uY5fJ4i1vn8cAF8w/MDS---GRUPO-03?node-id=0-1&p=f&t=JVrFpCNAFC0Fmbp2-0)
 
-**Protótipo:**: 
+**Protótipo:**: [clique aqui](https://www.figma.com/design/NSQw0YsJVA1PZDF9cclfxQ/Alta-Fidelidade?node-id=0-1&p=f&t=0bIOylbBO4zvvhBF-0)
 
-**Arquitetura:** 
+**Arquitetura:** [clique aqui](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/Docs/Diagrama%20modelo%20C4.pdf)
 
