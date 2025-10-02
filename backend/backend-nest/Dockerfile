@@ -17,6 +17,8 @@ RUN pnpm install
 # Copia o resto do código da sua aplicação para o diretório de trabalho
 COPY . .
 
+# Gera o Prisma Client baseado no seu schema.prism
+RUN pnpm exec prisma generate
 
 EXPOSE 3000
 
