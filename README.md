@@ -59,7 +59,42 @@ A arquitetura prioriza **produtividade, colaboração e manutenção**:
 
 
 ## ✨ Inicialização e configuração
+> 🚀 Executando com Docker
 
+Guia rápido para iniciar o ambiente de desenvolvimento.
+
+### 1. Preparar o Ambiente
+
+Crie o arquivo de configuração do backend a partir do exemplo:
+```bash
+cp backend-nest/.env.example backend-nest/.env
+```
+> **Nota:** Se necessário, ajuste as variáveis no arquivo `backend-nest/.env`.
+
+### 2. Iniciar a Aplicação
+
+Use o comando abaixo na raiz do projeto para construir e iniciar os contêineres:
+```bash
+docker-compose up --build
+```
+e só para inicia-lo posteriormente:
+```bash
+docker-compose up
+```
+Caso queira verificar os contâiner rodando:
+```bash
+docker ps
+```
+Após a inicialização:
+- **Frontend:** `http://localhost:3001`
+- **Backend:** `http://localhost:3000`
+
+### 3. Remover o contâiner
+
+Para remover os contêineres, execute:
+```bash
+docker-compose down
+```
 
 
 ## 📚 Documentação
