@@ -68,8 +68,10 @@
     border-radius: 8px;
     border-color: #3B82F6;
     padding: 1rem 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     display: flex;
+    font-size: 2rem;
+    font-weight: bold;
 }
 
 /*lado direito agora */

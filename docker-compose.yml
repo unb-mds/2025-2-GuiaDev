@@ -1,5 +1,3 @@
-# Define a versão do Docker Compose
-version: '3.8'
 
 # Define a lista de serviços (containers)
 services:
@@ -16,10 +14,17 @@ services:
     ports:
       # Mapeia a porta 3000 do host para a 3000 do container
       - '3000:3000'
+    env_file:
+      - ./backend/backend-nest/.env 
+
     volumes:
       # Mapeia o código do backend para o /app dentro do container
       - ./backend/backend-nest:/app
       - /app/node_modules
+
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
 
   # Serviço do Frontend (React)
   react-app:

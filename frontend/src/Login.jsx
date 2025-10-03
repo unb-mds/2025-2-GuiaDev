@@ -58,8 +58,8 @@ return(
                         required
                     />
                     <div className="options">
-                        <label>
-                            <input type="checkbox" /> Lembrar de mim
+                        <label style={{ display : "flex", alignItems: "center", gap: " -0.5rem" }}>
+                            <input type="checkbox"/> Lembrar de mim
                         </label>
                         <a href="#">Esqueci minha senha</a>
                     </div>
