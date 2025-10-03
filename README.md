@@ -1,4 +1,4 @@
-# 📝 Portal para Escrita Técnica em Software
+# 📝 **GuiaDev**
 
 Plataforma completa para **escrita técnica em projetos de software**, desenvolvida no contexto da disciplina **MDS – UnB (2025.2)**.  
 O objetivo é facilitar a criação, organização e manutenção de documentação técnica, alinhada a boas práticas de Engenharia de Software.
@@ -7,7 +7,7 @@ O objetivo é facilitar a criação, organização e manutenção de documentaç
 
 ## 📝 Sumário
 
-- [Portal para escrita técnica em software](#-portal-para-escrita-técnica-em-software) 
+- [GuiaDev](#-GuiaDev) 
     - [👥 Equipe](#-equipe)
     - [🚀 Visão Geral](#-visão-geral)
     - [🎯 Objetivos do Projeto](#-objetivos-do-projeto)
