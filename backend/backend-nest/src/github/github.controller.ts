@@ -19,9 +19,15 @@ export class GithubController {
     async getReleases(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getReleases(owner,repo);
     }
-
+/** 
     @Post('analyze')
     async analyzeRepo(@Body('url') url: string) {
         return this.githubService.AnalyzeRepo(url);
     }
+**/
+    @Get('analyze/user/:username')
+    async analyzeUser(@Param('username') username: string) {
+    return this.githubService.analyzeUserRepos(username);
+    }
+
 }

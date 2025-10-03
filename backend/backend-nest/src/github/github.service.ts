@@ -7,6 +7,22 @@ export class GithubService {
 
     private token = process.env.GITHUB_TOKEN;
 
+    async getUserRepos(username: string){
+        const url = `https://api.github.com/users/${username}/repos`;
+
+        const response = await this.http.axiosRef.get(url, {
+            headers: {
+            Authorization: `Bearer ${this.token}`,
+            Accept: 'application/vnd.github+json',
+            },
+        });
+        return response.data.map(repo => ({
+            name: repo.name,
+            owner: repo.owner.login,
+            url: repo.html_url,
+        }));
+    }
+
     async getCommits(owner: string, repo: string){
         const url = `https://api.github.com/repos/${owner}/${repo}/commits`;
 
@@ -69,7 +85,7 @@ export class GithubService {
             repo: match[2],
         };
     }
-
+/** 
     async AnalyzeRepo(url: string){
         const { owner, repo } = this.GithubUrl(url);
         const commits = await this.getCommits(owner, repo);
@@ -77,5 +93,26 @@ export class GithubService {
         const releases = await this.getReleases(owner, repo);
 
         return{ commits, issues, releases };
+    }
+**/
+    async analyzeUserRepos(username: string) {
+        const repos = await this.getUserRepos(username);
+
+        const results: any[] = [];
+
+        for (const repo of repos) {
+            const commits = await this.getCommits(repo.owner, repo.name);
+            const issues = await this.getIssues(repo.owner, repo.name);
+            const releases = await this.getReleases(repo.owner, repo.name);
+
+            results.push({
+              repo: repo.name,
+              commits,
+              issues,
+              releases,
+              });
+        }   
+
+        return results;
     }
 }
