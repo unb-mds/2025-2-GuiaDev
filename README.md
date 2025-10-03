@@ -5,17 +5,6 @@ O objetivo é facilitar a criação, organização e manutenção de documentaç
 
 ---
 
-## 📝 Sumário
-
-- [GuiaDev](#-GuiaDev) 
-    - [👥 Equipe](#-equipe)
-    - [🚀 Visão Geral](#-visão-geral)
-    - [🎯 Objetivos do Projeto](#-objetivos-do-projeto)
-    - [🛠️ Tecnologias utilizadas](#️-tecnologias-utilizadas)
-    - [🏗️ Arquitetura do Sistema](#️-arquitetura-do-sistema)
-    - [✨ Inicialização](#-inicialização-e-configuração)
-    - [📚 Documentação](#-documentação)
-    - [📎 Links úteis](#-links-úteis)
 
 ## 👥 Equipe 
 Squad 03-MDS 2025/2-FCTE/UnB
