@@ -13,13 +13,17 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/home",
+        index: true, // Rota padrão para "/"
         element: <Home />,
       },
       {
-        path:"/login",
-        element: <Login/>,
-      }
+        path: "home",
+        element: <Home />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
     ],
   },
 ]);

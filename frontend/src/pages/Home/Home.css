@@ -8,6 +8,8 @@
 
 /* Estilo para a área do conteúdo principal */
 .Boxrepo {
+  display: flex;
   padding: 40px; /* Espaçamento interno para o conteúdo respirar */
-  margin-left: 255px;
+  margin-left: auto;
+  margin-top: auto;
 }
