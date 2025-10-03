@@ -1,0 +1,13 @@
+/* Remove margens padrão e define o box-sizing para facilitar os cálculos */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  
+}
+
+/* Estilo para a área do conteúdo principal */
+.Boxrepo {
+  padding: 40px; /* Espaçamento interno para o conteúdo respirar */
+  margin-left: 255px;
+}

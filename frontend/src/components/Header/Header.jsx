@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import "./Header.css"
-import logo from "./assets/Logo.svg"
+import logo from '../../assets/Logo.svg'
 
 function Image() {
     return <img src={logo} className="logo" alt="Logo do GuiaDev" />;

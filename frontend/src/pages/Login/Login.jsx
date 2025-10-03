@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import "./Login.css"
-import Header from "./Header";
-import Footer from "./Footer";
+import Footer from "../../components/Footer/Footer"
 
 export default function Login() {
     const [email, setEmail] = useState("")
@@ -16,7 +15,7 @@ const handleSubmit = (e) => {
 }
 return(
     <div className="login-page">
-        <Header></Header>
+        
         <div className="content">
             <div className="content-left">
                 <h1>
