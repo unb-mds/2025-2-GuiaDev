@@ -19,7 +19,7 @@ export class GithubService {
         });
         return response.data.map(repo => ({
             name: repo.name,
-            owner: repo.owner.login,
+            owner: { login: repo.owner.login },
             url: repo.html_url,
         }));
     }
@@ -27,54 +27,81 @@ export class GithubService {
     async getCommits(owner: string, repo: string){
         const url = `https://api.github.com/repos/${owner}/${repo}/commits`;
 
-        const response = await this.http.axiosRef.get(url, {
-        headers: {
-            Authorization: `Bearer ${this.token}`,
-            Accept: 'application/vnd.github+json',
-        },
-        });
+        try{
+            const response = await this.http.axiosRef.get(url, {
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+                Accept: 'application/vnd.github+json',
+            },
+            });
 
-
-        return response.data.map ((c) => c.commit.message);
+            return response.data.map ((c) => c.commit.message);
+        } 
+        catch (error) {
+            if (error.response && error.response.status === 404) {
+                return {
+                    content: null,
+                };
+            }
+        }
     }
     
     async getIssues(owner: string, repo:string){
         const url = `https://api.github.com/repos/${owner}/${repo}/issues`;
 
-        const response = await this.http.axiosRef.get(url,{
-        headers: {
-            Authorization: `Bearer ${this.token}`,
-            Accept: 'application/vnd.github+json',
-        },
-        });
+        try{
+            const response = await this.http.axiosRef.get(url,{
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+                Accept: 'application/vnd.github+json',
+            },
+            });
 
-        return response.data.map(issue => ({
-            number: issue.number,
-            title: issue.title,
-            state: issue.state,
-            user: issue.user.login,
-            body: issue.body,
-        }));
+            return response.data.map(issue => ({
+                number: issue.number,
+                title: issue.title,
+                state: issue.state,
+                user: issue.user.login,
+                body: issue.body,
+            }));
+        } 
+        catch (error) {
+            if (error.response && error.response.status === 404) {
+                return {
+                    content: null
+                };
+            }
+        }
     }
     
     async getReleases(owner: string, repo: string){
         const url = `https://api.github.com/repos/${owner}/${repo}/releases`;
         
-        const response = await this.http.axiosRef.get(url, {
-        headers: {
-            Authorization: `Bearer ${this.token}`,
-            Accept: 'application/vnd.github+json',
-        },
-        });
-        
-        return response.data.map(release => ({
-            name: release.name,
-            tag: release.tag_name,
-            published_at: release.published_at,
-        }));
+        try{
+            const response = await this.http.axiosRef.get(url, {
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+                Accept: 'application/vnd.github+json',
+            },
+            });
+            
+            return response.data.map(release => ({
+                name: release.name,
+                tag: release.tag_name,
+                published_at: release.published_at,
+            }));
+        } 
+        catch (error) {
+            if (error.response && error.response.status === 404) {
+                return {
+                    content: null
+                };
+            }
+        }    
     }
 
 /** 
+ * se der bo eu volto pra esse
 
     private GithubUrl(url: string){
         const regex = /github\.com\/([^/]+)\/([^/]+)/;
@@ -117,7 +144,7 @@ export class GithubService {
             };
         }
         catch (error) {
-            if(error.response?.status === 500){
+            if(error.response?.status === 404){
                 return {
                     name: 'README.md',
                     content: null,
@@ -127,26 +154,63 @@ export class GithubService {
         }   
     }
 
+    async getLicenses(owner: string, repo: string){
+        const url = `https://api.github.com/repos/${owner}/${repo}/license`;
+
+        try{
+            const response = await this.http.axiosRef.get(url,{
+                headers: {
+                    Authorization: `Bearer ${this.token}`,
+                    Accept: 'application/vnd.github+json',
+                },
+            });
+
+            const licenseData = response.data;
+
+            return {
+                name: licenseData.license.name,
+                key: licenseData.key,
+                fileName: licenseData.name ,
+            };
+        } 
+        catch (error) {
+            if (error.response && error.response.status === 404) {
+                return {
+                    name: 'Unlicensed',
+                    key: 'unlicensed',
+                    fileName: null,
+                };
+            }
+        }
+    }
+
     async analyzeUserRepos(username: string) {
         const repos = await this.getUserRepos(username);
 
         const results: any[] = [];
 
         for (const repo of repos) {
-            const commits = await this.getCommits(repo.owner.login, repo.name);
-            const issues = await this.getIssues(repo.owner.login, repo.name);
-            const releases = await this.getReleases(repo.owner.login, repo.name);
-            const readme = await this.getReadme(repo.owner.login, repo.name)
+            const owner = repo.owner.login;
+            const name = repo.name;
+
+            const [commits, issues, releases, readme] = await Promise.allSettled([
+                this.getCommits(owner, name),
+                this.getIssues(owner, name),
+                this.getReleases(owner, name),
+                this.getReadme(owner, name),
+            ]);
 
             results.push({
-              repo: repo.name,
-              commits,
-              issues,
-              releases,
-              readme,
-              });
-        }   
+            repo: name,
+            commits: commits.status === 'fulfilled' ? commits.value : [],
+            issues: issues.status === 'fulfilled' ? issues.value : [],
+            releases: releases.status === 'fulfilled' ? releases.value : [],
+            readme: readme.status === 'fulfilled' ? readme.value : { content: null },
+            });
+
+        }
 
         return results;
     }
+
 }

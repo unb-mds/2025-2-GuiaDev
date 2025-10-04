@@ -21,7 +21,7 @@ export class GithubController {
     }
 
     @Get('readme/:owner/:repo')
-    async getRadme(@Param('owner') owner: string, @Param('repo') repo: string){
+    async getReadme(@Param('owner') owner: string, @Param('repo') repo: string){
         return this.githubService.getReadme(owner,repo);
     }
     
@@ -31,8 +31,14 @@ export class GithubController {
         return this.githubService.AnalyzeRepo(url);
     }
 **/
+
+    @Get('licenses/:owner/:repo')
+    async getLicenses(@Param('owner') owner: string, @Param('repo') repo: string){
+        return this.githubService.getLicenses(owner,repo);
+    }
+
     @Get('analyze/user/:username')
-    async analyzeUser(@Param('username') username: string) {
+    async analyzeUserRepos(@Param('username') username: string) {
     return this.githubService.analyzeUserRepos(username);
     }
 
