@@ -19,6 +19,12 @@ export class GithubController {
     async getReleases(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getReleases(owner,repo);
     }
+
+    @Get('readme/:owner/:repo')
+    async getRadme(@Param('owner') owner: string, @Param('repo') repo: string){
+        return this.githubService.getReadme(owner,repo);
+    }
+    
 /** 
     @Post('analyze')
     async analyzeRepo(@Body('url') url: string) {

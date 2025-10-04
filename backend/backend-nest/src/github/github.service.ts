@@ -1,5 +1,6 @@
 import { Injectable} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { Buffer } from 'buffer';
 
 @Injectable()
 export class GithubService {
@@ -73,6 +74,8 @@ export class GithubService {
         }));
     }
 
+/** 
+
     private GithubUrl(url: string){
         const regex = /github\.com\/([^/]+)\/([^/]+)/;
         const match = url.match(regex);
@@ -85,7 +88,7 @@ export class GithubService {
             repo: match[2],
         };
     }
-/** 
+
     async AnalyzeRepo(url: string){
         const { owner, repo } = this.GithubUrl(url);
         const commits = await this.getCommits(owner, repo);
@@ -95,21 +98,52 @@ export class GithubService {
         return{ commits, issues, releases };
     }
 **/
+ 
+    async getReadme(owner: string, repo: string){
+        const url = `https://api.github.com/repos/${owner}/${repo}/readme`;
+        
+        try{
+            const response = await this.http.axiosRef.get(url,{
+                headers: {
+                    Authorization: `Bearer ${this.token}`,
+                    Accept: 'application/vnd.github+json',
+                },
+            });
+            const decodedContent = Buffer.from(response.data.content, 'base64').toString('utf-8');
+
+            return {
+                name: response.data.name,
+                content: decodedContent,
+            };
+        }
+        catch (error) {
+            if(error.response?.status === 500){
+                return {
+                    name: 'README.md',
+                    content: null,
+                };
+            }
+            throw error;
+        }   
+    }
+
     async analyzeUserRepos(username: string) {
         const repos = await this.getUserRepos(username);
 
         const results: any[] = [];
 
         for (const repo of repos) {
-            const commits = await this.getCommits(repo.owner, repo.name);
-            const issues = await this.getIssues(repo.owner, repo.name);
-            const releases = await this.getReleases(repo.owner, repo.name);
+            const commits = await this.getCommits(repo.owner.login, repo.name);
+            const issues = await this.getIssues(repo.owner.login, repo.name);
+            const releases = await this.getReleases(repo.owner.login, repo.name);
+            const readme = await this.getReadme(repo.owner.login, repo.name)
 
             results.push({
               repo: repo.name,
               commits,
               issues,
               releases,
+              readme,
               });
         }   
 
