@@ -298,7 +298,62 @@ export class GithubService {
             }
             throw error;
         }   
-    } 
+    }
+
+    async getDocs(owner: string, repo: string){
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/docs/`;
+        
+        try{
+            const response = await this.http.axiosRef.get(url,{
+                headers: {
+                    Authorization: `Bearer ${this.token}`,
+                    Accept: 'application/vnd.github+json',
+                },
+            });
+
+            const filedata = response.data;
+
+            const files = filedata
+            
+                .filter(item => item.type === 'file')
+                .map(file => ({
+                    name: file.name,
+                    path: file.path,
+                    download_url: file.download_url
+                }));
+
+            return files;
+        }
+        catch (error) {
+            if(error.response?.status === 404){
+                return {
+                    content: null,
+                };
+            }
+            throw error;
+        }   
+    }
+
+    async getDocsContent(owner: string, repo: string) {
+        const files = await this.getDocs(owner, repo);
+        const docs: { name: string; content: string }[] = [];
+
+        for (const file of files) {
+            const response = await this.http.axiosRef.get(file.download_url, {
+            headers: { Accept: 'application/vnd.github.raw' },
+            });
+
+            docs.push({
+                name: file.name,
+                content: response.data,
+            });
+        }
+
+        return docs;
+    }
+
+
+    
 
     async analyzeUserRepos(username: string) {
         const repos = await this.getUserRepos(username);
@@ -309,7 +364,7 @@ export class GithubService {
             const owner = repo.owner.login;
             const name = repo.name;
 
-            const [commits, issues, releases, readme, changelog, license, gitignore, conductcode] = await Promise.allSettled([
+            const [commits, issues, releases, readme, changelog, license, gitignore, conductcode, docs, docsContent] = await Promise.allSettled([
                 this.getCommits(owner, name),
                 this.getIssues(owner, name),
                 this.getReleases(owner, name),
@@ -319,6 +374,8 @@ export class GithubService {
                 this.getContributing(owner,name),
                 this.getConductCode(owner, name),
                 this.getGitignore(owner, name),
+                this.getDocs(owner, name),
+                this.getDocsContent(owner, name),
             ]);
 
             results.push({       //essa bomba ai serve pra evitar error 500 e 404
@@ -331,6 +388,8 @@ export class GithubService {
             conductcode: conductcode.status === 'fulfilled' ? conductcode.value : [],
             license: license.status === 'fulfilled' ? license.value : [],
             gitignore: gitignore.status === 'fulfilled' ? gitignore.value : { content: null },
+            docs:docs.status === 'fulfilled' ? docs.value : { content: null },
+            docsContent: docsContent.status === 'fulfilled' ? docsContent.value : [],
             });
 
         }

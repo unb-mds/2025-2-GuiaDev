@@ -57,6 +57,16 @@ export class GithubController {
     return this.githubService.getConductCode(owner, repo);
     }
 
+    @Get('docs/:owner/:repo')
+    async getDocs(@Param('owner') owner: string, @Param('repo') repo: string) {
+    return this.githubService.getDocs(owner, repo);
+    }
+
+    @Get('content/docs/:owner/:repo')
+    async getDocsContent(@Param('owner') owner: string, @Param('repo') repo: string) {
+    return this.githubService.getDocsContent(owner, repo);
+    }
+
     @Get('analyze/user/:username')
     async analyzeUserRepos(@Param('username') username: string) {
     return this.githubService.analyzeUserRepos(username);
