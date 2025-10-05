@@ -309,11 +309,16 @@ export class GithubService {
             const owner = repo.owner.login;
             const name = repo.name;
 
-            const [commits, issues, releases, readme] = await Promise.allSettled([
+            const [commits, issues, releases, readme, changelog, license, gitignore, conductcode] = await Promise.allSettled([
                 this.getCommits(owner, name),
                 this.getIssues(owner, name),
                 this.getReleases(owner, name),
                 this.getReadme(owner, name),
+                this.getChangelog(owner, name),
+                this.getLicenses(owner, name),
+                this.getContributing(owner,name),
+                this.getConductCode(owner, name),
+                this.getGitignore(owner, name),
             ]);
 
             results.push({       //essa bomba ai serve pra evitar error 500 e 404
@@ -322,6 +327,10 @@ export class GithubService {
             issues: issues.status === 'fulfilled' ? issues.value : [],
             releases: releases.status === 'fulfilled' ? releases.value : [],
             readme: readme.status === 'fulfilled' ? readme.value : { content: null },
+            changelog: changelog.status === 'fulfilled' ? changelog.value : [],
+            conductcode: conductcode.status === 'fulfilled' ? conductcode.value : [],
+            license: license.status === 'fulfilled' ? license.value : [],
+            gitignore: gitignore.status === 'fulfilled' ? gitignore.value : { content: null },
             });
 
         }
