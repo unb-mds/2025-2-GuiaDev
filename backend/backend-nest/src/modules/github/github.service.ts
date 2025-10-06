@@ -352,7 +352,28 @@ export class GithubService {
         return docs;
     }
 
-
+    formatRepoData(reposData: any[]) {
+    return reposData.map((repo, index) => ({
+        id: index + 1,
+        nomeRepositorio: repo.repo,
+        commits: repo.commits?.length || 0,
+        ultimosCommits: repo.commits?.slice(0, 5) || [],
+        possuiIssues: repo.issues?.length > 0,
+        possuiReleases: repo.releases?.length > 0,
+        possuiReadme: !!repo.readme?.content,
+        possuiLicense: !!repo.license?.name || !!repo.license?.key,
+        possuiGitignore: !!repo.gitignore?.content,
+        possuiDocs: Array.isArray(repo.docsContent) && repo.docsContent.length > 0,
+        detalhes: {
+        readme: repo.readme?.content || null,
+        changelog: repo.changelog?.content || null,
+        conduct: repo.conductcode?.content || null,
+        license: repo.license?.name || null,
+        gitignore: repo.gitignore?.content || null,
+        docs: repo.docsContent || [],
+        },
+    }));
+}
     
 
     async analyzeUserRepos(username: string) {
@@ -394,7 +415,7 @@ export class GithubService {
 
         }
 
-        return results;
+        return this.formatRepoData(results);
     }
 
 }
