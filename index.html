@@ -4,322 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GuiaDev</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e2e8f0;
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            background: rgba(15, 15, 35, 0.9);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(59, 130, 246, 0.2);
-            padding: 2rem;
-            overflow-y: auto;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: white;
-        }
-
-        .logo h1 {
-            font-size: 1.25rem;
-            background: linear-gradient(135deg, #3b82f6, #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-section {
-            margin-bottom: 2rem;
-        }
-
-        .nav-section h3 {
-            color: #94a3b8;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .nav-item {
-            display: block;
-            color: #cbd5e1;
-            text-decoration: none;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.25rem;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border-left-color: #3b82f6;
-            transform: translateX(4px);
-        }
-
-        .nav-item.active {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            border-left-color: #60a5fa;
-        }
-
-        .main-content {
-            padding: 3rem;
-            overflow-y: auto;
-        }
-
-        .content-header {
-            margin-bottom: 3rem;
-            text-align: center;
-        }
-
-        .content-header h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #3b82f6, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        .content-header p {
-            font-size: 1.125rem;
-            color: #94a3b8;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .sprint-selector {
-            background: rgba(15, 15, 35, 0.7);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .sprint-selector h3 {
-            color: #60a5fa;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sprint-buttons {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .sprint-btn {
-            background: linear-gradient(135deg, #1e40af, #3b82f6);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sprint-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .sprint-btn:hover::before {
-            left: 100%;
-        }
-
-        .sprint-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-        }
-
-        .sprint-btn.active {
-            background: linear-gradient(135deg, #059669, #10b981);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .content-section {
-            background: rgba(15, 15, 35, 0.7);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
-            color: #60a5fa;
-            margin: 1.5rem 0 1rem 0;
-        }
-
-        .markdown-content h1 {
-            font-size: 2rem;
-            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
-            padding-bottom: 0.5rem;
-        }
-
-        .markdown-content h2 {
-            font-size: 1.5rem;
-        }
-
-        .markdown-content h3 {
-            font-size: 1.25rem;
-        }
-
-        .markdown-content p {
-            margin-bottom: 1rem;
-            color: #cbd5e1;
-        }
-
-        .markdown-content ul, .markdown-content ol {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .markdown-content li {
-            margin-bottom: 0.5rem;
-            color: #cbd5e1;
-        }
-
-        .markdown-content blockquote {
-            border-left: 4px solid #3b82f6;
-            padding-left: 1rem;
-            margin: 1rem 0;
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 0 8px 8px 0;
-        }
-
-        .markdown-content code {
-            background: rgba(59, 130, 246, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Fira Code', 'Consolas', monospace;
-            color: #60a5fa;
-        }
-
-        .markdown-content pre {
-            background: #1a1a2e;
-            padding: 1.5rem;
-            border-radius: 12px;
-            overflow-x: auto;
-            margin: 1rem 0;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .markdown-content pre code {
-            background: none;
-            padding: 0;
-            color: #e2e8f0;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 3rem;
-            color: #94a3b8;
-        }
-
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #94a3b8;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-            margin-left: 1rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                position: static;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-            }
-            
-            .main-content {
-                padding: 1.5rem;
-            }
-            
-            .content-header h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -357,16 +45,6 @@
                 <h2>🚀 Bem-vindo ao GuiaDev</h2>
                 <div class="markdown-content">
                     <p>Esta plataforma foi desenvolvida para facilitar a criação, organização e manutenção de documentação técnica em projetos de software. Aqui você encontrará:</p>
-                    
-                    <!-- <h3>📋 Funcionalidades Principais</h3>
-                    <ul>
-                        <li><strong>Editor Markdown Avançado:</strong> Interface intuitiva com preview em tempo real</li>
-                        <li><strong>Templates Personalizáveis:</strong> Modelos prontos para diferentes tipos de documentação</li>
-                        <li><strong>Colaboração em Equipe:</strong> Sistema de compartilhamento e comentários</li>
-                        <li><strong>Versionamento:</strong> Controle de versões integrado com Supabase</li>
-                        <li><strong>Integração Git:</strong> Export para repositórios e sync automático</li>
-                        <li><strong>Type Safety:</strong> TypeScript em todo o stack para maior confiabilidade</li>
-                    </ul> -->
                     
                     <h3>🎯 Objetivos do Projeto</h3>
                     <p>O GuiaDev visa resolver os principais desafios na criação de documentação técnica:</p>
@@ -439,9 +117,6 @@
             <div id="api-section" class="content-section" style="display: none;">
                 <h2>🔌 API Reference</h2>
                 <div class="markdown-content">
-                    <!-- <h3>Base URL</h3>
-                    <pre><code>https://api.techwrite.com/v1</code></pre>
-                     -->
                     <h3>Autenticação</h3>
                     <p>Utilizamos Supabase Auth com JWT tokens. Inclua o token no header:</p>
                     <pre><code>Authorization: Bearer {your-jwt-token}</code></pre>
@@ -460,11 +135,6 @@ PUT    /documents/:id       # Atualizar documento
 DELETE /documents/:id       # Deletar documento
 POST   /documents/:id/share # Compartilhar documento</code></pre>
                     
-                    <!-- <h3>Templates</h3>
-                    <pre><code>GET  /templates        # Listar templates
-POST /templates        # Criar template
-GET  /templates/:id    # Buscar template</code></pre>
-                     -->
                     <h3>Projetos/Sprints</h3>
                     <pre><code>GET    /projects           # Listar projetos
 POST   /projects           # Criar projeto
@@ -473,11 +143,6 @@ PUT    /projects/:id       # Atualizar projeto
 GET    /projects/:id/sprints # Listar sprints do projeto
 POST   /projects/:id/sprints # Criar sprint</code></pre>
                     
-                    <!-- <h3>Upload de Arquivos</h3>
-                    <pre><code>POST /upload/markdown  # Upload de arquivos .md
-POST /upload/images    # Upload de imagens
-GET  /files/:id        # Download de arquivo</code></pre>
-                     -->
                     <h3>Exemplo de Resposta</h3>
                     <pre><code>{
   "success": true,
@@ -510,8 +175,6 @@ GET  /files/:id        # Download de arquivo</code></pre>
         // ====================================
         // EDITE AQUI: Adicione os caminhos dos seus arquivos .md
         const markdownFiles = [
-            // Exemplo de como adicionar:
-            // { path: 'docs/sprint-1.md', name: 'Sprint 1' },
             {path: 'Docs/Milestones/Sprint-01/nestjs.md', name: 'Sprint 01 - Estudo Nest'},
             {path: 'Docs/Milestones/Sprint-01/React.md', name: 'Sprint 01 - Estudo React'},
             {path: 'Docs/Milestones/Sprint-02/documento-de-requisitos.md', name: 'Sprint 02 - Levantamento de Requisitos'},
@@ -520,17 +183,15 @@ GET  /files/:id        # Download de arquivo</code></pre>
             {path: 'Docs/Milestones/Sprint-04/Revisão Geral Sprint 04.md', name: 'Sprint 04'},
             {path: 'Docs/Milestones/Sprint-04/padrão_commits.md', name: 'Sprint 04 - Padrão de Commits'},
             {path: 'Docs/Milestones/Sprint-04/revisão_de_documento_da_R1.md', name: 'Sprint 04 - Revisão Release 1'},
-            
-     
         ];
 
-        // Estado da aplicação (vazio inicialmente)
+        // Estado da aplicação
         let sprintData = {};
 
         // Função para carregar arquivos markdown
         async function loadMarkdownFiles() {
             const sprintButtons = document.getElementById('sprint-buttons');
-            sprintButtons.innerHTML = ''; // Limpa botões existentes
+            sprintButtons.innerHTML = '';
             
             if (markdownFiles.length === 0) {
                 document.getElementById('sprint-content').innerHTML = `
@@ -555,13 +216,11 @@ GET  /files/:id        # Download de arquivo</code></pre>
                         const content = await response.text();
                         const fileKey = file.path.replace(/[^a-zA-Z0-9]/g, '-');
                         
-                        // Adiciona ao sprintData
                         sprintData[fileKey] = {
                             title: file.name,
                             content: content
                         };
                         
-                        // Cria botão
                         const btn = document.createElement('button');
                         btn.className = 'sprint-btn';
                         btn.dataset.sprint = fileKey;
@@ -583,7 +242,6 @@ GET  /files/:id        # Download de arquivo</code></pre>
                 }
             }
             
-            // Carrega o primeiro arquivo automaticamente
             if (Object.keys(sprintData).length > 0) {
                 const firstKey = Object.keys(sprintData)[0];
                 document.querySelector(`[data-sprint="${firstKey}"]`)?.classList.add('active');
@@ -591,7 +249,6 @@ GET  /files/:id        # Download de arquivo</code></pre>
             }
         }
 
-        // Gerenciamento de sprints
         function loadSprintContent(sprintId) {
             const sprintContent = document.getElementById('sprint-content');
             const data = sprintData[sprintId];
@@ -610,28 +267,22 @@ GET  /files/:id        # Download de arquivo</code></pre>
                 `;
             }
             
-            // Highlight code blocks
             sprintContent.querySelectorAll('pre code').forEach(block => {
                 hljs.highlightElement(block);
             });
         }
 
-        // Gerenciamento de navegação
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 
-                // Remove active de todos os itens
                 document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                // Adiciona active ao item clicado
                 item.classList.add('active');
                 
-                // Esconde todas as seções
                 document.querySelectorAll('[id$="-section"]').forEach(section => {
                     section.style.display = 'none';
                 });
                 
-                // Mostra a seção correspondente
                 const sectionId = item.dataset.section + '-section';
                 const section = document.getElementById(sectionId);
                 if (section) {
@@ -640,12 +291,10 @@ GET  /files/:id        # Download de arquivo</code></pre>
             });
         });
 
-        // Carrega arquivos markdown na inicialização
         document.addEventListener('DOMContentLoaded', () => {
             loadMarkdownFiles();
         });
 
-        // Configuração do marked para sintaxe highlighting
         marked.setOptions({
             highlight: function(code, lang) {
                 if (lang && hljs.getLanguage(lang)) {
