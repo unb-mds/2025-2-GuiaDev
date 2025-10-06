@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from '../modules/user/user.module';
 import { authModule } from 'src/modules/auth/auth.module';
-import { GithubModule } from 'src/github/github.module';
+import { GithubModule } from 'src/modules/github/github.module';
 
 @Module({
   imports: [
