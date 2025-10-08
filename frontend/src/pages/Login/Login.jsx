@@ -1,36 +1,13 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
+
 import "./Login.css";
 import Footer from "../../components/Footer/Footer";
-import api from "../../../services/api";
+
+
+import Sign_in from "../../components/Sign-in/Sign-in";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await api.post("/auth/login", {
-        email: email,
-        password: senha, // Corrigido para 'password'
-      });
-
-      const { access_token } = response.data; // Corrigido para 'access_token'
-
-      localStorage.setItem("authToken", access_token);
-      console.log("Token salvo:", access_token);
-      console.log("Redirecionando para /home");
-
-      navigate("/home");
-    } catch (err) {
-      console.error("Erro no login:", err);
-      alert("E-mail ou senha inválidos. Tente novamente.");
-    }
-  };
+  
 
   return (
     <div className="login-page">
@@ -57,49 +34,8 @@ export default function Login() {
           </ul>
         </div>
 
-        <div className="content-right">
-          <div className="login-box">
-            <div className="tabs">
-              <button className="active">Entrar</button>
-              <button>Cadastro</button>
-            </div>
-            <h2>Entrar na sua conta</h2>
-            <p className="subtitle">Acesse sua jornada de desenvolvedor</p>
-
-            <form onSubmit={handleSubmit}>
-              <label>E-mail</label>
-              <input
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <label>Senha</label>
-              <input
-                type="password"
-                placeholder="**********"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                required
-              />
-              <div className="options">
-                <label>
-                  <input type="checkbox" /> Lembrar de mim
-                </label>
-                <a href="#">Esqueci minha senha</a>
-              </div>
-              <button type="submit" className="btn-entrar">
-                Entrar
-              </button>
-            </form>
-            <div className="divider">ou continue com</div>
-
-            <div className="social-login">
-              <button className="btn-social google">Google</button>
-              <button className="btn-social github">GitHub</button>
-            </div>
-          </div>
+        <div className="content-right">      
+          <Sign_in/>
         </div>
       </div>
       <Footer />

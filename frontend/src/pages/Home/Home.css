@@ -9,7 +9,12 @@
 /* Estilo para a área do conteúdo principal */
 .Boxrepo {
   display: flex;
-  padding: 40px; /* Espaçamento interno para o conteúdo respirar */
-  margin-left: auto;
-  margin-top: auto;
+  margin-left: 20vw;
+ 
+  /* background-color: red; */
+  width: 100%;
+  min-height: 100vh;
+  /* background-color: aqua; */
+  /* margin-left: auto; */
+  /* justify-content: center; */
 }

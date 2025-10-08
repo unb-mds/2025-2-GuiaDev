@@ -4,14 +4,15 @@ body,
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+
   box-sizing: border-box; /* Garante que padding e bordas não adicionem largura extra */
 }
 
 .AppContainer {
   width: 100%;
   height: 100%;
-  background-color: aqua;
+  /* background-color: aqua; */
+  
 }
 
 .Main {
@@ -19,6 +20,7 @@ body,
   background-color: white;
   width: 100%; 
   height: 100%;
+  margin-top: 80px;
 
 }
 
@@ -26,7 +28,9 @@ body,
 .content {
   overflow-y: auto; /* Mantém a barra de rolagem vertical só aqui */
   flex: 1;
+  height: 100%;
   min-width: 100%;
-  /* height: 100%; */
+  
+ 
   /* background-color: blueviolet; */
 }

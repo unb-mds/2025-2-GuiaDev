@@ -10,7 +10,9 @@ function App() {
 
   return (
     <div className="AppContainer">
+      <div>
       <Header />
+      </div>
       <div className="Main">
        {showSideBar && <SideBar />}
 
