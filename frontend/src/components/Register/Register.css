@@ -1,0 +1,141 @@
+/* card de login */
+.register-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 380px;
+  height: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 0.6rem;
+  border: none;
+  background: none;
+  font-weight: bold;
+  cursor: pointer;
+  color: #667;
+  border-bottom: 2px solid transparent;
+  transition: 0.3s;
+}
+
+.tabs button.active {
+  color: #0f47c0;
+  border-bottom: 2px solid #0f47c0;
+}
+
+/* título e subtítulo */
+.register-box h2 {
+  margin-bottom: 0.3rem;
+  font-size: 1.3rem;
+}
+
+.register-box .subtitle {
+  font-size: 0.9rem;
+  color: #667;
+  margin-bottom: 1.5rem;
+}
+
+form label {
+  font-size: 0.85rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+form input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+/* opções (lembrar/esqueci a senha) */
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.option a {
+  font-size: 0.85rem;
+  color: #0f47c0;
+  text-decoration: none;
+}
+
+/* botão de entrar */
+.btn-entrar,
+.btn-cadastrar {
+  width: 100%;
+  padding: 0.7rem;
+  background: #0f47c0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-entrar:hover,
+.btn-cadastrar:hover {
+  background: #093599;
+}
+
+.divider {
+  margin: 1.2rem 0;
+  color: #778;
+  font-size: 0.85rem;
+  position: relative;
+  text-align: center;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #ddd;
+}
+.divider::before {
+  left: 0;
+}
+.divider::after {
+  right: 0;
+}
+
+/* .social-login {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+} */
+
+/* .btn-social {
+    flex: 1;
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.google {
+    color: #db4437;
+}
+
+.github {
+    color: #333;
+} */

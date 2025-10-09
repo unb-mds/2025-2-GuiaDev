@@ -1,17 +1,18 @@
 .box-repo-container {
-  padding: 10px;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    min-width: 1000px;
-  width: 100%;
+  min-width: 1000px;
   color: #344256;
   font-size: 10px;
+  /* margin-top: 10vh; */
+  /* background-color: red; */
+  width: 100%;
+  margin-top: 5vh;
 }
 .scroll {
   display: flex; /* Ativa o flexbox para permitir a centralização do filho */
   width: 100%;
- 
- 
+ margin-right: 2vw;
 }
 .boxes-list {
   display: flex;
@@ -23,8 +24,6 @@
 
   margin: 0 auto;
 }
-
-
 
 .box-item {
   color: #344256;
@@ -44,41 +43,37 @@
   justify-content: center;
 }
 
-.name{
-  font-size: 18px; 
+.name {
+  font-size: 18px;
 }
 
-.box-item svg{
-    height: 50px;
-    
+
+.box-item h2 {
+  font-size: 30px;
 }
 
-.box-item h2{
-    font-size: 30px;
+.box-item p {
+  font-size: 14px;
 }
-
-.box-item p{
-    font-size: 14px;
-}
-
 
 .boxes-list-repo {
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: repeat(2, 1fr);
   overflow-x: auto;
-gap:10px;
+  gap: 10px;
   padding-bottom: 16px;
   width: 100%;
-  /* ALTURA CORRIGIDA com base no seu card de 320px */
-  height: 400px; /* (4 * 320px) + (3 * 24px de gap) */
+  /* margin-right: 2vw; */
+  
+  height: 500px; /* (4 * 320px) + (3 * 24px de gap) */
 }
 
 .box-item-repo {
   color: #344256;
   border: 1px solid #777777;
   margin-top: 50px;
-  
+
   margin-bottom: 10px;
   padding: 10px 20px;
   border-radius: 10px;
@@ -87,7 +82,7 @@ gap:10px;
   /* min-width: 200px; Largura mínima da caixa */
   width: 270px;
   height: 280px;
-  
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -96,6 +91,7 @@ gap:10px;
 
 .repo-section {
   margin-top: 10px;
+  
 }
 
 .info {
@@ -108,48 +104,38 @@ gap:10px;
   width: 230px;
   height: 36px;
   border-radius: 5px;
-  
 }
 
 .info:hover {
   background-color: #344256;
   color: white;
-  
 }
 
 .box-item h1 {
   font-size: 25px;
 }
 
-
 .boxes-list::-webkit-scrollbar {
   height: 8px;
-  
-  
 }
 .boxes-list::-webkit-scrollbar-track {
   background: #757373;
   border-radius: 10px;
-
 }
 .boxes-list::-webkit-scrollbar-thumb {
   background: #0f53c2;
   border-radius: 10px;
-
 }
 
 .boxes-list-repo::-webkit-scrollbar {
   height: 8px;
   width: 8px;
-  
 }
 .boxes-list-repo::-webkit-scrollbar-track {
   background: #757373;
   border-radius: 10px;
-
 }
 .boxes-list-repo::-webkit-scrollbar-thumb {
   background: #0f53c2;
   border-radius: 10px;
-
 }

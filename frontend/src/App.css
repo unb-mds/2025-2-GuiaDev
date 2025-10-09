@@ -1,24 +1,36 @@
-/* Remove margens padrão e define o box-sizing para facilitar os cálculos */
-* {
-  box-sizing: border-box;
+html,
+body,
+#root {
   margin: 0;
   padding: 0;
+  width: 100%;
+
+  box-sizing: border-box; /* Garante que padding e bordas não adicionem largura extra */
+}
+
+.AppContainer {
+  width: 100%;
+  height: 100%;
+  /* background-color: aqua; */
   
 }
-.Main{
-display: flex;
-background-color: white;
-width: 100vw;
-height: 100vh;
-margin-top: 100px;
 
+.Main {
+  display: flex;
+  background-color: white;
+  width: 100%; 
+  height: 100%;
+  margin-top: 80px;
 
 }
+
 /* Estilo para a área do conteúdo principal */
-.Boxrepo {
-  flex-grow: 1; /* FAZ O CONTEÚDO OCUPAR TODO O RESTO DO ESPAÇO! */
-  padding: 40px; /* Espaçamento interno para o conteúdo respirar */
-  overflow-y: auto; /* Adiciona uma barra de rolagem SÓ AQUI se o conteúdo for longo */
-  width: 100%;
-  margin-left: 255px;
+.content {
+  overflow-y: auto; /* Mantém a barra de rolagem vertical só aqui */
+  flex: 1;
+  height: 100%;
+  min-width: 100%;
+  
+ 
+  /* background-color: blueviolet; */
 }

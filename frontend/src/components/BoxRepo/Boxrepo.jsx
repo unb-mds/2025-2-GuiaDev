@@ -86,9 +86,10 @@ function BoxRepo() {
     // Um único div container para a página é suficiente
     <div className="box-repo-container">
       {/* --- PRIMEIRA SEÇÃO: DASHBOARD/ESTATÍSTICAS --- */}
-
+      <div>
       <h1>Dashboard</h1>
       <br />
+      </div>
       <h2>Acompanhe o progresso da documentação dos seus repositórios!</h2>
       <div className="scroll">
         <div className="boxes-list">

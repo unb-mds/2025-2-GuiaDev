@@ -1,53 +1,26 @@
-import { useState, useEffect } from "react";
-import "./App.css"; 
-import Login from "./Login"; 
-import SideBar from "./components/Sidebar/Sidebar.jsx"; 
-import BoxRepo from "./components/BoxRepo/Boxrepo.jsx"; 
-import Header from "./Header.jsx";
-//outlett aquii
+import { Outlet, useLocation } from "react-router-dom"; // 1. Importe o Outlet!
+import Header from "./components/Header/Header.jsx";
+import SideBar from "./components/Sidebar/Sidebar.jsx";
+import "./App.css";
 
 function App() {
- 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+  const location = useLocation();
+  const  hiddenSideBarPaths = ["/login"];
+  const showSideBar = !hiddenSideBarPaths.includes(location.pathname); 
 
-  useEffect(() => {
-
-    if (window.location.pathname.toLowerCase() === "/main") {
-      setIsLoggedIn(true);
-    }
-  }, []);
-
-
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-  };
-
-
-  
-
-
-  if (!isLoggedIn) {
-    return (
-      <div className="App">
-        {/* Passa a função de sucesso para o Login */}
-        <Login onLoginSuccess={handleLoginSuccess} />
-      </div>
-    );
-  }
-
- 
   return (
-    <>
-     <Header/>
+    <div className="AppContainer">
+      <div>
+      <Header />
+      </div>
       <div className="Main">
-     
-        <SideBar />
-        <div className="Boxrepo">
-          <BoxRepo />
+       {showSideBar && <SideBar />}
+
+        <div className="content">
+          <Outlet />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
