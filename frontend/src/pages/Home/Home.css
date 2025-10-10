@@ -1,0 +1,20 @@
+/* Remove margens padrão e define o box-sizing para facilitar os cálculos */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  
+}
+
+/* Estilo para a área do conteúdo principal */
+.Boxrepo {
+  display: flex;
+  margin-left: 20vw;
+ 
+  /* background-color: red; */
+  width: 100%;
+  min-height: 100vh;
+  /* background-color: aqua; */
+  /* margin-left: auto; */
+  /* justify-content: center; */
+}
