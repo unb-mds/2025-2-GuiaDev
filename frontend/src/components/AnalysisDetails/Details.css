@@ -1,0 +1,51 @@
+.structerProject {
+  width: 68vw;
+  border: solid 1px black;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+
+/* Issues list styles */
+.issuesList {
+  margin-top: 1.75rem;
+  border: 1px solid #e6eef9;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #fff;
+}
+.issuesList h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 18px;
+}
+.issueCard {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 8px;
+  background: #fafafa;
+  margin-bottom: 12px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02) inset;
+}
+.issueIcon img {
+  width: 60px;
+  padding: 0;
+  margin: 0;
+}
+.issueBody {
+  flex: 1 1 auto;
+}
+.issuePath {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+.issuePoints {
+  margin: 0;
+  padding-left: 18px;
+  color: #475569;
+}
+.issuePoints li {
+  margin-bottom: 6px;
+}

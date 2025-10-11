@@ -7,6 +7,10 @@ import App from "./App.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
 
+//teste componente depois tirar e montar a page
+
+import AnalysisPage from "./pages/Analysis/Analysis.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -23,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "analysis",
+        element: <AnalysisPage/>,
       },
     ],
   },

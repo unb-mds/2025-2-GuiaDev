@@ -9,7 +9,7 @@
 /* Estilo para a área do conteúdo principal */
 .Boxrepo {
   display: flex;
-  margin-left: 20vw;
+ justify-content: center; 
  
   /* background-color: red; */
   width: 100%;

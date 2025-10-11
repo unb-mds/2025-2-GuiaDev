@@ -16,7 +16,9 @@ const Home = () => {
 
   return (
     <div className="Boxrepo">
+      <div>
       <BoxRepo />
+      </div>
     </div>
   );
 };
