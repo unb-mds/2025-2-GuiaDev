@@ -1,18 +1,46 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChatController } from './chat.controller';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { ChatModule } from './chat.module';
+import { HttpService } from '@nestjs/axios';
+import { of } from 'rxjs';
 
-describe('ChatController', () => {
-  let controller: ChatController;
+describe('ChatController (e2e)', () => {
+  let app: INestApplication;
+  let httpService: HttpService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [ChatController],
-    }).compile();
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [ChatModule],
+    })
+      .overrideProvider(HttpService)
+      .useValue({
+        post: jest.fn(() =>
+          of({
+            data: {
+              candidates: [
+                { content: { parts: [{ text: 'Resposta simulada do Gemini' }] } },
+              ],
+            },
+          }),
+        ),
+      })
+      .compile();
 
-    controller = module.get<ChatController>(ChatController);
+    app = moduleFixture.createNestApplication();
+    await app.init();
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('/chat (POST) deve retornar a resposta da IA', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/chat')
+      .send({ message: 'teste' })
+      .expect(201);
+
+    expect(response.body.response).toContain('Resposta simulada');
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });
