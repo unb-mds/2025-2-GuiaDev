@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from '../modules/user/user.module';
 import { authModule } from 'src/modules/auth/auth.module';
 import { GithubModule } from 'src/modules/github/github.module';
+import { AnalysisModule } from 'src/modules/analyse/analysis.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GithubModule } from 'src/modules/github/github.module';
     UserModule,
     authModule,
     GithubModule,
+    AnalysisModule
   ],
   controllers: [AppController],
   providers: [AppService],
