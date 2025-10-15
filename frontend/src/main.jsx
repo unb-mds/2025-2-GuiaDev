@@ -8,14 +8,20 @@ import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
 import LearningPage from "./pages/LearningPage/LearningPage.jsx";
 
-
 const router = createBrowserRouter([
+  // 🔹 Rota isolada do Login (sem Header nem Sidebar)
+  {
+    path: "/login",
+    element: <Home />,
+  },
+
+  // 🔹 Layout principal (com Header e Sidebar)
   {
     path: "/",
     element: <App />,
     children: [
       {
-        index: true, // Rota padrão para "/"
+        index: true, // rota padrão ("/")
         element: <Home />,
       },
       {
@@ -23,11 +29,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "aprendizado", 
+        path: "aprendizado",
         element: <LearningPage />,
       },
     ],
