@@ -3,7 +3,8 @@
     display: flex;
     width: 100%;
     min-height: 100vh;
-    background: #0f47c0;
+    background: #0F172A;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 1) 0%, rgba(23, 32, 51, 1) 60%, rgba(37, 99, 235, 1) 100%);
     color: white;
     font-family: Arial, sans-serif;
     align-items: center;
