@@ -1,0 +1,32 @@
+.learning {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) 1fr;
+  max-width: 70%;
+  max-height: 100%;
+  padding: 2rem;
+  margin: 0;
+  gap: 15px;
+  
+}
+.root {
+   height: 100%; 
+}
+
+.content{
+  height: 100%; 
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-container {
+  display: flex;
+  width: 30%;
+  height: 100%;
+  padding: 10rem;
+
+}
+
+.sidebar-container {
+  background: #0F172A;
+}
