@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./card.css";
+import "./Card.css";
 
 export default function LearningCard({title, icon, expandedText}) {
 

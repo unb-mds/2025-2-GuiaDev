@@ -1,6 +1,6 @@
 import React from 'react';
 import './LearningPage.css';
-import LearningCard from '../../components/LearningCard/card';
+import LearningCard from '../../components/LearningCard/Card';
 import Chat from '../../components/Chat/Chat';
 
 const MockIcon = ({ children }) => <>{children}</>;
