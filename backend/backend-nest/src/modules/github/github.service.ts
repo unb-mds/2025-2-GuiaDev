@@ -352,6 +352,41 @@ export class GithubService {
         return docs;
     }
 
+    async checkFolders(owner, repo) {
+        const folders = ['src', 'src/components', 'src/hooks', 'src/utils', 'public'];
+        const results: any[] = [];
+
+        for (const path of folders) {
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            try {
+                const response = await this.http.axiosRef.get(url,{
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                        Accept: 'application/vnd.github+json',
+                }});
+            
+            results.push({
+                path,
+                exists: true,
+                items: response.data.length,
+                files: response.data.map(f => f.name)
+            });
+            } 
+            catch (error) {
+                results.push({
+                    path,
+                    existe: false,
+                    items: 0,
+                    files: []
+                });
+            }
+        }
+
+        return results;
+    }
+
+
+
     formatRepoData(reposData: any[]) {
     return reposData.map((repo, index) => ({
         id: index + 1,
@@ -364,6 +399,9 @@ export class GithubService {
         possuiLicense: !!repo.license?.name || !!repo.license?.key,
         possuiGitignore: !!repo.gitignore?.content,
         possuiDocs: Array.isArray(repo.docsContent) && repo.docsContent.length > 0,
+        conduct: !!repo.conductcode?.content,
+        changelog: !!repo.changelog?.content,
+
         detalhes: {
         readme: repo.readme?.content || null,
         changelog: repo.changelog?.content || null,
@@ -372,6 +410,10 @@ export class GithubService {
         gitignore: repo.gitignore?.content || null,
         docs: repo.docsContent || [],
         },
+
+        Folders: repo.checkFolders  || [],
+        
+        
     }));
 }
     
@@ -385,7 +427,7 @@ export class GithubService {
             const owner = repo.owner.login;
             const name = repo.name;
 
-            const [commits, issues, releases, readme, changelog, license, gitignore, conductcode, docs, docsContent] = await Promise.allSettled([
+            const [commits, issues, releases, readme, changelog, license, contributing, gitignore, conductcode, docs, docsContent, checkFolders] = await Promise.allSettled([
                 this.getCommits(owner, name),
                 this.getIssues(owner, name),
                 this.getReleases(owner, name),
@@ -397,6 +439,7 @@ export class GithubService {
                 this.getGitignore(owner, name),
                 this.getDocs(owner, name),
                 this.getDocsContent(owner, name),
+                this.checkFolders(owner, name),
             ]);
 
             results.push({       //essa bomba ai serve pra evitar error 500 e 404
@@ -410,7 +453,9 @@ export class GithubService {
             license: license.status === 'fulfilled' ? license.value : [],
             gitignore: gitignore.status === 'fulfilled' ? gitignore.value : { content: null },
             docs:docs.status === 'fulfilled' ? docs.value : { content: null },
+            contributing: contributing.status === 'fulfilled' ? contributing.value : [],
             docsContent: docsContent.status === 'fulfilled' ? docsContent.value : [],
+            checkFolders: checkFolders.status === 'fulfilled' ? checkFolders.value : [],    
             });
 
         }

@@ -62,6 +62,11 @@ export class GithubController {
     return this.githubService.getDocs(owner, repo);
     }
 
+    @Get('folder/repo/:owner/:repo')
+    async checkFolders(@Param('owner') owner: string, @Param('repo') repo: string) {
+    return this.githubService.checkFolders(owner, repo);
+    }
+
     @Get('content/docs/:owner/:repo')
     async getDocsContent(@Param('owner') owner: string, @Param('repo') repo: string) {
     return this.githubService.getDocsContent(owner, repo);
