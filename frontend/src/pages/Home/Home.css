@@ -2,29 +2,51 @@
 .learning-page {
   display: flex;
   height: 100vh;
-  width: 100%;
-  background: linear-gradient(90deg, rgba(15, 23, 42, 1) 0%, rgba(23, 32, 51, 1) 60%, rgba(37, 99, 235, 1) 100%);
+  width: 100vw;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 1) 0%,
+    rgba(23, 32, 51, 1) 60%,
+    rgba(37, 99, 235, 1) 100%
+  );
+  font-family: "Inter", Arial, sans-serif;
   position: relative;
-  font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
+/* ===== Fundo decorativo ===== */
 .learning-page::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.15), transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.15), transparent 50%);
+  background: radial-gradient(
+      circle at 20% 50%,
+      rgba(37, 99, 235, 0.15),
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(59, 130, 246, 0.15),
+      transparent 50%
+    );
   pointer-events: none;
+  z-index: 0;
 }
 
 /* ===== Conteúdo Principal ===== */
 .learning-content {
-  flex: 1;
-  padding: 2.5rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 320px; /* 👈 garante que o conteúdo vá até o chat */
   overflow-y: auto;
-  position: relative;
+  padding: 2.5rem 3rem;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: transparent;
 }
 
 /* ===== Header ===== */
@@ -34,296 +56,180 @@
 }
 
 .learning-title {
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-size: 2.6rem;
+  font-weight: 700;
   color: #ffffff;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  letter-spacing: -0.5px;
 }
 
 .learning-subtitle {
   font-size: 1.1rem;
-  color: #e0e0e0;
+  color: #d9e3ff;
   font-weight: 400;
+  opacity: 0.9;
 }
 
 /* ===== Grid de Cards ===== */
 .learning-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.8rem;
+  width: 100%;
   animation: fadeInUp 0.8s ease-out;
+  padding-bottom: 2rem;
 }
 
 /* ===== Cards ===== */
 .learning-grid .card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(15px);
+  border-radius: 14px;
+  padding: 1.8rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease,
+    background 0.3s ease;
   cursor: pointer;
-  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .learning-grid .card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 12px 48px rgba(37, 99, 235, 0.3);
-  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.3);
+  border-color: rgba(59, 130, 246, 0.6);
+  background: rgba(255, 255, 255, 0.96);
 }
 
+/* ===== Cabeçalho dos Cards ===== */
 .learning-grid .card-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .learning-grid .card-icon {
-  font-size: 1.5rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  color: #2563eb;
+  opacity: 0.9;
+  transition: color 0.3s ease, opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.learning-grid .card:hover .card-icon {
+  color: #1e40af;
+  opacity: 1;
 }
 
 .learning-grid .card h3 {
-  color: #1e293b;
+  color: #0f172a;
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0;
+  letter-spacing: -0.3px;
 }
 
+/* ===== Texto dos Cards ===== */
 .learning-grid .card-text {
-  color: #475569;
+  color: #334155;
   font-size: 0.95rem;
   line-height: 1.6;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 0.8rem;
+  opacity: 0.95;
+  transition: opacity 0.3s ease;
+}
+
+.learning-grid .card:hover .card-text {
+  opacity: 1;
 }
 
 /* ===== Container do Chat ===== */
 .chat-container {
-  width: 250px; /* 👈 menor largura */
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100vh;
   background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(59, 130, 246, 0.2);
+  backdrop-filter: blur(25px);
+  border-left: 1px solid rgba(59, 130, 246, 0.25);
   display: flex;
   flex-direction: column;
-  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
-  position: relative;
-  z-index: 2;
-  transition: width 0.3s ease;
+  box-shadow: -5px 0 35px rgba(0, 0, 0, 0.25);
+  z-index: 10;
 }
 
-/* ===== Estilos do Chat ===== */
-.chat {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.chat-header {
-  padding: 1rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 1) 0%, rgba(37, 99, 235, 1) 100%);
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.chat-header-content {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.chat-icon {
-  font-size: 1.1rem;
-}
-
-.chat-header h2 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.status-indicator {
-  color: #48bb78;
-  font-size: 0.7rem;
-  animation: pulse 2s infinite;
-}
-
-.chat-messages {
-  flex: 1;
-  padding: 1rem;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  background: #f7fafc;
-}
-
-.message {
-  display: flex;
-  animation: slideIn 0.3s ease-out;
-}
-
-.message.user {
-  justify-content: flex-end;
-}
-
-.message.bot {
-  justify-content: flex-start;
-}
-
-.message-bubble {
-  max-width: 75%;
-  padding: 0.6rem 0.9rem;
-  border-radius: 14px;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.message.user .message-bubble {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 1) 0%, rgba(37, 99, 235, 1) 100%);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.message.bot .message-bubble {
-  background: white;
-  color: #2d3748;
-  border-bottom-left-radius: 4px;
-  border: 1px solid #e2e8f0;
-}
-
-.chat-input-form {
-  padding: 0.8rem;
-  background: white;
-  border-top: 1px solid #e2e8f0;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.chat-input {
-  flex: 1;
-  padding: 0.6rem 0.9rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 18px;
-  font-size: 0.85rem;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.chat-input:focus {
-  border-color: #3B82F6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.chat-send-btn {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 1) 0%, rgba(37, 99, 235, 1) 100%);
-  border: none;
-  border-radius: 50%;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.chat-send-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-}
-
-.chat-send-btn:active {
-  transform: scale(0.95);
-}
-
-/* ===== Scroll personalizado ===== */
+/* ===== Scrollbar ===== */
 ::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
 }
-
 ::-webkit-scrollbar-thumb {
   background: rgba(59, 130, 246, 0.5);
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.8);
 }
 
 /* ===== Animações ===== */
 @keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+.learning-grid .card:hover {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
 }
 
 /* ===== Responsividade ===== */
+@media (max-width: 1280px) {
+  .learning-content {
+    right: 280px;
+    padding: 2rem;
+  }
+  .chat-container {
+    width: 280px;
+  }
+}
+
 @media (max-width: 1024px) {
   .learning-page {
     flex-direction: column;
   }
 
   .learning-content {
+    position: relative;
+    width: 100%;
+    right: 0;
     padding: 2rem;
   }
 
   .chat-container {
+    position: relative;
     width: 100%;
     height: 45vh;
+    box-shadow: none;
     border-left: none;
-    border-top: 1px solid rgba(59, 130, 246, 0.2);
-  }
-}
-
-@media (max-width: 768px) {
-  .learning-content {
-    padding: 1.5rem;
-  }
-
-  .learning-header {
-    margin-bottom: 2rem;
-  }
-
-  .learning-title {
-    font-size: 1.75rem;
-  }
-
-  .learning-subtitle {
-    font-size: 1rem;
-  }
-
-  .learning-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .chat-container {
-    height: 50vh;
+    border-top: 1px solid rgba(59, 130, 246, 0.25);
   }
 }
