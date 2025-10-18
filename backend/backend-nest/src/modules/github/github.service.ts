@@ -9,7 +9,7 @@ export class GithubService {
     private token = process.env.GITHUB_TOKEN;
 
     async getUserRepos(username: string){
-        const url = `https://api.github.com/users/${username}/repos`;
+        const url = `https://api.github.com/users/${username}/repos?sort=updated&direction=desc`;
 
         const response = await this.http.axiosRef.get(url, {
             headers: {
@@ -352,39 +352,118 @@ export class GithubService {
         return docs;
     }
 
-    async checkFolders(owner, repo) {
-        const folders = ['src', 'src/components', 'src/hooks', 'src/utils', 'public'];
-        const results: any[] = [];
+    async checkFolders(owner: string, repo: string) {
+        const foldersToCheck = ['src', 'src/components', 'src/hooks', 'src/utils', 'public'];
 
-        for (const path of folders) {
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            try {
-                const response = await this.http.axiosRef.get(url,{
-                    headers: {
-                        Authorization: `Bearer ${this.token}`,
-                        Accept: 'application/vnd.github+json',
-                }});
-            
-            results.push({
-                path,
-                exists: true,
-                items: response.data.length,
-                files: response.data.map(f => f.name)
+        const itemsToCheck = [
+            '.github/issue_template',
+            'governance.md',
+            'docs/governance.md',
+            '.github/pull_request_template.md',
+            '.github/pull_request_template',
+            'arquitetura.md',
+            'docs/arquitetura.md',
+            'arquitetura',
+            'roadmap.md',
+            'docs/roadmap.md',
+            'roadmap'
+        ];
+        
+        const results: ( { path: string; exists: boolean; } )[] = [];
+
+        const defaultArchResults = foldersToCheck.map(path => ({ path, exists: false, files: [] }));
+        const defaultCommResults = [
+            { path: 'issue_templates', exists: false },
+            { path: 'governance', exists: false },
+            { path: 'pull_request_template', exists: false },
+            { path: 'arquitetura', exists: false },
+            { path: 'roadmap', exists: false },
+        ];
+        const defaultResults = [...defaultArchResults, ...defaultCommResults];
+
+
+        try {
+            const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`;
+            const treeResponse = await this.http.axiosRef.get(treeUrl, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`,
+                    Accept: 'application/vnd.github+json',
+                },
             });
-            } 
-            catch (error) {
-                results.push({
-                    path,
-                    existe: false,
-                    items: 0,
-                    files: []
-                });
+
+            const tree = treeResponse.data.tree || [];
+
+            
+            const allPaths = tree.map((item: any) => item.path.toLowerCase());
+            
+            const allFilePaths = tree
+                .filter((item: any) => item.path && item.type === 'blob')
+                .map((item: any) => item.path.toLowerCase());
+
+
+            for (const folder of foldersToCheck) {
+                const normalizedFolder = folder.toLowerCase();
+
+                const exists = allFilePaths.some(
+                    (p) =>
+                        p.startsWith(`${normalizedFolder}/`) ||
+                        p.includes(`/${normalizedFolder}/`)
+                );
+
+                const files = exists
+                    ? allFilePaths
+                        .filter(
+                            (p) =>
+                                p.startsWith(`${normalizedFolder}/`) &&
+                                p.split('/').length === normalizedFolder.split('/').length + 1
+                        )
+                        .map((p) => p.split('/').pop()!)
+                    : [];
+
+                results.push({ path: folder, exists,});
             }
+
+            const foundItems = new Set<string>();
+            for (const item of itemsToCheck) {
+                const normalizedItem = item.toLowerCase();
+
+                const exists = allPaths.some(p =>
+                    p === normalizedItem ||
+                    p.startsWith(`${normalizedItem}/`)
+                );
+
+                if (exists) {
+                    foundItems.add(item);
+                }
+            }
+
+            results.push({
+                path: 'issue_templates',
+                exists: foundItems.has('.github/issue_template')
+            });
+            results.push({
+                path: 'governance',
+                exists: foundItems.has('governance.md') || foundItems.has('docs/governance.md')
+            });
+            results.push({
+                path: 'pull_request_template',
+                exists: foundItems.has('.github/pull_request_template.md') || foundItems.has('.github/pull_request_template')
+            });
+            results.push({
+                path: 'arquitetura',
+                exists: foundItems.has('arquitetura.md') || foundItems.has('docs/arquitetura.md') || foundItems.has('arquitetura')
+            });
+            results.push({
+                path: 'roadmap',
+                exists: foundItems.has('roadmap.md') || foundItems.has('docs/roadmap.md') || foundItems.has('roadmap')
+            });
+
+        } catch (error) {
+            return defaultResults;
         }
 
         return results;
     }
-
 
 
     formatRepoData(reposData: any[]) {
