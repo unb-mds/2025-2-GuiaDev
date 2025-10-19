@@ -16,8 +16,13 @@ function App() {
 
       <div className="Main">
         
-        <div className="sideBar">{showSideBar && <SideBar />}</div>
+        {/* <div className="sideBar">{showSideBar && <SideBar />}</div> */}
         
+        {showSideBar && (
+          <div className="sideBar">
+            <SideBar />
+          </div>
+        )}
         <div className="content">
           <Outlet />
         </div>

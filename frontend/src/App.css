@@ -56,8 +56,9 @@ body,
   height: calc(100vh - var(--header-height));
   /* background-color: aqua; */
   min-width: calc(100% - 260px);
+  min-width: 100%;
   padding-top: 120px;
-  /* background-color: blue; */
+  /* background-color: red; */
   
 }
 }
