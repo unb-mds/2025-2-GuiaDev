@@ -12,7 +12,7 @@ const router = createBrowserRouter([
   // 🔹 Rota isolada do Login (sem Header nem Sidebar)
   {
     path: "/login",
-    element: <Home />,
+    element: <Login />,
   },
 
   // 🔹 Layout principal (com Header e Sidebar)

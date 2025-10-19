@@ -1,3 +1,9 @@
+.learningPage{
+  display: flex;
+  background-color: aqua;
+  min-height: 100vh;
+}
+
 .learning {
   display: grid;
   grid-template-columns: repeat(2, 1fr) 1fr;
@@ -22,8 +28,9 @@
 .chat-container {
   display: flex;
   width: 30%;
-  height: 100%;
+  min-height: 100%;
   padding: 10rem;
+  background-color: red;
 
 }
 

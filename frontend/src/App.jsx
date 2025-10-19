@@ -5,8 +5,8 @@ import "./App.css";
 
 function App() {
   const location = useLocation();
-  const  hiddenSideBarPaths = ["/home"];
-  const showSideBar = !hiddenSideBarPaths.includes(location.pathname); 
+  // const  hiddenSideBarPaths = ["/home"];
+  // const showSideBar = !hiddenSideBarPaths.includes(location.pathname); 
 
   return (
     <div className="AppContainer">
@@ -14,7 +14,8 @@ function App() {
       <Header />
       </div>
       <div className="Main">
-       {showSideBar && <SideBar />}
+       
+          <SideBar />
 
         <div className="content">
           <Outlet />

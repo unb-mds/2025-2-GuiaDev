@@ -56,20 +56,23 @@ export default function LearningPage() {
   ];
 
   return (
-    <><div className="learning">
-      {cardData.map((data, index) => (
-        <LearningCard
-          key={index}
-          title={data.title}
-          icon={data.icon}
-          expandedText={data.expandedText} />
-      ))}
 
-    </div>
+    <div className='learningPage'>
+      <div className="learning">
+        {cardData.map((data, index) => (
+          <LearningCard
+            key={index}
+            title={data.title}
+            icon={data.icon}
+            expandedText={data.expandedText} />
+        ))}
+
+      </div>
       <div className='chat-container'>
-        <Chat>
+        <Chat />
 
-        </Chat>
-      </div></>
-  );
+
+      </div>
+      </div>
+      );
 }
