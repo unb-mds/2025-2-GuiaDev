@@ -1,7 +1,7 @@
 .learningPage{
   display: flex;
   background-color: aqua;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 .learning {
