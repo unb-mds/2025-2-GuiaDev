@@ -12,24 +12,31 @@ function Sign_in() {
 
   const navigate = useNavigate();
 
-  const handleGithubLogin = async () => {
+  // const handleGithubLogin = async () => {
 
-    try {
-      const response = await api.get("/auth/github");
+  //   try {
+  //     const response = await api.get("/auth/github");
 
-      // if (response.data.access_token) {
-      //   localStorage.setItem("authToken", response.data.access_token);
-      //   console.log("Token GitHub: ", response.data.access_token);
-      //   navigate("/home");
-      // } else if (response.data.redirect_url) {
-      //   // Se o backend retornar URL de redirecionamento OAuth
-      //   window.location.href = response.data.redirect_url;
-      // }
-    } catch (err) {
-      console.error("Erro no login GitHub:", err);
-      alert("Erro ao fazer login com GitHub. Tente novamente.");
-    }
-  };
+  //     // if (response.data.access_token) {
+  //     //   localStorage.setItem("authToken", response.data.access_token);
+  //     //   console.log("Token GitHub: ", response.data.access_token);
+  //     //   navigate("/home");
+  //     // } else if (response.data.redirect_url) {
+  //     //   // Se o backend retornar URL de redirecionamento OAuth
+  //     //   window.location.href = response.data.redirect_url;
+  //     // }
+  //   } catch (err) {
+  //     console.error("Erro no login GitHub:", err);
+  //     alert("Erro ao fazer login com GitHub. Tente novamente.");
+  //   }
+  // };
+
+  // React
+const handleGithubLogin = () => {
+  window.open('http://localhost:3000/auth/github', '_self'); // ou '_blank'
+
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
