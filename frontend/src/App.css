@@ -28,7 +28,7 @@ body,
 .content {
   overflow-y: auto; /* Mantém a barra de rolagem vertical só aqui */
   flex: 1;
-  height: 100%;
+  min-height: 100%;
   min-width: 100%;
   
  

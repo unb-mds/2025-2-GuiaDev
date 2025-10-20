@@ -1,18 +1,83 @@
 .learningPage{
   display: flex;
-  background-color: aqua;
-  min-height: 100%;
+  align-items: flex-start;
+  /* leave space for the sidebar on the left */
+  margin-left: 260px;
+  /* background-color: aqua; */
+  height: calc(100vh - 80px); /* fix the viewport height minus header */
+  box-sizing: border-box;
+  overflow: hidden; /* prevent whole-page double scroll */
 }
 
 .learning {
   display: grid;
-  grid-template-columns: repeat(2, 1fr) 1fr;
-  max-width: 70%;
-  max-height: 100%;
+  /* 4 columns layout — each column is flexible */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: 1 1 auto; /* allow the grid to grow/shrink inside the page */
+  max-width: calc(100% - 340px); /* leave room for the chat column */
   padding: 2rem;
   margin: 0;
-  gap: 15px;
-  
+  gap: 1.5rem;
+  box-sizing: border-box;
+  overflow-y: auto; /* internal scrolling for long content */
+}
+
+.root {
+   height: 100%; 
+}
+
+.content{
+  height: 100%; 
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-container {
+  display: flex;
+  flex: 0 0 320px; /* fixed width for chat column to avoid layout shift */
+  width: 320px;
+  box-sizing: border-box;
+  overflow-y: auto; /* allow chat area to scroll if tall */
+  /* padding: 1rem; */
+  height: calc(100% - 100px);
+}
+
+.sidebar-container {
+  background: #0F172A;
+}
+
+/* Responsiveness: reduce columns on smaller viewports */
+@media (max-width: 1200px) {
+  .learning {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: calc(100% - 300px);
+  }
+  .chat-container {
+    flex: 0 0 300px;
+    width: 300px;
+  }
+}
+
+@media (max-width: 900px) {
+  .learning {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+  .chat-container {
+    display: none; /* hide chat column on smaller screens to save space */
+  }
+}
+
+@media (max-width: 600px) {
+  .learning {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  .learningPage {
+    margin-left: 0; /* let mobile use full width (sidebar likely hidden/responsive elsewhere) */
+  }
 }
 .root {
    height: 100%; 
@@ -27,13 +92,32 @@
 
 .chat-container {
   display: flex;
-  width: 30%;
-  min-height: 100%;
-  padding: 10rem;
-  background-color: red;
+  width: 20%;
+  /* height: calc(100% - 30px); */
+  /* padding: 10rem; */
+  /* background-color: red; */
 
 }
 
 .sidebar-container {
   background: #0F172A;
+}
+
+.renderPage{
+  display: grid;
+  margin-top: 30px;
+  color: #344256;
+  /* background-color: aquamarine; */
+}
+
+.textTitle{
+  font-size: 36px;
+  font-weight: bold;
+  margin-left: 280px;
+  /* background-color: red; */
+}
+
+.subtitle{
+  font-size: 20px;
+  font-weight: 500;
 }

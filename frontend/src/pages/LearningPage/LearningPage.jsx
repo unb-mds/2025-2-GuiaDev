@@ -57,7 +57,16 @@ export default function LearningPage() {
 
   return (
 
+    <div className='renderPage'> 
+    <div className='textTitle'>
+    <p>Aprendizado</p>
+    <p className='subtitle'>Boas práticas de documentação de projetos de software</p>
+    </div>
     <div className='learningPage'>
+     
+
+
+
       <div className="learning">
         {cardData.map((data, index) => (
           <LearningCard
@@ -73,6 +82,9 @@ export default function LearningPage() {
 
 
       </div>
-      </div>
-      );
+    </div>
+    
+    
+    </div>
+  );
 }
