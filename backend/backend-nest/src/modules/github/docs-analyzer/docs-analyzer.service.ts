@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-// import Gemini client dynamically to avoid type mismatch with package typings
-const GenerativeAI: any = require('@google/generative-ai');
+// REMOVED: require dinâmico e formas legadas do SDK
+// const GenerativeAI: any = require('@google/generative-ai');
+// CHANGED: usar o SDK oficial tipado e simples
+import { GoogleGenerativeAI } from '@google/generative-ai'; // CHANGED
 
 export type DocAnalysis = {
   name: string;
@@ -13,15 +15,18 @@ export type DocAnalysis = {
 @Injectable()
 export class DocsAnalyzerService {
   private readonly logger = new Logger(DocsAnalyzerService.name);
-  private client: any | null = null;
+  // CHANGED: centralizar envs e sanitizar modelo aqui
+  private readonly apiKey = process.env.GEMINI_API_KEY ?? ''; // CHANGED
+  private readonly model = (process.env.GEMINI_MODEL || 'gemini-2.5-flash') // CHANGED
+    .replace(/^models\//, ''); // CHANGED: evita models/models/...
+
+  private client: GoogleGenerativeAI | null = null; // CHANGED: tipado
 
   constructor() {
-    // initialize Gemini client only if key is present
-    const key = process.env.GEMINI_API_KEY || null;
-    if (key) {
+    // CHANGED: inicialização simples do SDK oficial
+    if (this.apiKey) {
       try {
-        // store the module to call generate later. The concrete client/shape may vary by version.
-        this.client = GenerativeAI;
+        this.client = new GoogleGenerativeAI(this.apiKey); // CHANGED
       } catch (err) {
         this.logger.warn('Falha ao inicializar cliente Gemini, fallback para heurística', err as any);
         this.client = null;
@@ -29,90 +34,105 @@ export class DocsAnalyzerService {
     }
   }
 
+  // CHANGED: prompt separado para reaproveitar
+  private buildPrompt(name: string, content: string) { // NEW
+    return `Você é um avaliador técnico de documentação.
+Analise o conteúdo do documento abaixo e responda SOMENTE com um objeto JSON.
+O objeto deve conter:
+- "score": um número inteiro entre 0 e 100 (sem aspas)
+- "summary": um resumo curto em português (até 200 caracteres)
+- "suggestions": uma lista de até 6 sugestões curtas em português
+
+Avalie a clareza, completude, presença de seções (Instalação, Uso, Contribuição), exemplos e estrutura de acordo com as boas práticas de cada documento específico.
+Document name: ${name}.
+CONTENT_START
+${content}
+CONTENT_END`;
+  }
+
   // Faz análise com o LLM Gemini. Retorna { score, summary, suggestions }
-  private async analyzeWithGemini(name: string, content: string): Promise<Pick<DocAnalysis, 'score' | 'summary' | 'suggestions'>> {
-    const axios = require('axios');
+  private async analyzeWithGemini(
+    name: string,
+    content: string
+  ): Promise<Pick<DocAnalysis, 'score' | 'summary' | 'suggestions'>> {
+    const axios = require('axios'); // mantive axios
+    const prompt = this.buildPrompt(name, content); // CHANGED
 
-    const apiKey = process.env.GEMINI_API_KEY || null;
-    const modelEnv = process.env.GEMINI_MODEL;
+    // 1) Tenta via SDK oficial (@google/generative-ai)
+    if (this.client) {
+      try {
+        // CHANGED: uso do generateContent com responseMimeType JSON
+        const model = this.client.getGenerativeModel({
+          model: this.model, // CHANGED
+          generationConfig: {
+            temperature: 0.6,
+            maxOutputTokens: 1024,
+            responseMimeType: 'application/json', // CHANGED: força JSON
+          } as any,
+        });
 
-    const prompt = `You are a meticulous technical documentation reviewer. Given the document content, return ONLY a JSON object with keys: score (integer 0-100), summary (short string <= 200 chars), and suggestions (array of up to 6 concise actionable suggestions). Evaluate clarity, completeness, sections (installation, usage, contributing), examples, structure, and potential missing items. Do not output any other text. Document name: ${name}. Document content follows between CONTENT_START and CONTENT_END.\nCONTENT_START\n${content}\nCONTENT_END`;
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        }); // CHANGED
 
-    // 1) try to use the installed SDK in common shapes
-    try {
-      const GenerativeAI: any = this.client || require('@google/generative-ai');
-
-      // shape: TextServiceClient
-      if (GenerativeAI.TextServiceClient) {
-        const Client = GenerativeAI.TextServiceClient;
-        const client = new Client();
-        // try different method names that may exist
-        let res: any;
-        if (typeof client.generateText === 'function') {
-          res = await client.generateText({ model: modelEnv, prompt: { text: prompt }, maxOutputTokens: 512 });
-        } else if (typeof client.generate === 'function') {
-          res = await client.generate({ model: modelEnv, input: prompt, maxOutputTokens: 512 });
-        }
-        const text = res?.candidates?.[0]?.content ?? res?.output ?? res?.result?.content ?? JSON.stringify(res);
+        // CHANGED: leitura consistente do texto
+        const text = result?.response?.text?.() ?? '';
         const json = this.extractJson(text);
         return this.normalizeParsed(json);
+      } catch (libErr) {
+        this.logger.warn('Library call to Gemini falhou; tentando REST v1 generateContent', libErr as any);
       }
-
-      // shape: module.text.generate
-      if (GenerativeAI.text && typeof GenerativeAI.text.generate === 'function') {
-        const res = await GenerativeAI.text.generate({ model: modelEnv, prompt: { text: prompt }, maxOutputTokens: 512 });
-        const text = res?.candidates?.[0]?.content ?? res?.output ?? JSON.stringify(res);
-        const json = this.extractJson(text);
-        return this.normalizeParsed(json);
-      }
-
-      // shape: direct generate function
-      if (typeof GenerativeAI.generate === 'function') {
-        const res = await GenerativeAI.generate({ model: modelEnv, prompt, maxOutputTokens: 512 });
-        const text = res?.candidates?.[0]?.output ?? res?.output ?? JSON.stringify(res);
-        const json = this.extractJson(text);
-        return this.normalizeParsed(json);
-      }
-    } catch (libErr) {
-      this.logger.warn('Library call to Gemini failed or not supported, will attempt REST fallback', libErr as any);
     }
 
-    // 2) REST fallback to Generative Language API
-    if (!apiKey) {
+    // 2) REST fallback (Generative Language API v1)
+    if (!this.apiKey) {
       throw new Error('No Gemini/Google API key found in env (GEMINI_API_KEY or GOOGLE_API_KEY)');
     }
 
-    const versions = ['v1beta2', 'v1'];
-    const modelsToTry = [modelEnv, process.env.GEMINI_MODEL || 'models/gemini-1.0', 'text-bison-001', 'models/text-bison-001'];
+    // CHANGED: endpoint correto v1 + :generateContent
+    const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(
+      this.model
+    )}:generateContent?key=${this.apiKey}`; // CHANGED
 
-    for (const ver of versions) {
-      for (const model of modelsToTry) {
-        if (!model) continue;
-        const endpointModel = encodeURIComponent(model);
-        const url = `https://generativelanguage.googleapis.com/${ver}/models/${endpointModel}:generate?key=${apiKey}`;
-        const body = { prompt: { text: prompt }, maxOutputTokens: 512 };
-        try {
-          const res = await axios.post(url, body, { timeout: 20000 });
-          const data = res.data;
-          const text = data?.candidates?.[0]?.content ?? data?.output ?? JSON.stringify(data);
-          const json = this.extractJson(text);
-          return this.normalizeParsed(json);
-        } catch (err) {
-          const status = err?.response?.status;
-          const bodyResp = err?.response?.data;
-          this.logger.warn(`Generative API REST attempt failed (ver=${ver}, model=${model}, status=${status})`, bodyResp);
+    // CHANGED: payload no formato contents/parts e response_mime_type
+    const body = {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }], // CHANGED
+      generationConfig: {
+        temperature: 0.6,
+        maxOutputTokens: 1024,
+        response_mime_type: 'application/json', // CHANGED
+      },
+    };
 
-          // If auth issues, rethrow to let upper layer handle
-          if (status === 401 || status === 403) {
-            throw new Error(`Authentication/permission error calling Generative API (status ${status}). Check API key and IAM permissions.`);
-          }
+    try {
+      const res = await axios.post(url, body, { timeout: 25000 });
+      const data = res.data;
 
-          // otherwise continue to next model/version
-        }
+      // CHANGED: caminhos atuais de resposta
+      const text =
+        data?.candidates?.[0]?.content?.parts?.[0]?.text ??
+        data?.candidates?.[0]?.content?.parts?.[0]?.stringValue ??
+        '';
+
+      const json = this.extractJson(text);
+      return this.normalizeParsed(json);
+    } catch (err: any) {
+      const status = err?.response?.status;
+      const bodyResp = err?.response?.data;
+      this.logger.warn(
+        `Generative API REST attempt failed (v1, model=${this.model}, status=${status})`,
+        bodyResp
+      );
+
+      // CHANGED: só relançar auth; demais deixam cair na heurística
+      if (status === 401 || status === 403) {
+        throw new Error(
+          `Authentication/permission error calling Generative API (status ${status}). Check API key and IAM permissions.`
+        ); // CHANGED
       }
+      // para outros erros, deixamos cair para heurística no chamador
+      throw err; // CHANGED
     }
-
-    throw new Error('All REST attempts to Generative API failed; check logs for details.');
   }
 
   // helper: extract JSON object from text block
@@ -122,13 +142,13 @@ export class DocsAnalyzerService {
     const candidate = idx >= 0 ? text.slice(idx) : text;
     try {
       return JSON.parse(candidate);
-    } catch (e) {
+    } catch {
       // try to recover by finding last brace
       const last = candidate.lastIndexOf('}');
       if (last > 0) {
         try {
           return JSON.parse(candidate.slice(0, last + 1));
-        } catch (e2) {
+        } catch {
           return {};
         }
       }
@@ -160,7 +180,8 @@ export class DocsAnalyzerService {
     const length = content.trim().length;
     const lines = content.split(/\r?\n/).length;
     const hasTitle = /^#\s+.+/m.test(content);
-    const hasBadge = /\[!\[|badge|shields.io|img.shields.io/mi.test(content);
+    // CHANGED: regex tinha um bug (".mi.test"), corrigi e escapei pontos
+    const hasBadge = /\[!\[|badge|shields\.io|img\.shields\.io/mi.test(content); // CHANGED
     const hasTOC = /(^##\s+Table of Contents|\- \[)/mi.test(content);
 
     let score = Math.min(60, Math.floor(Math.log10(Math.max(1, length)) * 10));
@@ -194,10 +215,11 @@ export class DocsAnalyzerService {
 
   // Public API: analyzeText -> tries Gemini if available, otherwise heuristic
   async analyzeText(name: string, content: string | null): Promise<DocAnalysis> {
-    // If no content, return quickly
+    // Se não há conteúdo, retorna rápido
     if (!content) return this.heuristicAnalyze(name, null);
 
-    if (!this.client) {
+    // CHANGED: tenta LLM; se falhar, cai na heurística
+    if (!this.client && !this.apiKey) { // CHANGED
       return this.heuristicAnalyze(name, content);
     }
 
@@ -210,8 +232,7 @@ export class DocsAnalyzerService {
         summary: llm.summary,
         suggestions: llm.suggestions,
       };
-    } catch (err) {
-      // fallback
+    } catch {
       return this.heuristicAnalyze(name, content);
     }
   }
