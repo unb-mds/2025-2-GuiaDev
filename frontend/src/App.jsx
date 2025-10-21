@@ -13,18 +13,21 @@ function App() {
       <div>
         <Header />
       </div>
-
-      <div className="Main">
-        
-        {/* <div className="sideBar">{showSideBar && <SideBar />}</div> */}
-        
         {showSideBar && (
           <div className="sideBar">
             <SideBar />
           </div>
         )}
+
+      <div className="Main">
+        
+        {/* <div className="sideBar">{showSideBar && <SideBar />}</div> */}
+        
+
         <div className="content">
+          <span>
           <Outlet />
+          </span>
         </div>
 
       </div>
