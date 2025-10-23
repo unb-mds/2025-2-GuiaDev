@@ -5,24 +5,24 @@ import { CreateUserBody } from "src/dtos/create-user.dto";
 import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
-export class authService{
+export class authService {
     constructor(
-    private prisma : PrismaService,
-    private jwtService: JwtService
-    ){}
+        private prisma: PrismaService,
+        private jwtService: JwtService
+    ) { }
 
-    async register(body : CreateUserBody){
-        const {email, name, lastName, password} = body;
+    async register(body: CreateUserBody) {
+        const { email, name, lastName, password } = body;
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const user = await this.prisma.user.create({
-        data: {
-            name,
-            lastName,
-            email,
-            password: hashedPassword,
-        },
+            data: {
+                name,
+                lastName,
+                email,
+                password: hashedPassword,
+            },
         });
 
         // Exclude password from returned user object
@@ -30,31 +30,44 @@ export class authService{
         return userWithoutPassword;
     }
 
-    async login(email: string, password: string){
+    async login(email: string, password: string) {
         //1. procurar usuario
         const user = await this.prisma.user.findUnique({ where: { email } });
 
         if (!user) {
-        throw new UnauthorizedException("Credenciais inválidas");
+            throw new UnauthorizedException("Credenciais inválidas");
         }
 
         // 2. Comparar senha
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException("Credenciais inválidas");
-        }   
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new UnauthorizedException("Credenciais inválidas");
+        }
 
-    // 3. Gerar token JWT
-    const payload = { sub: user.id, email: user.email };
-    const token = await this.jwtService.signAsync(payload);
-    
-    return {
-      message: "Login realizado com sucesso",
-      access_token: token,
+        // 3. Gerar token JWT
+        const payload = { sub: user.id, email: user.email };
+        const token = await this.jwtService.signAsync(payload);
+
+        return {
+            message: "Login realizado com sucesso",
+            access_token: token,
         };
     }
 
-    getUser(){
+    async validateOAuthUser(user: any) {
+        // Aqui você pode buscar ou criar o usuário no banco de dados
+        // Exemplo simples:
+        return user;
+    }
+
+    async loginGithub(user: any) {
+        const payload = { username: user.username, sub: user.githubId };
+        return {
+            access_token: this.jwtService.sign(payload),
+        };
+    }
+
+    getUser() {
         return 'Você fez um get na rota auth/get'
     }
 

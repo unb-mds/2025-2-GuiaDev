@@ -1,29 +1,52 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
+// eslint.config.js
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Ignora a pasta de build
+  globalIgnores(["dist", "node_modules", "coverage"]),
+
   {
-    files: ['**/*.{js,jsx}'],
+    files: ["**/*.{js,jsx}"],
+    ignores: ["vite.config.js"], // evita lintar configs internas
+
+    // Configurações base e plugins recomendados
     extends: [
-      js.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
+      js.configs.recommended, // regras JS padrão
+      reactHooks.configs["recommended-latest"], // boas práticas React Hooks
+      reactRefresh.configs.vite, // integração com Vite e React Refresh
     ],
+
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.node, // útil para projetos com scripts Node (ex: vite.config)
+      },
       parserOptions: {
-        ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
-        sourceType: 'module',
       },
     },
+
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // ⚙️ Boas práticas gerais
+      "no-unused-vars": ["warn", { varsIgnorePattern: "^[A-Z_]" }],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+
+      // ⚛️ React Hooks
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+
+      // 🔄 Código mais limpo e consistente
+      "prefer-const": "warn",
+      "no-var": "error",
+      "eqeqeq": ["error", "always"],
+      "curly": ["error", "all"],
+      "no-trailing-spaces": "warn",
     },
   },
-])
+]);

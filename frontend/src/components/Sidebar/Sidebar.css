@@ -1,12 +1,15 @@
 .sidebar-container {
+  
   width: 260px;
   height: 100%;
   background-color: #fafafa;
   padding: 24px 12px;
   box-sizing: border-box;
   min-width: 255px;
-  position: relative; /* keep in document flow on desktop so it doesn't overlay content */
+  position: fixed; /* keep in document flow on desktop so it doesn't overlay content */
   /* margin-top: 65px; */
+
+
 }
 
 .sidebar-header {

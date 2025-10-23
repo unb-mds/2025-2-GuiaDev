@@ -4,6 +4,7 @@
   /* background-color: red; */
   /* margin-left: 260px; */
   color: #344256;
+  /* background-color: red; */
   /* background-color: rebeccapurple; */
   /* padding: 4rem; */
   /* background-color: red; */
@@ -85,10 +86,7 @@
   cursor: pointer;
 }
 
-.changeModule .generalVision.active,
-.changeModule .details.active {
-  /* optional visual when active */
-}
+
 
 .firstSection {
   display: flex;

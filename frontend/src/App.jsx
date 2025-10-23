@@ -13,23 +13,27 @@ function App() {
       <div>
         <Header />
       </div>
+      <div className="ajustCente">
+
+        <div className="Main">
+
         {showSideBar && (
           <div className="sideBar">
             <SideBar />
           </div>
         )}
 
-      <div className="Main">
-        
-        {/* <div className="sideBar">{showSideBar && <SideBar />}</div> */}
-        
+          {/* <div className="sideBar">{showSideBar && <SideBar />}</div> */}
 
-        <div className="content">
-          <span>
-          <Outlet />
-          </span>
+
+          <div className="content">
+
+            
+              <Outlet />
+            
+          </div>
+
         </div>
-
       </div>
 
     </div>

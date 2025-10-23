@@ -100,7 +100,7 @@ function Sign_in() {
           <i className="fab fa-google social-icon"></i>
           Google
         </button>
-        <button className="btn-social github">
+        <button className="btn-social github" onClick={() => handleGithubLogin()}>
           <i className="fab fa-github social-icon"></i>
            
           GitHub

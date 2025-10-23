@@ -4,6 +4,8 @@ import folder from "./../../assets/folder.svg";
 import docs from "./../../assets/docs.svg";
 import chevron from "./../../assets/chevron-right.svg";
 import { useSummary } from "../../hooks/useSummary";
+import GitHubAPI from "../../../services/github";
+
 
 export default function FileTree({
   tree = [],

@@ -5,8 +5,16 @@ import Overview from "../../components/Overview/Overview";
 import MetricsRepo from "../../components/Overview/MetricsRepo";
 import Summary from "../../components/Overview/Summary";
 import Details from "../../components/AnalysisDetails/Details";
+import { useParams, useLocation } from 'react-router-dom';
 
 const AnalysisPage = () => {
+
+  const params = useParams();        // { owner, repo }
+  const location = useLocation();    // location.state?.repo (objeto passado)
+
+  const owner = params.owner;
+  const repoObj = location.state?.repo || null;
+
   const [selected, setSelected] = useState("general");
   const containerRef = useRef(null);
   const generalRef = useRef(null);
@@ -57,9 +65,8 @@ const AnalysisPage = () => {
           />
           <div
             ref={generalRef}
-            className={`generalVision ${
-              selected === "general" ? "active" : ""
-            }`}
+            className={`generalVision ${selected === "general" ? "active" : ""
+              }`}
             onClick={() => setSelected("general")}
           >
             Visão Geral
@@ -90,7 +97,7 @@ const AnalysisPage = () => {
           </div>
         </div>
       ) : (
-        <Details />
+        <Details owner={owner} repo={repoObj}/>
       )}
     </div>
   );

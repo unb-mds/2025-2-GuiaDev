@@ -8,13 +8,25 @@
 
 /* Estilo para a área do conteúdo principal */
 .Boxrepo {
-  display: flex;
- justify-content: center; 
- 
+  padding-top: 120px;
+  display: grid;
+  justify-content: center;
+  align-items: start;
+
   /* background-color: red; */
   width: 100%;
-  min-height: 100vh;
-  /* background-color: aqua; */
+  /* min-height: 100vh; */
+  background-color: aqua;
   /* margin-left: auto; */
   /* justify-content: center; */
+}
+
+.inputLink{
+  display: flex;
+  justify-content: end;
+}
+
+.center{
+  
+  background-color: beige;
 }
