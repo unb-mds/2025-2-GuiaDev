@@ -67,8 +67,12 @@ export class authService {
         };
     }
 
-    getUser() {
-        return 'Você fez um get na rota auth/get'
+    async verifyToken(token: string) {
+        try {
+            return this.jwtService.verify(token); // retorna payload decodificado
+        } catch (error) {
+            return null; // inválido ou expirado
+        }
     }
 
 }

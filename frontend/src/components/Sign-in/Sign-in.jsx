@@ -103,10 +103,10 @@ const handleGithubLogin = () => {
       <div className="divider">ou continue com</div>
 
       <div className="social-login">
-        <button className="btn-social google">
+        {/* <button className="btn-social google">
           <i className="fab fa-google social-icon"></i>
           Google
-        </button>
+        </button> */}
         <button className="btn-social github" onClick={() => handleGithubLogin()}>
           <i className="fab fa-github social-icon"></i>
           GitHub
