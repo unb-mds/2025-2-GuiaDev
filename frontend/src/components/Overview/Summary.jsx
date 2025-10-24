@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "./Summary.css";
-import { useSummary } from "../../hooks/useSummary";
 
-/*
-  Quando o backend estiver pronto, substitua o mock por um hook:
-  // import { useSummary } from '../../hooks/useSummary';
-  // const { summaryDocs, loading } = useSummary(projectId);
-*/
+import "./Summary.css";
 
 const BoxDocsSummary = ({ name, status }) => {
   return (
@@ -31,7 +25,9 @@ const BoxDocsSummary = ({ name, status }) => {
 function Summary() {
   // projectId and hook
   const projectId = "demo";
-  const { summary, loading, error } = useSummary(projectId);
+  const summary = [];
+  const loading = false;
+  const error = null;
 
   const [summaryDocs, setDocs] = useState([]);
 

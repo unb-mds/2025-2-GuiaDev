@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./Overview.css";
-import { useRepos } from "../../hooks/useRepos";
 import branchIcon from "../../assets/branch.svg"
 import userIcon from "../../assets/users.svg"
 import docs from "../../assets/docs.svg"
-/*
-  Para consumir dados do backend, crie/ative um hook `useOverview` ou use os hooks
-  individuais (`useMetrics`, `useSummary`, `useRepos`) e substitua o `apiFake`.
-
-  Exemplo (comentar/descomentar quando o backend estiver pronto):
-  // import { useOverview } from '../../hooks/useOverview';
-  // const { data, loading } = useOverview(projectId);
-*/
 
 const BoxRepoInfo = ({
   name,
@@ -85,7 +76,9 @@ const BoxRepoInfo = ({
 function Overview() {
   // projectId pode vir de props/rota; mantive como 'demo' enquanto integra
   const projectId = "demo";
-  const { repos, loading, error } = useRepos(projectId);
+  const repos = [];
+  const loading = false;
+  const error = null;
 
   const [repoInfo, setRepoInfo] = useState([]);
 

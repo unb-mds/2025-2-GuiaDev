@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./Boxrepo.css";
-import { useRepos } from "../../hooks/useRepos";
 import GitHubAPI from "../../../services/github";
 import { useNavigate } from "react-router-dom";
 
-// --- Seus Componentes de Caixa (estão ótimos) ---
 
 const BoxStat = ({ nome, num, comment }) => {
   return (
     <div className="box-item">
       <div className="name">
-        {nome} {/* Usei <p> para o título para melhor semântica */}
+        {nome} 
       </div>
 
       <h2>{num}</h2>
@@ -36,7 +34,7 @@ const BoxRepositorio = ({ repo, owner }) => {
   );
 };
 
-// --- Seu Componente Principal Corrigido ---
+
 
 function BoxRepo({ owner }) {
   // 1. DOIS ESTADOS SEPARADOS: um para cada tipo de dado
@@ -72,7 +70,7 @@ useEffect(() => {
    
 
   return (
-    // Um único div container para a página é suficiente
+    
     <div className="box-repo-container">
       {/* --- PRIMEIRA SEÇÃO: DASHBOARD/ESTATÍSTICAS --- */}
       <div>

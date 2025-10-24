@@ -3,8 +3,6 @@ import "./FileTree.css";
 import folder from "./../../assets/folder.svg";
 import docs from "./../../assets/docs.svg";
 import chevron from "./../../assets/chevron-right.svg";
-import { useSummary } from "../../hooks/useSummary";
-import GitHubAPI from "../../../services/github";
 
 
 export default function FileTree({
@@ -13,10 +11,8 @@ export default function FileTree({
   projectId,
   summary: summaryProp,
 }) {
-  // prefer hook when projectId provided, otherwise fall back to prop
-  const { summary: summaryFromHook = [] } = useSummary(projectId || null);
-  const summary =
-    summaryProp && summaryProp.length ? summaryProp : summaryFromHook;
+  
+  const summary = summaryProp && summaryProp.length ? summaryProp : [];
 
   return (
     <div className="file-tree">
@@ -33,7 +29,7 @@ export default function FileTree({
   );
 }
 
-// helper: parse percent string like "85%" => 85, otherwise null
+// Converte um valor para porcentagem (aceita número ou string com '%')
 function parsePercent(value) {
   if (!value) return null;
   if (typeof value === "number")
@@ -45,16 +41,19 @@ function parsePercent(value) {
   return null;
 }
 
-// compute aggregated progress for a node: if folder, average child progresses; if file, read meta.badge
+// Calcula progresso: arquivos usam node.meta.badge; pastas usam badge próprio ou média dos filhos
 function getProgress(node) {
   if (!node) return null;
+  // se for arquivo, retorna o badge (se houver)
   if (node.type === "file") {
     return parsePercent(node.meta && node.meta.badge);
   }
-  // folder
+  // se for pasta, prefira o badge da própria pasta
   const fromMeta = parsePercent(node.meta && node.meta.badge);
   if (fromMeta !== null) return fromMeta;
+  // se não houver filhos, não há progresso
   if (!node.children || node.children.length === 0) return null;
+  // calcula média apenas com valores válidos
   const childValues = node.children
     .map(getProgress)
     .filter((v) => v !== null && v !== undefined);
@@ -103,7 +102,7 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
           </span>
           <span className="node-name">{node.name}</span>
         </div>
-        {/* optional badge + progress (for folders: prefer node.meta.badge else aggregated children) */}
+  {/* Badge e barra de progresso: pastas usam node.meta.badge ou média dos filhos */}
         {isFolder &&
           (() => {
             const fromMeta = node.meta && node.meta.badge;
@@ -129,7 +128,7 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
                 </div>
               );
             }
-            // fallback: show non-percent badge if present
+            // fallback: mostra badge de texto se existir
             if (fromMeta) {
               return (
                 <div className="node-meta">
@@ -140,11 +139,11 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
             return null;
           })()}
 
-        {/* Status badge at the right: only for files. reuse Overview.css classes (.status.Ativo / .status.Parcial) */}
+  {/* Badge de status à direita: só para arquivos. usa classes .status.Ativo / .status.Parcial */}
         {node.type === "file" && (
           <div className="node-status-wrap">
             {(() => {
-              // try to find matching summary entry by path or name
+              // procura no resumo por entrada que combine por path ou nome
               const match =
                 summary &&
                 summary.find((s) => {

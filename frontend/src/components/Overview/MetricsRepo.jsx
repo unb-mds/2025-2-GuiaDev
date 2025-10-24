@@ -4,16 +4,7 @@ import accept from "./../../assets/accept.svg";
 import docs from "./../../assets/docs.svg";
 import warning from "./../../assets/warning.svg";
 import clock from "./../../assets/clock.svg";
-import { useMetrics } from "../../hooks/useMetrics";
 
-/*
-  Quando o backend estiver pronto, descomente um hook similar a:
-
-  // import { useMetrics } from '../../hooks/useMetrics';
-  // const { metrics, loading } = useMetrics(projectId);
-
-  E substitua o uso do estado local `infos` por `metrics`.
-*/
 
 const MetricBoxRender = ({ name, num, icon }) => {
   return (
@@ -30,7 +21,9 @@ const MetricBoxRender = ({ name, num, icon }) => {
 function MetricsRepo() {
   // projectId pode vir de props/rota; deixei 'demo' enquanto backend não existir
   const projectId = "demo";
-  const { metrics, loading, error } = useMetrics(projectId);
+  const metrics = [];
+  const loading = false;
+  const error = null;
 
   // fallback (dados de simulação) para desenvolvimento offline
   const [dataMetric, setData] = useState([]);

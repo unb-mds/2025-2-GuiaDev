@@ -5,6 +5,7 @@
     min-height: 100vh;
     background: #0F172A;
     background: linear-gradient(90deg, rgba(15, 23, 42, 1) 0%, rgba(23, 32, 51, 1) 60%, rgba(37, 99, 235, 1) 100%);
+    /* background-color: red; */
     color: white;
     font-family: Arial, sans-serif;
     align-items: center;
@@ -13,12 +14,16 @@
     padding-left: 5vw;
     padding-bottom: 120px;
 }
+.content-right{
+    background-color: rebeccapurple;
+    
+}
 
 .content {
     display: flex;
     flex-direction: row;
     align-items: center;
-   
+   height: calc(100% - 80px);
     justify-content: space-around;
     max-width: 1200px;
     margin-right: 12vw;
