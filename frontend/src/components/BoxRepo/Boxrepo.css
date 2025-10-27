@@ -7,12 +7,15 @@
   /* margin-top: 10vh; */
   /* background-color: red; */
   width: 100%;
-  margin-top: 5vh;
+
+  /* margin-top: 10000px; */
+
+  /* background-color: rebeccapurple; */
 }
 .scroll {
   display: flex; /* Ativa o flexbox para permitir a centralização do filho */
   width: 100%;
- margin-right: 2vw;
+  margin-right: 2vw;
 }
 .boxes-list {
   display: flex;
@@ -47,7 +50,6 @@
   font-size: 18px;
 }
 
-
 .box-item h2 {
   font-size: 30px;
 }
@@ -58,15 +60,40 @@
 
 .boxes-list-repo {
   display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(2, 1fr);
-  overflow-x: auto;
-  gap: 10px;
+  /* up to 4 columns on wide screens */
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 24px;
   padding-bottom: 16px;
   width: 100%;
-  /* margin-right: 2vw; */
-  
-  height: 500px; /* (4 * 320px) + (3 * 24px de gap) */
+}
+
+/* New: scrollable container for the repo grid */
+.repo-scroll {
+  /* limit the visible height so the grid scrolls internally */
+  max-height: 520px; /* adjust as needed */
+  overflow-y: auto;
+  padding-right: 8px; /* avoid hiding scrollbar over content */
+}
+
+/* responsive: 3 cols */
+@media (max-width: 1200px) {
+  .boxes-list-repo {
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+  }
+}
+
+/* responsive: 2 cols */
+@media (max-width: 900px) {
+  .boxes-list-repo {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+/* responsive: 1 col */
+@media (max-width: 560px) {
+  .boxes-list-repo {
+    grid-template-columns: 1fr;
+  }
 }
 
 .box-item-repo {
@@ -91,7 +118,6 @@
 
 .repo-section {
   margin-top: 10px;
-  
 }
 
 .info {

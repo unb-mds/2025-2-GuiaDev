@@ -21,6 +21,12 @@ const Home = () => {
     }
   }
   
+  const [ownerInput, setOwnerInput] = useState("");
+  const [owner, setOwner] = useState("");
+
+  const [search, setSearch] = useState(false);
+  // const [repo, setRepos] = useState("");
+
   useEffect(() => {
     let token = urlToken;
 
@@ -39,10 +45,30 @@ const Home = () => {
   
   }, [urlToken, navigate]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();                // evita reload
+    const clean = ownerInput.trim();
+    if (!clean) return;                // evita submit vazio
+    setOwner(clean);                   // congela o valor p/ BoxRepo
+  };
+
   return (
     <div className="Boxrepo">
-      <div>
-        <BoxRepo />
+      <div className="inputLink">
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Username (GitHub)"
+            value={ownerInput}
+            onChange={(e) => setOwnerInput(e.target.value)}
+          />
+          <button type="submit">Buscar</button>
+        </form>
+      </div>
+
+      <div className="center">
+       
+        <BoxRepo owner={owner}/>
       </div>
     </div>
   );

@@ -1,0 +1,122 @@
+.allComponent {
+  width: 100%;
+  
+  /* background-color: rebeccapurple; */
+  
+}
+
+.repoInfo {
+  background-color: white;
+  color: #344256;
+  width: 68vw;
+  /* height: 225px; */
+  border: solid 1px black;
+  border-radius: 12px;
+
+}
+
+.repoText {
+   
+}
+
+.firstPart {
+  padding: 1.5rem;
+}
+
+.firstLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.repoName {
+  font-size: 32px;
+}
+
+.status {
+  display: flex;
+  height: 22px;
+  width: 50.5px;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 0.5rem;
+}
+
+.status.Ativo {
+  background-color: #2463eb;
+  width: auto;
+
+}
+
+.status.Desconectado{
+background-color: #ef4444;
+width: auto;
+}
+
+.status.Parcial{
+    background-color: #f1f5f9;
+    color: #4c4256;
+}
+
+.descripLang {
+  /* font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji"; */
+  tab-size: 4;
+  margin-top: 6px;
+}
+
+.progress {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* progress bar styles */
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.progress-bar {
+  flex: 1 1 auto;
+  max-width: 100%;
+  height: 8px;
+  background: #e6e6e6;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2463eb);
+  width: 0%;
+  transition: width 600ms ease;
+
+}
+
+.repoInfoBottom{
+    display: flex;
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+    border-top: solid 1px;
+    margin-top: 12px;
+    gap: 2%;
+    
+}
+
+.repoInfoBottom span{
+    border-bottom: solid 1px black;
+    margin-bottom: 2%;
+}
+
+.repoInfoBottom img{
+    height: 15px;
+    padding: 0;
+    fill: #374458
+    /* background-color: rebeccapurple; */
+}

@@ -1,0 +1,59 @@
+.allComponentMetrics {
+  display: flex;
+  flex-wrap: wrap; /* permite que os cards quebrem em várias linhas */
+  gap: 1rem; /* espaçamento entre os cards */
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 68vw;
+}
+
+/* .renderBox {
+} */
+
+.metricBoxMetrics {
+  display: grid;
+  align-items: center;
+  padding-left: 2rem;
+  background-color: white;
+  width: 16vw;
+  min-width: 180px; /* evita que o card encolha demais */
+  flex: 1 1 16vw; /* permite encolher/expandir — base 16vw */
+  height: 110px;
+  border: solid 1px black;
+  border-radius: 10px;
+}
+
+.nameMetrics {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  font-size: 20px;
+  font-weight: 100;
+}
+
+.numMetrics {
+  font-size: 20px;
+  padding-bottom: 1rem;
+  font-weight: 600;
+}
+
+img {
+  height: 20px;
+  padding-right: 2rem;
+  /* background-color: rebeccapurple; */
+}
+.accept {
+  fill: green;
+}
+
+@media (max-width: 720px) {
+  .allComponentMetrics {
+    justify-content: center;
+  }
+  .metricBoxMetrics {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+    max-width: 420px; /* opcional: limita largura máxima do card em mobile */
+  }
+}

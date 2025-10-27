@@ -25,6 +25,21 @@ export class GithubController {
         return this.githubService.getReadme(owner,repo);
     }
     
+    @Get('governance/:owner/:repo')
+    async getGovernance(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getGovernance(owner, repo);
+    }
+
+    @Get('architecture/:owner/:repo')
+    async getArchitecture(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getArchitecture(owner, repo);
+    }
+
+    @Get('roadmap/:owner/:repo')
+    async getRoadmap(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getRoadmap(owner, repo);
+    }
+    
 /** 
     @Post('analyze')
     async analyzeRepo(@Body('url') url: string) {
@@ -62,6 +77,11 @@ export class GithubController {
     return this.githubService.getDocs(owner, repo);
     }
 
+    @Get('folder/repo/:owner/:repo')
+    async checkFolders(@Param('owner') owner: string, @Param('repo') repo: string) {
+    return this.githubService.checkFolders(owner, repo);
+    }
+
     @Get('content/docs/:owner/:repo')
     async getDocsContent(@Param('owner') owner: string, @Param('repo') repo: string) {
     return this.githubService.getDocsContent(owner, repo);
@@ -70,6 +90,11 @@ export class GithubController {
     @Get('analyze/user/:username')
     async analyzeUserRepos(@Param('username') username: string) {
     return this.githubService.analyzeUserRepos(username);
+    }
+
+    @Get('tree/:owner/:repo')
+    async getRepoTree(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getRepoTree(owner, repo);
     }
 
 }
