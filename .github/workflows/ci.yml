@@ -25,23 +25,27 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-          cache-dependency-path: ./backend/pnpm-lock.yaml
+          cache-dependency-path: ./backend/backend-nest/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: ./backend/backend-nest
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma Client
+        working-directory: ./backend/backend-nest
+        run: pnpm prisma generate
+
       - name: Run build
         working-directory: ./backend/backend-nest
         run: pnpm run build
 
-      # - name: Run Linter
-      #   working-directory: ./backend/backend-nest
-      #   run: pnpm run lint
+      - name: Run Linter
+        working-directory: ./backend/backend-nest
+        run: pnpm run lint
 
-      # - name: Run Unit Tests
-      #   working-directory: ./backend/backend-nest
-      #   run: pnpm run test -- --passWithNoTests --runInBand
+      - name: Run Unit Tests
+        working-directory: ./backend/backend-nest
+        run: pnpm test -- --watch=false --passWithNoTests --runInBand
 
   frontend:
     name: Build Frontend (React)
