@@ -11,46 +11,42 @@ jobs:
     name: Build, Lint and Test Backend (NestJS)
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./backend/backend-nest
-
     steps:
-      - name: Install pnpm
-        run: npm install -g pnpm   
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
           cache-dependency-path: ./backend/pnpm-lock.yaml
 
-
-
       - name: Install dependencies
+        working-directory: ./backend/backend-nest
         run: pnpm install --frozen-lockfile
 
       - name: Run build
+        working-directory: ./backend/backend-nest
         run: pnpm run build
 
       # - name: Run Linter
+      #   working-directory: ./backend/backend-nest
       #   run: pnpm run lint
 
       # - name: Run Unit Tests
+      #   working-directory: ./backend/backend-nest
       #   run: pnpm run test -- --passWithNoTests --runInBand
 
   frontend:
     name: Build Frontend (React)
-    # needs: backend
+    needs: backend
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./frontend
 
     steps:
       - name: Checkout repository
@@ -64,8 +60,9 @@ jobs:
           cache-dependency-path: ./frontend/package-lock.json
 
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm ci
 
       - name: Build Frontend
+        working-directory: ./frontend
         run: npm run build
-
