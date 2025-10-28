@@ -13,7 +13,7 @@
   /* background-color: rebeccapurple; */
 }
 .scroll {
-  display: flex; /* Ativa o flexbox para permitir a centralização do filho */
+  display: flex; 
   width: 100%;
   margin-right: 2vw;
 }
@@ -60,19 +60,27 @@
 
 .boxes-list-repo {
   display: grid;
-  /* up to 4 columns on wide screens */
+  justify-items: center;
   grid-template-columns: repeat(4, minmax(220px, 1fr));
   gap: 24px;
   padding-bottom: 16px;
-  width: 100%;
+  /* background-color: red; */
 }
 
-/* New: scrollable container for the repo grid */
+
+.boxes-list-repo .empty-placeholder {
+  grid-column: 1 / -1;
+  text-align: center;
+  align-self: center;
+  padding: 8px 12px;
+}
+
+
 .repo-scroll {
-  /* limit the visible height so the grid scrolls internally */
-  max-height: 520px; /* adjust as needed */
+  
+  max-height: 520px; 
   overflow-y: auto;
-  padding-right: 8px; /* avoid hiding scrollbar over content */
+  padding-right: 8px; 
 }
 
 /* responsive: 3 cols */
