@@ -1,0 +1,72 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend:
+    name: Build, Lint and Test Backend (NestJS)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: ./backend/backend-nest/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: ./backend/backend-nest
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        working-directory: ./backend/backend-nest
+        run: pnpm prisma generate
+
+      - name: Run build
+        working-directory: ./backend/backend-nest
+        run: pnpm run build
+
+      - name: Run Linter
+        working-directory: ./backend/backend-nest
+        run: pnpm run lint
+
+      - name: Run Unit Tests
+        working-directory: ./backend/backend-nest
+        run: pnpm test -- --watch=false --passWithNoTests --runInBand
+
+  frontend:
+    name: Build Frontend (React)
+    needs: backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: npm run build
