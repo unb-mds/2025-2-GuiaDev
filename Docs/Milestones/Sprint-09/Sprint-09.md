@@ -1,10 +1,10 @@
-# **🏁** Sprint 00
+# **🏁** Sprint 09
 
-Período: 00/00/2025 a 00/00/2025
+Período: 29/10/2025 a 02/11/2025
 
 ## Descrição
 
-> A descrição da Sprint deve conter um resumo do que o time se propôs a fazer.
+> A nossa equipe va focar em terminar as issues que faltaram.
 > 
 
 ## Objetivos
@@ -16,19 +16,19 @@ Período: 00/00/2025 a 00/00/2025
 
 ### Reunião 1
 
-**Data:** 00/00/2025  
-**Local:**  
-**Inicio:** 00:00  
-**Encerramento:** 00:00
+**Data:** 29/10/2025  
+**Local:**  Discord
+**Inicio:** 19:30  
+**Encerramento:** 22:00
 
 **Assuntos:**
 
-* Assunto 1
-* Assunto 2
+* Assunto 1: Falar sobre o que foi feito na sprint passada, um review de tudo que foi feito. E ver se alguém não conseguiu concluir alguma issue.
+* Assunto 2: Falamos sobre o que vai ser feito na próxima sprint e se precisava estender a sprint passada por um pouco mais de tempo.
 
 ## Finalização
 
-> A Sprint deve ser finalizada com um resumo do que realmente foi feito e quais tarefas foram postergadas para a próxima Sprint.
+> Estendemos a sprint 8 para concluir algumas issues que faltaram para não acumular muita tarefa para os integrantes do projeto. E vamos dar uma atenção especial na proóxima sprint para o preencher o figma
 > 
 
 ---
