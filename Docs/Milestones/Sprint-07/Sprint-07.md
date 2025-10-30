@@ -33,7 +33,7 @@ Período: 13/10/2025 a 19/10/2025
 ## Finalização
 
 * Estipulamos um prazo para terminar essas tarefas e foi uma ótima sugestão em que trabalhássemos em grupo o que aumentou significamente a produtividade e o compartilhamento de conhecimento. 
-*
+
 
 ---
 
