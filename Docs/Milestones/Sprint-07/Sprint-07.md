@@ -4,32 +4,36 @@ Período: 00/00/2025 a 00/00/2025
 
 ## Descrição
 
-> A descrição da Sprint deve conter um resumo do que o time se propôs a fazer.
-> 
+* Realizamos uma atualização no Figma com o objetivo de melhorar a organização e o entendimento geral do projeto.
+* Iniciamos a criação da página de aprendizado(Learning-Page).
+* Também Iniciamos na parte do backend a implementação do chat de IA p/ Guia de Documentação.
+* Tivemos como objetivo também a integração do frontend - backend.
+* E a nálise de documentos obtidos pela API por meio da IA. 
+ 
 
 ## Objetivos
 
-- Objetivo 1
-- Objetivo 2
+- Objetivo 1: Na parte do figma: As mudanças tornam o Figma mais intuitivo e colaborativo, facilitando tanto o desenvolvimento quanto futuras atualizações de design.
+- Objetivo 2: Deixar o projeto melhor estruturado e avançando para novas implementações de funções do projeto.
 
 ## Reuniões
 
 ### Reunião 1
 
-**Data:** 29/10/2025  
+**Data:** 13/10/2025  
 **Local:**  Discord
-**Inicio:** 19:30  
-**Encerramento:** 22:00
+**Inicio:** 21:00  
+**Encerramento:** 23:00
 
 **Assuntos:**
 
-* Assunto 1: Falar sobre o que foi feito na sprint passada, um review de tudo que foi feito. E ver se alguém não conseguiu concluir alguma issue.
-* Assunto 2: Falamos sobre o que vai ser feito na próxima sprint e se precisava estender a sprint passada por um pouco mais de tempo.
+* Assunto 1: Distribuiçoes das issues para cada integrante com foco em melhorar o projeto
+* Assunto 2: E um review do que foi feito na sprint passada, se todos conseguiram entregar as issues da sprint quais dificuldades os participantes tiveram.
 
 ## Finalização
 
-> Estendemos a sprint 8 para concluir algumas issues que faltaram e começar a planejar a próxima sprint que vai ser um.
-> 
+* Estipulamos um prazo para terminar essas tarefas e foi uma ótima sugestão em que trabalhássemos em grupo o que aumentou significamente a produtividade e o compartilhamento de conhecimento. 
+*
 
 ---
 
