@@ -4,8 +4,8 @@ Período: 29/10/2025 a 02/11/2025
 
 ## Descrição
 
-> A nossa equipe va focar em terminar as issues que faltaram.
-> 
+* A nossa equipe va focar em terminar as issues que faltaram.
+
 
 ## Objetivos
 
@@ -28,8 +28,8 @@ Período: 29/10/2025 a 02/11/2025
 
 ## Finalização
 
-> Estendemos a sprint 8 para concluir algumas issues que faltaram para não acumular muita tarefa para os integrantes do projeto. E vamos dar uma atenção especial na proóxima sprint para o preencher o figma
-> 
+* Estendemos a sprint 8 para concluir algumas issues que faltaram para não acumular muita tarefa para os integrantes do projeto. E vamos dar uma atenção especial na proóxima sprint para o preencher o figma
+ 
 
 ---
 
