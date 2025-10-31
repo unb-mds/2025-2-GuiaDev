@@ -1,126 +1,128 @@
 import React, { useState, useEffect } from "react";
 import "./Boxrepo.css";
-
-// --- Seus Componentes de Caixa (estão ótimos) ---
+import GitHubAPI from "../../../services/github";
+import { useNavigate } from "react-router-dom";
 
 
 const BoxStat = ({ nome, num, comment }) => {
   return (
     <div className="box-item">
       <div className="name">
-        {nome}  {/* Usei <p> para o título para melhor semântica */}
-       
+        {nome} 
       </div>
-      
+
       <h2>{num}</h2>
       <p>{comment}</p>
     </div>
   );
 };
 
-const BoxRepositorio = ({ nome }) => {
+const BoxRepositorio = ({ repo, owner }) => {
+  const navigate = useNavigate();
   return (
     <div className="box-item-repo">
       <div>
-        <h2>{nome}</h2>
+        <h2>{repo.nomeRepositorio}</h2>
       </div>
-      <div className="info">Ver detalhes</div>
+      <button
+        className="btn-details"
+        onClick={() => navigate(`/analysis/${encodeURIComponent(owner)}/${encodeURIComponent(repo.nomeRepositorio)}`, { state: { repo } })}
+      >
+        Ver detalhes
+      </button>
     </div>
   );
 };
 
-// --- Seu Componente Principal Corrigido ---
 
-function BoxRepo() {
+
+function BoxRepo({ owner }) {
   // 1. DOIS ESTADOS SEPARADOS: um para cada tipo de dado
   const [stats, setStats] = useState([]);
   const [repos, setRepos] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // --- SIMULAÇÃO DE UMA CHAMADA AO BACKEND ---
+useEffect(() => {
+  let alive = true;
+  if (!owner) return;
 
-    // Dados para a primeira seção (Resumo/Estatísticas)
-    const dadosStatsDoBackend = [
-      {
-        id: "stat-1",
-        nome: "Repositórios",
-        num: "12",
-        comment: "Total conectado.",
-       
-      },
-      {
-        id: "stat-2",
-        nome: "Completos",
-        num: "14",
-        comment: "Bem documentados.",
-      },
-      {
-        id: "stat-3",
-        nome: "Pendentes",
-        num: "5",
-        comment: "Precisam de atenção.",
-      },
-    ];
+  setError(null);
+  setLoading(true);
 
-    // Dados para a segunda seção (Lista de Repositórios)
-    const dadosReposDoBackend = [
-      { id: "repo-a", nome: "react-dashboard" },
-      { id: "repo-b", nome: "api-gateway" },
-      { id: "repo-c", nome: "mobile-app" },
-      { id: "repo-d", nome: "data-pipeline" },
-      { id: "repo-d", nome: "data-pipeline" },
-      { id: "repo-d", nome: "data-pipeline" },
-      { id: "repo-d", nome: "data-pipeline" },
-      { id: "repo-d", nome: "data-pipeline" },
-    ];
+  (async () => {
+    try {
+      const data = await GitHubAPI.analyzeUserRepos(owner);
+      if (!alive) return;
+      setRepos(Array.isArray(data) ? data : []);
+    } catch (err) {
+      if (!alive) return;
+      setError("Erro ao pegar os repositórios");
+      console.error(err);
+    } finally {
+      if (alive) setLoading(false);
+    }
+  })();
 
-    // Simulamos um pequeno delay para a chegada dos dados
-    setTimeout(() => {
-      // 2. ATUALIZAR CADA ESTADO COM SEUS DADOS CORRESPONDENTES
-      setStats(dadosStatsDoBackend);
-      setRepos(dadosReposDoBackend);
-    }, 1000); // 1 segundo de delay
-  }, []); // O array vazio [] garante que rode só uma vez
+  return () => { alive = false; };
+}, [owner]);
+   
 
   return (
-    // Um único div container para a página é suficiente
+    
     <div className="box-repo-container">
       {/* --- PRIMEIRA SEÇÃO: DASHBOARD/ESTATÍSTICAS --- */}
       <div>
-      <h1>Dashboard</h1>
-      <br />
+        <h1>Dashboard</h1>
+        <br />
       </div>
       <h2>Acompanhe o progresso da documentação dos seus repositórios!</h2>
       <div className="scroll">
         <div className="boxes-list">
-          {stats.length === 0 ? (
-            <p>Carregando estatísticas...</p>
+          {!owner ? (
+            <p>Digite o nome de usuário do GitHub no campo acima e clique em "Buscar".</p>
+          ) : loading ? (
+            <p>Buscando repositórios de "{owner}"...</p>
+          ) : stats.length === 0 ? (
+            <p>Ainda não há estatísticas disponíveis para este usuário.</p>
           ) : (
             // 3. RENDERIZAR USANDO O ESTADO 'stats'
-            stats.map((stat) => (
+            stats.map((s) => (
               <BoxStat
-                key={stat.id}
-                nome={stat.nome}
-                num={stat.num}
-                comment={stat.comment}
-                icon={stat.icon}
+                key={s.id}
+                nome={s.nome}
+                num={s.num}
+                comment={s.comment}
+                icon={s.icon}
               />
             ))
           )}
         </div>
       </div>
 
-      {/* --- SEGUNDA SEÇÃO: SEUS REPOSITÓRIOS --- */}
+
       <div className="repo-section">
         <h1>Seus repositórios</h1>
-        <div className="scroll">
+
+        <div className="repo-scroll">
           <div className="boxes-list-repo" id="repo-list">
-            {repos.length === 0 ? (
-              <p>Carregando repositórios...</p>
+            {!owner ? (
+              <span className="empty-placeholder">
+                <p>Digite o nome de usuário do GitHub no campo acima e clique em "Buscar".</p>
+              </span>
+            ) : loading ? (
+              <span className="empty-placeholder">
+                <p>Buscando repositórios de "{owner}"...</p>
+              </span>
+            ) : repos.length === 0 ? (
+              <span className="empty-placeholder">
+                <p>Nenhum repositório encontrado para "{owner}". Verifique o nome e tente novamente.</p>
+              </span>
             ) : (
               // 4. RENDERIZAR USANDO O ESTADO 'repos'
               repos.map((repo) => (
-                <BoxRepositorio key={repo.id} nome={repo.nome} />
+               <BoxRepositorio key={repo.id} repo={repo} owner={owner} />
               ))
             )}
           </div>

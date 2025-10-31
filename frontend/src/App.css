@@ -4,33 +4,69 @@ body,
   margin: 0;
   padding: 0;
   width: 100%;
+  /* height: 100%; */
+  box-sizing: border-box; 
+}
 
-  box-sizing: border-box; /* Garante que padding e bordas não adicionem largura extra */
+:root {
+  --header-height: 80px;
 }
 
 .AppContainer {
+  /* display: flex; */
   width: 100%;
-  height: 100%;
-  /* background-color: aqua; */
-  
+  min-height: 100vh;
+  /* reserve space for fixed header so it doesn't overlap content */
+  padding-top: var(--header-height);
+  background-color: white;
+}
+.ajustCente{
+
 }
 
 .Main {
   display: flex;
+  justify-content: space-between;
   background-color: white;
-  width: 100%; 
-  height: 100%;
-  margin-top: 80px;
-
+  width: 100%;
+  min-height: 100%;
+  /* margin-top: 80px; */
 }
 
-/* Estilo para a área do conteúdo principal */
+.sideBar {
+  display: block;
+  flex: 0 0 260px; /* reserve space for sidebar in the flex layout */
+}
+
+@media (max-width: 900px) {
+  .sideBar {
+    flex: 0 0 auto; /* allow sidebar to be hidden/overlay on small screens */
+  }
 .content {
   overflow-y: auto; /* Mantém a barra de rolagem vertical só aqui */
   flex: 1;
-  height: 100%;
+  height: calc(100vh - var(--header-height));
+   padding-top: 120px;
   min-width: 100%;
+  /* background-color: blue; */
   
- 
-  /* background-color: blueviolet; */
+}
+}
+
+/* Estilo para a área do conteúdo principal */
+@media (min-width:901px){
+.content {
+  display: flex;
+  justify-content: center;
+  overflow-y: auto; 
+  flex: 1;
+  height: calc(100vh - var(--header-height));
+  /* background-color: aqua; */
+  min-width: calc(100% - 260px);
+  /* min-width: 100%; */
+  /* padding-top: 120px; */
+  /* margin-top: 120px; */
+  /* background-color: red; */
+  
+}
 }

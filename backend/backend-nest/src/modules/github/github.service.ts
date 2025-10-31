@@ -127,6 +127,21 @@ export class GithubService {
     for (const file of files) { try { const response = await this.http.axiosRef.get(file.download_url, { headers: { Accept: 'application/vnd.github.raw' } }); docs.push({ name: file.name, content: response.data }); } catch (err: any) { docs.push({ name: file.name, content: null }); } } return docs;
   }
 
+  async getRepoTree(owner: string, repo: string) {
+  // no cache here; fetch directly
+    try {
+      const branch = await this._fetchDefaultBranch(owner, repo);
+      const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+      const res = await this.httpGet(treeUrl);
+      const tree = res.data?.tree || [];
+  const result = tree.map((entry: any) => ({ path: entry.path, type: entry.type }));
+  return result;
+    } catch (err: any) {
+      this.logger.warn(`getRepoTree ${owner}/${repo}: ${err?.message || err}`);
+      throw err.original || err;
+    }
+  }
+
   async getGovernance(owner: string, repo: string) {
     try { const branch = await this._fetchDefaultBranch(owner, repo); const patterns = ['governance.md']; const { resultsByPath } = await this.fetchChecklistMdFiles(owner, repo, patterns, branch); const result = Object.values(resultsByPath).find(r => r.content && path.basename(r.path).toLowerCase() === 'governance.md'); return { path: result?.path || null, content: result?.content || null }; }
     catch (err: any) { if (err.status !== 404) this.logger.warn(`getGovernance ${owner}/${repo}: ${err.message}`); return { path: null, content: null }; }

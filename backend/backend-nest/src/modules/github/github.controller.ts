@@ -92,4 +92,9 @@ export class GithubController {
     return this.githubService.analyzeUserRepos(username);
     }
 
+    @Get('tree/:owner/:repo')
+    async getRepoTree(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getRepoTree(owner, repo);
+    }
+
 }

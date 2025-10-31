@@ -8,6 +8,10 @@ import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
 import LearningPage from "./pages/LearningPage/LearningPage.jsx";
 
+//teste componente depois tirar e montar a page
+
+import AnalysisPage from "./pages/Analysis/Analysis.jsx";
+
 const router = createBrowserRouter([
   // 🔹 Rota isolada do Login (sem Header nem Sidebar)
   {
@@ -31,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "aprendizado",
         element: <LearningPage />,
+      },
+      {
+        path: "analysis/:owner/:repo",
+        element: <AnalysisPage/>,
       },
     ],
   },
