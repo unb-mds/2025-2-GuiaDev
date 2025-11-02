@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Logger, HttpException,HttpStatus} from '@nestjs/common';
 import { GithubService } from './github.service';
 
 @Controller('github')
 export class GithubController {
+
+    private readonly logger = new Logger(GithubController.name);
     constructor(private readonly githubService: GithubService) {}
     
     @Get('commits/:owner/:repo')
@@ -89,7 +91,27 @@ export class GithubController {
 
     @Get('analyze/user/:username')
     async analyzeUserRepos(@Param('username') username: string) {
-    return this.githubService.analyzeUserRepos(username);
+        try {
+        this.logger.log(`Iniciando análise para o usuário: ${username}`);
+        const analysisResults = await this.githubService.analyzeUserRepos(username);
+        this.logger.log(`Análise concluída para: ${username}`);
+        return analysisResults;
+        } catch (error: any) {
+        this.logger.error(`Falha ao analisar repositórios para ${username}: ${error.message}`, error.stack);
+
+        // Trata erros de 404 de forma específica para o GitHub
+        if (error?.original?.response?.status === 404) {
+            throw new HttpException(
+            `Usuário do GitHub "${username}" não encontrado.`,
+            HttpStatus.NOT_FOUND,
+            );
+        }
+        
+        throw new HttpException(
+            'Falha ao buscar dados do GitHub. Tente novamente mais tarde.',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+        }
     }
 
     @Get('tree/:owner/:repo')
