@@ -1,8 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-// REMOVED: require dinâmico e formas legadas do SDK
-// const GenerativeAI: any = require('@google/generative-ai');
-// CHANGED: usar o SDK oficial tipado e simples
-import { GoogleGenerativeAI } from '@google/generative-ai'; // CHANGED
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export type DocAnalysis = {
   name: string;
@@ -15,35 +12,105 @@ export type DocAnalysis = {
 @Injectable()
 export class DocsAnalyzerService {
   private readonly logger = new Logger(DocsAnalyzerService.name);
-  // CHANGED: centralizar envs e sanitizar modelo aqui
-  private readonly apiKey = process.env.GEMINI_API_KEY ?? ''; // CHANGED
-  private readonly model = (process.env.GEMINI_MODEL || 'gemini-2.5-flash') // CHANGED
-    .replace(/^models\//, ''); // CHANGED: evita models/models/...
+  private readonly apiKey = process.env.GEMINI_API_KEY ?? '';
+  private readonly model = (process.env.GEMINI_MODEL || 'gemini-2.5-flash').replace(/^models\//, '');
 
-  private client: GoogleGenerativeAI | null = null; // CHANGED: tipado
+  private client: GoogleGenerativeAI | null = null;
 
   constructor() {
-    // CHANGED: inicialização simples do SDK oficial
     if (this.apiKey) {
       try {
-        this.client = new GoogleGenerativeAI(this.apiKey); // CHANGED
+        this.client = new GoogleGenerativeAI(this.apiKey);
       } catch (err) {
-        this.logger.warn('Falha ao inicializar cliente Gemini, fallback para heurística', err as any);
+        this.logger.warn('Falha ao inicializar cliente Gemini', err as any);
         this.client = null;
       }
     }
   }
 
-  // CHANGED: prompt separado para reaproveitar
-  private buildPrompt(name: string, content: string) { // NEW
-    return `Você é um avaliador técnico de documentação.
-Analise o conteúdo do documento abaixo e responda SOMENTE com um objeto JSON.
-O objeto deve conter:
-- "score": um número inteiro entre 0 e 100 (sem aspas)
-- "summary": um resumo curto em português (até 200 caracteres)
-- "suggestions": uma lista de até 6 sugestões curtas em português
+  // Constrói o prompt para o modelo Gemini
+  private buildPrompt(name: string, content: string) {
+    return `Assunto: Análise de Documentação de Repositório de Software
 
-Avalie a clareza, completude, presença de seções (Instalação, Uso, Contribuição), exemplos e estrutura de acordo com as boas práticas de cada documento específico.
+Persona: Você é um agente de IA especialista em engenharia de software, com foco em boas práticas de documentação técnica.
+
+Objetivo: Sua tarefa é analisar arquivos de documentação de um repositório de software.
+Para cada arquivo, você deve verificar se ele existe e, em seguida, avaliá-lo com base em um conjunto de regras, 
+retornando sua análise em um formato JSON específico.
+
+Formato de Saída Obrigatório: Sua resposta DEVE ser um único OBJETO JSON. Cada objeto representa um arquivo analisado e deve conter exatamente as seguintes chaves:
+
+
+  {
+    "name": "nome-do-arquivo.md",
+    "exists": true,
+    "score": 0,
+    "summary": "",
+    "suggestions": []
+  }
+
+
+Regras de Análise Detalhadas
+Você deve aplicar as seguintes regras para cada arquivo  de entrada:
+
+Regra 1: O Arquivo NÃO EXISTE
+Se o arquivo não for encontrado no repositório:
+
+"exists": false
+
+"score": 0
+
+"summary": "" (uma string vazia)
+
+"suggestions": [ "Sugerir adicionar este documento ao repositório atendendo as boas práticas de escrita técnica." ]
+
+Regra 2: O Arquivo EXISTE (Análise Padrão)
+Esta regra se aplica a todos os arquivos que existem, EXCETO o arquivo LICENSE.
+
+"exists": true
+
+"summary": Leia e analise o conteúdo completo do arquivo e, em seguida, escreva um breve resumo (1-2 frases) explicando por que este tipo de documento é essencial para um projeto de software.
+
+"score": Atribua uma pontuação de 0 a 100.
+
+A pontuação deve avaliar a qualidade e completude do conteúdo com base nas boas práticas de escrita técnica para aquele tipo específico de documento.
+
+Por exemplo: Um README.md deve ter descrição do projeto, instruções de instalação, exemplos de uso, etc. Um CONTRIBUTING.md deve ter guia de ambiente, fluxo de pull request, etc.
+
+Um arquivo vazio ou com conteúdo mínimo deve receber uma pontuação baixa (próxima de 0).
+
+Um arquivo completo, claro e bem estruturado deve receber uma pontuação alta (próxima de 100).
+
+"suggestions": Gere uma lista de strings contendo sugestões de melhoria claras e acionáveis para o documento, com base no que foi observado na análise de conteúdo.
+
+Regra 3: Caso Especial - Pontuação Máxima
+Se a análise da Regra 2 resultar em um "score" de 100 (ou seja, o documento é considerado perfeito e atende a todos os requisitos de boas práticas):
+
+O campo "suggestions" deve ser: [ "Documento OK." ]
+
+Regra 4: Caso Especial - O Arquivo LICENSE
+O arquivo LICENSE (ou LICENSE.md) segue regras binárias e não deve ter seu conteúdo analisado para qualidade, apenas para existência.
+
+Se o arquivo LICENSE EXISTIR:
+
+"exists": true
+
+"score": 100
+
+"summary": "Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído."
+
+"suggestions": [ "Documento OK." ]
+
+Se o arquivo LICENSE NÃO EXISTIR:
+
+"exists": false
+
+"score": 0
+
+"summary": ""
+
+"suggestions": [ "Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários." ]
+
 Document name: ${name}.
 CONTENT_START
 ${content}
@@ -55,52 +122,49 @@ CONTENT_END`;
     name: string,
     content: string
   ): Promise<Pick<DocAnalysis, 'score' | 'summary' | 'suggestions'>> {
-    const axios = require('axios'); // mantive axios
-    const prompt = this.buildPrompt(name, content); // CHANGED
+    const axios = require('axios');
+    const prompt = this.buildPrompt(name, content);
 
-    // 1) Tenta via SDK oficial (@google/generative-ai)
+    // Tenta via SDK oficial (@google/generative-ai) se inicializado
     if (this.client) {
       try {
-        // CHANGED: uso do generateContent com responseMimeType JSON
         const model = this.client.getGenerativeModel({
-          model: this.model, // CHANGED
+          model: this.model,
           generationConfig: {
             temperature: 0.6,
             maxOutputTokens: 1024,
-            responseMimeType: 'application/json', // CHANGED: força JSON
+            responseMimeType: 'application/json',
           } as any,
         });
 
         const result = await model.generateContent({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        }); // CHANGED
+        });
 
-        // CHANGED: leitura consistente do texto
         const text = result?.response?.text?.() ?? '';
         const json = this.extractJson(text);
         return this.normalizeParsed(json);
       } catch (libErr) {
-        this.logger.warn('Library call to Gemini falhou; tentando REST v1 generateContent', libErr as any);
+        this.logger.warn('Library call to Gemini falhou', libErr as any);
+        throw libErr;
       }
     }
 
-    // 2) REST fallback (Generative Language API v1)
+    // Se SDK não estiver disponível, usa REST v1
     if (!this.apiKey) {
       throw new Error('No Gemini/Google API key found in env (GEMINI_API_KEY or GOOGLE_API_KEY)');
     }
 
-    // CHANGED: endpoint correto v1 + :generateContent
     const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(
       this.model
-    )}:generateContent?key=${this.apiKey}`; // CHANGED
+    )}:generateContent?key=${this.apiKey}`;
 
-    // CHANGED: payload no formato contents/parts e response_mime_type
     const body = {
-      contents: [{ role: 'user', parts: [{ text: prompt }] }], // CHANGED
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.6,
         maxOutputTokens: 1024,
-        response_mime_type: 'application/json', // CHANGED
+        response_mime_type: 'application/json',
       },
     };
 
@@ -108,7 +172,6 @@ CONTENT_END`;
       const res = await axios.post(url, body, { timeout: 25000 });
       const data = res.data;
 
-      // CHANGED: caminhos atuais de resposta
       const text =
         data?.candidates?.[0]?.content?.parts?.[0]?.text ??
         data?.candidates?.[0]?.content?.parts?.[0]?.stringValue ??
@@ -124,14 +187,12 @@ CONTENT_END`;
         bodyResp
       );
 
-      // CHANGED: só relançar auth; demais deixam cair na heurística
       if (status === 401 || status === 403) {
         throw new Error(
           `Authentication/permission error calling Generative API (status ${status}). Check API key and IAM permissions.`
-        ); // CHANGED
+        );
       }
-      // para outros erros, deixamos cair para heurística no chamador
-      throw err; // CHANGED
+      throw err;
     }
   }
 
@@ -143,7 +204,6 @@ CONTENT_END`;
     try {
       return JSON.parse(candidate);
     } catch {
-      // try to recover by finding last brace
       const last = candidate.lastIndexOf('}');
       if (last > 0) {
         try {
@@ -165,76 +225,73 @@ CONTENT_END`;
     };
   }
 
-  // Heuristic fallback (kept from original implementation)
-  private heuristicAnalyze(name: string, content: string | null): DocAnalysis {
-    if (!content) {
+
+
+  // Public API: analyzeText -> usa somente Gemini
+  async analyzeText(name: string, content: string | null): Promise<DocAnalysis> {
+    // Caso 1: Arquivo NÃO EXISTE (Regra 1 do prompt)
+    if (content === null) {
+      // O arquivo "LICENSE" é um caso especial
+      if (name.toUpperCase() === 'LICENSE' || name.toUpperCase() === 'LICENSE.MD') {
+        return {
+          name,
+          exists: false,
+          score: 0,
+          summary: '',
+          suggestions: [
+            'Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários.',
+          ],
+        };
+      }
+      // Demais arquivos
       return {
         name,
         exists: false,
         score: 0,
-        summary: `${name} não encontrado no repositório`,
-        suggestions: [`Adicione um ${name} com propósito e estrutura claros.`],
+        summary: '',
+        suggestions: [
+          'Sugerir adicionar este documento ao repositório atendendo as boas práticas de escrita técnica.',
+        ],
       };
     }
 
-    const length = content.trim().length;
-    const lines = content.split(/\r?\n/).length;
-    const hasTitle = /^#\s+.+/m.test(content);
-    // CHANGED: regex tinha um bug (".mi.test"), corrigi e escapei pontos
-    const hasBadge = /\[!\[|badge|shields\.io|img\.shields\.io/mi.test(content); // CHANGED
-    const hasTOC = /(^##\s+Table of Contents|\- \[)/mi.test(content);
-
-    let score = Math.min(60, Math.floor(Math.log10(Math.max(1, length)) * 10));
-
-    if (hasTitle) score += 15;
-    if (lines > 10) score += 10;
-    if (hasTOC) score += 10;
-    if (hasBadge) score += 5;
-
-    score = Math.max(0, Math.min(100, score));
-
-    const suggestions: string[] = [];
-
-    if (!hasTitle) suggestions.push('Adicione um título de nível superior (e.g. `# Nome do Projeto`)');
-    if (lines < 5) suggestions.push('Expanda o documento com propósito, instalação, uso e exemplos.');
-    if (!hasTOC && lines > 20) suggestions.push('Adicione uma Tabela de Conteúdos para ajudar a navegar em um README longo.');
-    if (!/##\s+Installation/mi.test(content)) suggestions.push('Adicione uma seção `Instalação` com etapas para executar o projeto localmente.');
-    if (!/##\s+Usage/mi.test(content)) suggestions.push('Adicione uma seção `Casos de Uso` com exemplos e saídas esperadas.');
-    if (!/##\s+Contributing/mi.test(content)) suggestions.push('Adicione uma seção `Contribuição` para orientar potenciais colaboradores.');
-
-    const summary = `Heurística de análise produziu uma pontuação de ${score}/100. Título encontrado: ${hasTitle}, linhas: ${lines}.`;
-
-    return {
-      name,
-      exists: true,
-      score,
-      summary,
-      suggestions,
-    };
-  }
-
-  // Public API: analyzeText -> tries Gemini if available, otherwise heuristic
-  async analyzeText(name: string, content: string | null): Promise<DocAnalysis> {
-    // Se não há conteúdo, retorna rápido
-    if (!content) return this.heuristicAnalyze(name, null);
-
-    // CHANGED: tenta LLM; se falhar, cai na heurística
-    if (!this.client && !this.apiKey) { // CHANGED
-      return this.heuristicAnalyze(name, content);
-    }
-
-    try {
-      const llm = await this.analyzeWithGemini(name, content);
+    // Caso 2: Arquivo EXISTE, MAS ESTÁ VAZIO
+    if (content.trim() === '') {
       return {
         name,
         exists: true,
-        score: llm.score,
-        summary: llm.summary,
-        suggestions: llm.suggestions,
+        score: 0,
+        summary: 'O arquivo existe, mas está vazio.',
+        suggestions: ['Preencher o documento com conteúdo relevante seguindo as boas práticas.'],
       };
-    } catch {
-      return this.heuristicAnalyze(name, content);
     }
+
+    // Caso 3: Arquivo EXISTE e tem conteúdo (Chamar a IA)
+    if (!this.client && !this.apiKey) {
+      throw new Error('Gemini is not configured. Set GEMINI_API_KEY or initialize the SDK client.');
+    }
+
+    // Caso especial LICENSE (Regra 4) - Se existe e tem conteúdo, não precisa analisar
+    if (name.toUpperCase() === 'LICENSE' || name.toUpperCase() === 'LICENSE.MD') {
+      return {
+        name,
+        exists: true,
+        score: 100,
+        summary:
+          'Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído.',
+        suggestions: ['Documento OK.'], // Alterado de "Tudo certo." para "Documento OK." para bater com a Regra 3
+      };
+    }
+
+    // Somente chama a IA para arquivos normais que têm conteúdo
+    const llm = await this.analyzeWithGemini(name, content);
+    return {
+      name,
+      exists: true,
+      score: llm.score,
+      summary: llm.summary,
+      suggestions: llm.suggestions,
+    };
   }
 
   // Analisa múltiplos documentos de uma só vez
