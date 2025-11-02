@@ -24,3 +24,11 @@ model Project {
   author    User?    @relation(fields: [authorId], references: [id])
   authorId  Int?
 }
+
+model GithubCache {
+  url        String   @id
+  etag       String?
+  data       Json?
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+}
