@@ -55,6 +55,24 @@
 .chat-bubble.user{
     justify-content: flex-end;
 }
+
+.chat-bubble.bot .botIcon{
+    display: flex;
+    justify-items: start;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 90%;
+    height: 40px;
+    /* background-color: red; */
+    width: 10%;
+}
+
+.chat-bubble.user .botIcon{
+    width: 0%;
+    overflow: hidden;
+}
+
+
 .chat-bubble.bot{
     justify-content: flex-start;
 }

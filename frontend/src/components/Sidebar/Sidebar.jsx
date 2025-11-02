@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Sidebar.css";
+import { useNavigate } from "react-router-dom";
 
 const IconDashboard = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -35,6 +36,7 @@ const IconConfiguracoes = () => (
 
 function SideBar() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -49,7 +51,7 @@ function SideBar() {
       <div className={`sidebar-container ${open ? "open" : ""}`}>
         <div className="sidebar-header">Navegação</div>
 
-        <div className="btn-nav">
+        <div className="btn-nav" onClick={() => navigate("/home")}>
           <IconDashboard />
           <a>Dashboard</a>
         </div>
@@ -59,7 +61,7 @@ function SideBar() {
           <a>Repositórios</a>
         </div>
 
-        <div className="btn-nav">
+        <div className="btn-nav" onClick={() => navigate("/aprendizado")}>
           <IconDocumentacao />
           <a>Documentação</a>
         </div>

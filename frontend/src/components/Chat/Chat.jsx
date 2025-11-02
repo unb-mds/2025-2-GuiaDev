@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Chat.css';
+import logo from "../../assets/Logo.svg";
 
 export default function Chat() {
     const [messages, setMessagens] = useState([]);
@@ -13,7 +14,7 @@ export default function Chat() {
         setInput('');
     };
 
-   
+
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -35,13 +36,17 @@ export default function Chat() {
                 ) : (
                     messages.map((msg, index) => (
                         <div key={index} className={`chat-bubble ${msg.sender === 'user' ? 'user' : 'bot'}`}>
+                            <div className='botIcon'>
+                                <img src={logo}/> 
+                            </div>
+
                             <div className='msg'>
                                 {msg.text}
                             </div>
                         </div>
                     ))
                 )}
-                
+
                 <div ref={messagesEndRef} />
             </div>
             <div className='chat-input-area'>
@@ -56,7 +61,7 @@ export default function Chat() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
-                        
+
                         if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
                             handleMenssagem();
