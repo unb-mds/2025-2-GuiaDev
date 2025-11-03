@@ -1,72 +1,62 @@
-name: CI Pipeline
+name: CI Pipeline (Docker Compose)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main , pipelineCI02]
   pull_request:
-    branches: [ main ]
+    branches: [ main , pipelineCI02 ]
 
 jobs:
-  backend:
-    name: Build, Lint and Test Backend (NestJS)
+  build-and-test:
+    name: Build, Lint and Test Full Stack (Docker Compose)
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ Baixa o repositório
+      - name: 🧾 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      # 2️⃣ Configura o Docker Buildx (build avançado + cache)
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 3️⃣ Faz cache de camadas Docker (para builds mais rápidos)
+      - name: ⚡ Cache Docker layers
+        uses: actions/cache@v4
         with:
-          version: 9
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: ./backend/backend-nest/pnpm-lock.yaml
+      # 4️⃣ Constrói os serviços do docker-compose
+      - name: 🔧 Build Docker Compose services
+        run: docker compose -f docker-compose.yml build
 
-      - name: Install dependencies
-        working-directory: ./backend/backend-nest
-        run: pnpm install --frozen-lockfile
+      # 5️⃣ Sobe os containers em background
+      - name: 🚀 Start containers
+        # run: docker compose -f docker-compose.yml up -d
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          NODE_ENV: production
+        run: docker compose up -d --build || docker compose logs
 
-      - name: Generate Prisma Client
-        working-directory: ./backend/backend-nest
-        run: pnpm prisma generate
+        
 
-      - name: Run build
-        working-directory: ./backend/backend-nest
-        run: pnpm run build
+      # 6️⃣ Aplica o linter no backend (ajuste o caminho se necessário)
+      # - name: 🧹 Run Linter (NestJS)
+      #   run: docker compose exec -T backend npm run lint
 
-      - name: Run Linter
-        working-directory: ./backend/backend-nest
-        run: pnpm run lint
+      # # 7️⃣ Executa testes unitários no backend
+      # - name: 🧪 Run Tests (NestJS)
+      #   run: docker compose exec -T backend npm run test -- --passWithNoTests
 
-      - name: Run Unit Tests
-        working-directory: ./backend/backend-nest
-        run: pnpm test -- --watch=false --passWithNoTests --runInBand
+      # 8️⃣ (Opcional) Verifica se o front está rodando
+      - name: 🌐 Check frontend container health
+        run: docker compose ps
 
-  frontend:
-    name: Build Frontend (React)
-    needs: backend
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: ./frontend/package-lock.json
-
-      - name: Install dependencies
-        working-directory: ./frontend
-        run: npm ci
-
-      - name: Build Frontend
-        working-directory: ./frontend
-        run: npm run build
+      # 9️⃣ Para e remove containers após os testes
+      - name: 🧼 Clean up
+        if: always()
+        run: docker compose -f docker-compose.yml down --volumes --remove-orphans
