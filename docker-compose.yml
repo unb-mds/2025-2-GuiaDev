@@ -13,8 +13,11 @@ services:
     ports:
       # Mapeia a porta 3000 do host para a 3000 do container
       - "3000:3000"
-    env_file:
-      - ./backend/backend-nest/.env
+    # env_file:
+    #   - ./backend/backend-nest/.env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
 
     volumes:
       # Mapeia o código do backend para o /app dentro do container
