@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Logger, HttpException,HttpStatus} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Logger, HttpException,HttpStatus, Query} from '@nestjs/common';
 import { GithubService } from './github.service';
 
 @Controller('github')
@@ -79,11 +79,6 @@ export class GithubController {
     return this.githubService.getDocs(owner, repo);
     }
 
-    @Get('folder/repo/:owner/:repo')
-    async checkFolders(@Param('owner') owner: string, @Param('repo') repo: string) {
-    return this.githubService.checkFolders(owner, repo);
-    }
-
     @Get('content/docs/:owner/:repo')
     async getDocsContent(@Param('owner') owner: string, @Param('repo') repo: string) {
     return this.githubService.getDocsContent(owner, repo);
@@ -119,4 +114,22 @@ export class GithubController {
         return this.githubService.getRepoTree(owner, repo);
     }
 
+    @Get('cache')
+    async getCache(
+    @Query('owner') owner?: string,
+    @Query('repo') repo?: string,
+    @Query('url') url?: string,
+     ){
+    if (url) {
+      return this.githubService.getCacheByUrl(url);
+    }
+
+    if (owner && repo) {
+      const fullUrl = `https://api.github.com/repos/${owner}/${repo}`;
+      return this.githubService.getCacheByUrl(fullUrl);
+    }
+
+    return this.githubService.getAllCache();
+  }
 }
+

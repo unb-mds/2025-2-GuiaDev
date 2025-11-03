@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Buffer } from 'buffer';
 import path from 'path';
@@ -279,46 +279,174 @@ export class GithubService {
     return { patternResults, resultsByPath, summary };
   }
 
-  async checkFolders(owner: string, repo: string) {
-    let effectiveBranch = 'main'; try { effectiveBranch = await this._fetchDefaultBranch(owner, repo); } catch {/*ignore*/}
-    const foldersToCheck = ['src', 'docs', 'src/components', 'src/hooks', 'src/utils', 'public'];
-    const itemsToCheck: string[] = ['.github/issue_template', 'governance.md', 'docs/governance.md', '.github/pull_request_template.md', '.github/pull_request_template', 'arquitetura.md', 'docs/arquitetura.md', 'arquitetura', 'roadmap.md', 'docs/roadmap.md', 'roadmap', 'code_of_conduct.md', '.github/code_of_conduct.md', 'docs/code_of_conduct.md'];
-    const gitignorePath = '.gitignore';
-    const licensePatterns = ['license', 'license.md', 'license.txt', 'copying', 'copying.md', 'copying.txt', 'unlicense', 'unlicense.md', 'unlicense.txt', 'licence'];
-    const results: ({ path: string; exists: boolean })[] = [];
-    const defaultResults = foldersToCheck.map(p => ({ path: p, exists: false })).concat([{ path: 'issue_templates', exists: false }, { path: 'governance', exists: false }, { path: 'pull_request_template', exists: false }, { path: 'arquitetura', exists: false }, { path: 'roadmap', exists: false }, { path: gitignorePath, exists: false }, { path: 'code_of_conduct', exists: false }, { path: 'changelog', exists: false }, { path: 'license_file_check', exists: false }]);
+  async getFormattedCachedRepos() {
+    const allCache = await this.prisma.githubCache.findMany();
+    const parsed = allCache
+      .map((entry) => {
+        try {
+          const data = entry.data as any;
+          const owner = data?.owner || data?.repoOwner || '';
+          const repo = data?.repo || data?.repoName || '';
+          return { owner, repo, ...data };
+        } catch {
+          return null;
+        }
+      })
+      .filter((x) => x && x.repo && x.owner);
 
-    try {
-      const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(effectiveBranch)}?recursive=1`;
-      const treeResponse = await this.httpGet(treeUrl);
-      const tree = treeResponse.data.tree || [];
-      const allPaths = tree.map((item: any) => item.path.toLowerCase()); const allFilePaths = tree.filter((item: any) => item.path && item.type === 'blob').map((item: any) => item.path.toLowerCase());
-      for (const folder of foldersToCheck) { const norm = folder.toLowerCase(); const exists = allFilePaths.some(p => p.startsWith(`${norm}/`) || p.includes(`/${norm}/`)); results.push({ path: folder, exists }); } const foundItems = new Set<string>(); for (const item of itemsToCheck) { const norm = item.toLowerCase(); const exists = allPaths.some(p => p === norm || p.startsWith(`${norm}/`)); if (exists) foundItems.add(norm); } const gitignoreExists = allFilePaths.some(p => path.basename(p) === gitignorePath); const changelogExists = allFilePaths.some(p => path.basename(p) === 'changelog.md');
-      const licenseFileExists = allFilePaths.some(p => { const basenameLower = path.basename(p).toLowerCase(); return licensePatterns.some(pattern => basenameLower === pattern || basenameLower.startsWith(pattern + '.')); });
-      results.push({ path: 'issue_templates', exists: foundItems.has('.github/issue_template') }); results.push({ path: 'governance', exists: foundItems.has('governance.md') || foundItems.has('docs/governance.md') }); results.push({ path: 'pull_request_template', exists: foundItems.has('.github/pull_request_template.md') || foundItems.has('.github/pull_request_template') }); results.push({ path: 'arquitetura', exists: foundItems.has('arquitetura.md') || foundItems.has('docs/arquitetura.md') || foundItems.has('arquitetura') }); results.push({ path: 'roadmap', exists: foundItems.has('roadmap.md') || foundItems.has('docs/roadmap.md') || foundItems.has('roadmap') }); results.push({ path: 'code_of_conduct', exists: foundItems.has('code_of_conduct.md') || foundItems.has('.github/code_of_conduct.md') || foundItems.has('docs/code_of_conduct.md') }); results.push({ path: gitignorePath, exists: gitignoreExists }); results.push({ path: 'changelog', exists: changelogExists });
-      results.push({ path: 'license_file_check', exists: licenseFileExists });
-      return results;
-    } catch (error: any) { this.logger.warn(`checkFolders error for ${owner}/${repo}@${effectiveBranch}: ${error?.message || error}`); return defaultResults; }
+    // Agrupa por owner/repo
+    const grouped: Record<string, any[]> = {};
+    for (const item of parsed) {
+      const key = `${item.owner}/${item.repo}`;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(item);
+    }
+
+    // Junta os dados de cada repositório
+    const mergedRepos = Object.values(grouped).map((entries: any[]) => {
+      const base = entries[0];
+      const merged = {
+        owner: base.owner,
+        repo: base.repo,
+        commits: entries.find((e) => e.commits)?.commits || [],
+        issues: entries.find((e) => e.issues)?.issues || [],
+        releases: entries.find((e) => e.releases)?.releases || [],
+        docsContent: entries.find((e) => e.docsContent)?.docsContent || [],
+        checkFolders: entries.find((e) => e.checkFolders)?.checkFolders || [],
+        gitignore: entries.find((e) => e.gitignore)?.gitignore || null,
+        license: entries.find((e) => e.license)?.license || null,
+      };
+      return merged;
+    });
+
+    return this.formatRepoData(mergedRepos);
   }
-
 
   formatRepoData(reposData: any[]) {
     return reposData.map((repo, index) => {
-      const folderChecks = repo.checkFolders || []; const findCheck = (pathStr: string) => folderChecks.find((f: any) => f.path.toLowerCase() === pathStr.toLowerCase())?.exists || false; const allDocs = repo.docsContent || []; const findDocContent = (basename: string) => { const lowerBasename = basename.toLowerCase(); const matches = allDocs.filter((d: any) => d.name && d.name.toLowerCase() === lowerBasename); if (matches.length === 0) return null; if (matches.length === 1) return matches[0].content; matches.sort((a: any, b: any) => a.path.length - b.path.length); return matches[0].content; };
-      const apiLicenseValid = repo.license?.key && repo.license.key !== 'unlicensed'; const fileLicenseExists = findCheck('license_file_check'); const possuiLicense = apiLicenseValid || fileLicenseExists;
-      const possuiGitignore = !!repo.gitignore?.content || findCheck('.gitignore'); const possuiConductCode = !!findDocContent('code_of_conduct.md'); const possuiChangelog = !!findDocContent('changelog.md'); const possuiReadme = !!findDocContent('readme.md'); const possuiGovernance = !!findDocContent('governance.md'); const possuiArquitetura = !!findDocContent('arquitetura.md') || !!findDocContent('architecture.md'); const possuiRoadmap = !!findDocContent('roadmap.md');
+      const folderChecks = repo.checkFolders || [];
+      const findCheck = (pathStr: string) =>
+        folderChecks.find((f: any) => f.path.toLowerCase() === pathStr.toLowerCase())?.exists || false;
+
+      const allDocs = repo.docsContent || [];
+      const findDocContent = (basename: string) => {
+        const lowerBasename = basename.toLowerCase();
+        const matches = allDocs.filter(
+          (d: any) => d.name && d.name.toLowerCase() === lowerBasename,
+        );
+        if (matches.length === 0) return null;
+        if (matches.length === 1) return matches[0].content;
+        matches.sort((a: any, b: any) => a.path.length - b.path.length);
+        return matches[0].content;
+      };
+
+      const apiLicenseValid = repo.license?.key && repo.license.key !== 'unlicensed';
+      const fileLicenseExists = findCheck('license_file_check');
+      const possuiLicense = apiLicenseValid || fileLicenseExists;
+
+      const possuiGitignore = !!repo.gitignore?.content || findCheck('.gitignore');
+      const possuiConductCode = !!findDocContent('code_of_conduct.md');
+      const possuiChangelog = !!findDocContent('changelog.md');
+      const possuiReadme = !!findDocContent('readme.md');
+      const possuiGovernance = !!findDocContent('governance.md');
+      const possuiArquitetura =
+        !!findDocContent('arquitetura.md') || !!findDocContent('architecture.md');
+      const possuiRoadmap = !!findDocContent('roadmap.md');
+
       return {
-        id: index + 1, nomeRepositorio: repo.repo, commits: Array.isArray(repo.commits) ? repo.commits.length : 0, ultimosCommits: Array.isArray(repo.commits) ? repo.commits.slice(0, 5) : [], possuiIssues: Array.isArray(repo.issues) && repo.issues.length > 0, possuiReleases: Array.isArray(repo.releases) && repo.releases.length > 0, possuiReadme: possuiReadme, possuiLicense: possuiLicense, possuiGitignore: possuiGitignore, possuiDocs: Array.isArray(allDocs) && allDocs.length > 0, conduct: possuiConductCode, changelog: possuiChangelog, possuiSrc: findCheck('src'), possuiPublic: findCheck('public'), possuiGovernance: possuiGovernance, possuiArquitetura: possuiArquitetura, possuiRoadmap: possuiRoadmap, possuiDocsFolder: findCheck('docs'),
-        detalhes: { readme: findDocContent('readme.md'), changelog: findDocContent('changelog.md'), conduct: findDocContent('code_of_conduct.md'), license: apiLicenseValid ? repo.license.name : null, gitignore: repo.gitignore?.content || null, governance: findDocContent('governance.md'), arquitetura: findDocContent('arquitetura.md') || findDocContent('architecture.md'), roadmap: findDocContent('roadmap.md'), docs: allDocs, },
+        id: index + 1,
+        nomeRepositorio: repo.repo,
+        commits: Array.isArray(repo.commits) ? repo.commits.length : 0,
+        ultimosCommits: Array.isArray(repo.commits)
+          ? repo.commits.slice(0, 5)
+          : [],
+        possuiIssues: Array.isArray(repo.issues) && repo.issues.length > 0,
+        possuiReleases:
+          Array.isArray(repo.releases) && repo.releases.length > 0,
+        possuiReadme,
+        possuiLicense,
+        possuiGitignore,
+        possuiDocs: Array.isArray(allDocs) && allDocs.length > 0,
+        conduct: possuiConductCode,
+        changelog: possuiChangelog,
+        possuiSrc: findCheck('src'),
+        possuiPublic: findCheck('public'),
+        possuiGovernance,
+        possuiArquitetura,
+        possuiRoadmap,
+        possuiDocsFolder: findCheck('docs'),
+        detalhes: {
+          readme: findDocContent('readme.md'),
+          changelog: findDocContent('changelog.md'),
+          conduct: findDocContent('code_of_conduct.md'),
+          license: apiLicenseValid ? repo.license.name : null,
+          gitignore: repo.gitignore?.content || null,
+          governance: findDocContent('governance.md'),
+          arquitetura:
+            findDocContent('arquitetura.md') ||
+            findDocContent('architecture.md'),
+          roadmap: findDocContent('roadmap.md'),
+          docs: allDocs,
+        },
         Folders: folderChecks,
       };
     });
   }
 
+
+  async checkRepoChanged(owner: string, repo: string): Promise<boolean> {
+    const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
+
+    const cached = await this.prisma.githubCache.findUnique({
+      where: { url: repoUrl },
+    });
+
+    const headers: Record<string, string> = this.defaultHeaders();
+    if (cached?.etag) headers['If-None-Match'] = cached.etag;
+
+    try {
+      const res = await this.http.axiosRef.get(repoUrl, {
+        headers,
+        validateStatus: (status) => (status >= 200 && status < 300) || status === 304,
+      });
+
+      if (res.status === 304) {
+        this.logger.debug(`[RepoCache] ${owner}/${repo} não mudou (304).`);
+        return false; // nada mudou
+      }
+
+      // Se 200, atualiza o cache
+      const newEtag = res.headers['etag'] ?? null;
+      await this.prisma.githubCache.upsert({
+        where: { url: repoUrl },
+        update: { etag: newEtag, data: res.data },
+        create: { url: repoUrl, etag: newEtag, data: res.data },
+      });
+
+      this.logger.debug(`[RepoCache] ${owner}/${repo} mudou. Novo ETag: ${newEtag}`);
+      return true;
+    } catch (err: any) {
+      this.logger.warn(`[RepoCache] Falha ao verificar ${owner}/${repo}: ${err?.message || err}`);
+      return true; 
+    }
+  }
+  
+
   async analyzeUserRepos(username: string) {
-    const repos = await this.getUserRepos(username); const results: any[] = [];
+    let repos = await this.getUserRepos(username); const results: any[] = [];
+
+    repos = repos.slice(0, 30);
+
     for (const repo of repos) {
-      const owner = repo.owner.login; const name = repo.name; const defaultBranch = repo.default_branch;
+      const owner = repo.owner.login;
+      const name = repo.name; 
+      const defaultBranch = repo.default_branch;
+
+      const repoChanged = await this.checkRepoChanged(owner, name);
+      if (!repoChanged) {
+        this.logger.debug(`[Analyze] Pulando ${owner}/${name} (sem mudanças).`);
+        continue; // pula para o próximo repo
+      }
       try {
         let patterns: string[] = ['/'];
         try {
@@ -340,8 +468,8 @@ export class GithubService {
           }
         } catch { /* ignora */ }
 
-        const [commitsSettled, issuesSettled, releasesSettled, readmeSettled, changelogSettled, licenseSettled, contributingSettled, conductSettled, gitignoreSettled, docsListSettled, checkFoldersSettled] = await Promise.allSettled([
-          this.getCommits(owner, name), this.getIssues(owner, name), this.getReleases(owner, name), this.getReadme(owner, name), this.getChangelog(owner, name), this.getLicenses(owner, name), this.getContributing(owner, name), this.getConductCode(owner, name), this.getGitignore(owner, name), this.getDocs(owner, name), this.checkFolders(owner, name)
+        const [commitsSettled, issuesSettled, releasesSettled, readmeSettled, changelogSettled, licenseSettled, contributingSettled, conductSettled, gitignoreSettled, docsListSettled] = await Promise.allSettled([
+          this.getCommits(owner, name), this.getIssues(owner, name), this.getReleases(owner, name), this.getReadme(owner, name), this.getChangelog(owner, name), this.getLicenses(owner, name), this.getContributing(owner, name), this.getConductCode(owner, name), this.getGitignore(owner, name), this.getDocs(owner, name)
         ]);
         
         const { patternResults, resultsByPath, summary } = await this.fetchChecklistMdFiles(owner, name, patterns, defaultBranch);
@@ -349,10 +477,51 @@ export class GithubService {
         const docsContentArray = Object.values(resultsByPath).map(r => ({ name: path.basename(r.path), content: r.content, path: r.path, skipped: r.skipped }));
         
         results.push({
-          repo: name, commits: commitsSettled.status === 'fulfilled' ? commitsSettled.value : [], issues: issuesSettled.status === 'fulfilled' ? issuesSettled.value : [], releases: releasesSettled.status === 'fulfilled' ? releasesSettled.value : [], readme: readmeSettled.status === 'fulfilled' ? readmeSettled.value : { content: null }, changelog: changelogSettled.status === 'fulfilled' ? changelogSettled.value : { content: null }, conductcode: conductSettled.status === 'fulfilled' ? conductSettled.value : { content: null }, license: licenseSettled.status === 'fulfilled' ? licenseSettled.value : { name: 'Unlicensed' }, gitignore: gitignoreSettled.status === 'fulfilled' ? gitignoreSettled.value : { content: null }, docs: docsListSettled.status === 'fulfilled' ? docsListSettled.value : [], contributing: contributingSettled.status === 'fulfilled' ? contributingSettled.value : { content: null }, docsContent: docsContentArray || [], checkFolders: checkFoldersSettled.status === 'fulfilled' ? checkFoldersSettled.value : [], checklistSummary: summary, checklistMatches: patternResults,
+          repo: name, commits: commitsSettled.status === 'fulfilled' ? commitsSettled.value : [], issues: issuesSettled.status === 'fulfilled' ? issuesSettled.value : [], releases: releasesSettled.status === 'fulfilled' ? releasesSettled.value : [], readme: readmeSettled.status === 'fulfilled' ? readmeSettled.value : { content: null }, changelog: changelogSettled.status === 'fulfilled' ? changelogSettled.value : { content: null }, conductcode: conductSettled.status === 'fulfilled' ? conductSettled.value : { content: null }, license: licenseSettled.status === 'fulfilled' ? licenseSettled.value : { name: 'Unlicensed' }, gitignore: gitignoreSettled.status === 'fulfilled' ? gitignoreSettled.value : { content: null }, docs: docsListSettled.status === 'fulfilled' ? docsListSettled.value : [], contributing: contributingSettled.status === 'fulfilled' ? contributingSettled.value : { content: null }, docsContent: docsContentArray || [], checklistSummary: summary, checklistMatches: patternResults,
         });
       } catch (err: any) { this.logger.warn(`analyzeUserRepos per-repo error ${owner}/${name}: ${err?.message || err}`); results.push({ repo: name, commits: [], issues: [], releases: [], readme: { content: null }, changelog: { content: null }, conductcode: { content: null }, license: { name: 'Unlicensed' }, gitignore: { content: null }, docs: [], contributing: { content: null }, docsContent: [], checkFolders: [] }); }
     }
     return this.formatRepoData(results);
+  }
+
+   async getAllCache() {
+    const results = await this.prisma.githubCache.findMany({
+      orderBy: { updatedAt: 'desc' },
+      select: {
+        url: true,
+        etag: true,
+        updatedAt: true,
+        data: true,
+      },
+    });
+
+    return results.map((r) => ({
+      owner: this.extractOwner(r.url),
+      repo: this.extractRepo(r.url),
+      updatedAt: r.updatedAt,
+      data: r.data,
+    }));
+  }
+
+  async getCacheByUrl(url: string) {
+    const result = await this.prisma.githubCache.findUnique({ where: { url } });
+    if (!result) throw new NotFoundException(`Cache não encontrado para ${url}`);
+
+    return {
+      owner: this.extractOwner(result.url),
+      repo: this.extractRepo(result.url),
+      updatedAt: result.updatedAt,
+      data: result.data,
+    };
+  }
+
+  private extractOwner(url: string): string {
+    const match = url.match(/repos\/([^/]+)/);
+    return match ? match[1] : '';
+  }
+
+  private extractRepo(url: string): string {
+    const match = url.match(/repos\/[^/]+\/([^/?]+)/);
+    return match ? match[1] : '';
   }
 }
