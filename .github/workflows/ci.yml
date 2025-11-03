@@ -36,7 +36,12 @@ jobs:
       # 5️⃣ Sobe os containers em background
       - name: 🚀 Start containers
         # run: docker compose -f docker-compose.yml up -d
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          NODE_ENV: production
         run: docker compose up -d --build || docker compose logs
+
         
 
       # 6️⃣ Aplica o linter no backend (ajuste o caminho se necessário)
