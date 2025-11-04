@@ -6,8 +6,7 @@
   padding: 24px 12px;
   box-sizing: border-box;
   min-width: 255px;
-  position: fixed; /* keep in document flow on desktop so it doesn't overlay content */
-  /* margin-top: 65px; */
+  position: fixed; 
 
 
 }
@@ -62,7 +61,6 @@
   color: white;
 }
 
-/* Toggle button - hidden on desktop */
 .sidebar-toggle {
   display: none;
   position: fixed;
@@ -76,7 +74,6 @@
   
 }
 
-/* Responsive: hide sidebar by default on small screens and enable toggle */
 @media (max-width: 900px) {
   .sidebar-container {
     transform: translateX(-110%);

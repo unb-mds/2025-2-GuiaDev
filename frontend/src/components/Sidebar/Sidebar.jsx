@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Sidebar.css";
 import { useNavigate } from "react-router-dom";
-
+import { useConfigModal } from "../../contexts/ConfigModalContext";
 const IconDashboard = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"></path>
@@ -35,8 +35,10 @@ const IconConfiguracoes = () => (
 );
 
 function SideBar() {
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+    const { setOpen: setConfigOpen } = useConfigModal();
+ 
 
   return (
     <>
@@ -75,8 +77,8 @@ function SideBar() {
           <IconBuscar />
           <a>Buscar</a>
         </div>
-        <div className="sidebar-header">Sistema</div>
-        <div className="btn-nav">
+          <div className="btn-nav" onClick={() => setConfigOpen(true)} role="button" tabIndex={0}>
+        
           <IconConfiguracoes />
           <a>Configurações</a>
         </div>

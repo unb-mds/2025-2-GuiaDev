@@ -10,7 +10,7 @@ export default function Chat() {
     const handleMenssagem = () => {
         if (input.trim() === '') return;
 
-        setMessagens((prev) => [...prev, { text: input, sender: 'user' }]);
+        setMessagens((prev) => [...prev, { text: input, sender: 'bot' }]);
         setInput('');
     };
 
