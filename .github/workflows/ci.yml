@@ -2,9 +2,9 @@ name: CI Pipeline (Docker Compose)
 
 on:
   push:
-    branches: [ main , pipelineCI02]
+    branches: [ main ]
   pull_request:
-    branches: [ main , pipelineCI02 ]
+    branches: [ main ]
 
 jobs:
   build-and-test:
