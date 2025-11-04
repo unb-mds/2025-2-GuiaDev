@@ -131,5 +131,10 @@ export class GithubController {
 
     return this.githubService.getAllCache();
   }
+
+  @Get('repos')
+  async getCachedRepos() {
+    return this.githubService.getFormattedCachedRepos();
+  }
 }
 
