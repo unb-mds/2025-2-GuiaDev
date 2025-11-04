@@ -9,7 +9,7 @@ body,
 }
 
 :root {
-  --header-height: 80px;
+  --header-height: 65px;
 }
 
 .AppContainer {

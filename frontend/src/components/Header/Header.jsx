@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./Header.css";
-import logo from "../../assets/Logo.svg";
+// import logo from "../../assets/Logo.svg";
+import logoGuia from "../../assets/icone-guia-branco-512.png"
 
 function Image() {
-  return <img src={logo} className="logo" alt="Logo do GuiaDev" />;
+  return <img src={logoGuia} className="logo" alt="Logo do GuiaDev" />;
 }
 
 export default function Header() {
