@@ -17,11 +17,12 @@ export default function ConfigComponent({ onClose }) {
             try {
                 setLoading(true);
 
-                const res = await api.get("/config");
-                const data = res.data;
+                const res = await api.get('/auth/profile');
+               
+                const payload = res.data?.user ?? res.data ?? {};
                 if (!mounted) return;
-                setEmail(data?.email || "");
-                setUsernameGit(data?.usernameGit || "");
+                setEmail(payload?.email || "");
+                setUsernameGit(payload?.usernameGit || payload?.username || "");
                 setError(null);
             } catch (e) {
                 if (mounted) setError(e?.response?.data?.message || e?.message || "Falha ao carregar");
@@ -40,10 +41,11 @@ export default function ConfigComponent({ onClose }) {
         try {
             setSaving(true);
 
-            const res = await api.patch("/config", { email, usernameGit, senha});
-            const updated = res.data || {};
+            const res = await api.patch("/user/userUpdate", { email, usernameGit, senha});
+            
+            const updated = res.data?.user ?? res.data ?? {};
             setEmail(updated.email ?? email);
-            setUsernameGit(updated.usernameGit ?? usernameGit);
+            setUsernameGit(updated.usernameGit ?? updated.username ?? usernameGit);
             setError(null);
             onClose && onClose();
         } catch (e) {
