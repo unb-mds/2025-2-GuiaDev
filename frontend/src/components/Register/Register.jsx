@@ -75,11 +75,8 @@ function Register({ onSwitchToLogin }) {
           onChange={(e) => setSenha(e.target.value)}
           required
         />
-        <div className="options">
-          <label>
-            <input type="checkbox" required /> Aceito os termos de uso
-          </label>
-        </div>
+        <hr className="register-divider"></hr>
+        
         <button type="submit" className="btn-cadastrar">
           Criar Conta
         </button>

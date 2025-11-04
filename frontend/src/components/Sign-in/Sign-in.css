@@ -66,10 +66,16 @@ form input {
   margin-bottom: 1.5rem;
 }
 
-.option a {
+.forgot-pass{
   font-size: 0.85rem;
-  color: #0f47c0;
+  color: #667;
   text-decoration: none;
+  margin-left: 5px;
+}
+
+.forgot-pass:hover{
+  color: #667;
+  opacity: 0.7;
 }
 
 /* botão de entrar */
@@ -102,7 +108,7 @@ form input {
   content: "";
   position: absolute;
   top: 50%;
-  width: 40%;
+  width: 25%;
   height: 1px;
   background: #ddd;
 }
