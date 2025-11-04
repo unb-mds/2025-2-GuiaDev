@@ -1,5 +1,6 @@
+// file: docs-analyzer.service.ts
 import { Injectable, Logger } from '@nestjs/common';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
 export type DocAnalysis = {
   name: string;
@@ -7,6 +8,12 @@ export type DocAnalysis = {
   score: number; // 0..100
   summary: string;
   suggestions: string[];
+  // compatível para frente: opcional; quem não usar, ignora
+  content_evidence?: {
+    non_empty: boolean;
+    length: number;
+    sha256: string;
+  };
 };
 
 @Injectable()
@@ -28,275 +35,250 @@ export class DocsAnalyzerService {
     }
   }
 
-  // Constrói o prompt para o modelo Gemini
+  //  utils 
+  private normalizeNewlines(s: string) {
+    return s.replace(/\r\n/g, '\n');
+  }
+  private sha256Hex(data: string) {
+    //  manter compatível com Node 16+ via createHash dinâmico
+    const { createHash } = require('crypto');
+    return createHash('sha256').update(data).digest('hex');
+  }
+  private isLicense(name: string) {
+    const n = name.toLowerCase();
+    return n === 'license' || n === 'license.md';
+  }
+
+  //  prompt (1 arquivo - OBJETO) 
   private buildPrompt(name: string, content: string) {
-    return `Assunto: Análise de Documentação de Repositório de Software
-
-Persona: Você é um agente de IA especialista em engenharia de software, com foco em boas práticas de documentação técnica.
-
-Objetivo: Sua tarefa é analisar arquivos de documentação de um repositório de software.
-Para cada arquivo, você deve verificar se ele existe e, em seguida, avaliá-lo com base em um conjunto de regras, 
-retornando sua análise em um formato JSON específico.
-
-Formato de Saída Obrigatório: Sua resposta DEVE ser um único OBJETO JSON. Cada objeto representa um arquivo analisado e deve conter exatamente as seguintes chaves:
-
-
-  {
-    "name": "nome-do-arquivo.md",
-    "exists": true,
-    "score": 0,
-    "summary": "",
-    "suggestions": []
+    return [
+      'Assunto: Análise de Documentação de Repositório de Software',
+      '',
+      'Persona: Você é um agente de IA especialista em engenharia de software, com foco em boas práticas de documentação técnica.',
+      '',
+      'Objetivo: Analisar UM arquivo de documentação do repositório e retornar um OBJETO JSON com exatamente as chaves: score, summary, suggestions.',
+      '',
+      'Instruções de saída (OBRIGATÓRIO):',
+      '- Responda com um ÚNICO OBJETO JSON, sem texto extra, sem comentários, sem cercas de código.',
+      '- Formato: { "score": 0, "summary": "", "suggestions": [] }',
+      '',
+      'Regras de avaliação (exceto LICENSE):',
+      '- summary: 1–2 frases explicando por que este tipo de documento é essencial + síntese do conteúdo.',
+      '- score: inteiro 0–100 (0–20 vazio; 21–60 incompleto; 61–85 bom; 86–99 excelente; 100 exemplar).',
+      "- suggestions: 3–8 melhorias acionáveis (começando com verbos), ou ['Documento OK.'] se score=100.",
+      '',
+      'Critérios por tipo (se aplicável):',
+      '- README(.md): visão geral, objetivos, pré-requisitos, instalação, configuração, exemplos, run/test/build, estrutura, roadmap/estado, link p/ CONTRIBUTING, licença, badges, links úteis, suporte/contato, i18n, acessibilidade, compatibilidade.',
+      '- CONTRIBUTING(.md): setup de ambiente, branches/commits, estilo/linters, testes/coverage, fluxo de PR, codeowners, DCO/CLA, security policy, labels/triagem, tempos de resposta, docs/changelog, versionamento/semver, templates.',
+      '',
+      `Document name: ${name}`,
+      'CONTENT_START',
+      content,
+      'CONTENT_END',
+    ].join('\n');
   }
 
+  //  parser tolerante 
+  private stripFences(text: string) {
+    return text.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
+  }
+  private extractJson(text: string): any {
+    if (!text) return {};
+    const raw = this.stripFences(text);
+    const firstBrace = raw.indexOf('{');
+    const firstBracket = raw.indexOf('[');
+    let start = -1;
+    let isArray = false;
 
-Regras de Análise Detalhadas
-Você deve aplicar as seguintes regras para cada arquivo  de entrada:
+    if (firstBracket >= 0 && (firstBrace < 0 || firstBracket < firstBrace)) {
+      start = firstBracket;
+      isArray = true;
+    } else if (firstBrace >= 0) {
+      start = firstBrace;
+    }
+    const candidate = start >= 0 ? raw.slice(start) : raw;
 
-Regra 1: O Arquivo NÃO EXISTE
-Se o arquivo não for encontrado no repositório:
+    const tryParse = (s: string) => {
+      try { return JSON.parse(s); } catch { return null; }
+    };
 
-"exists": false
+    let parsed = tryParse(candidate);
+    if (parsed) return parsed;
 
-"score": 0
+    const endChar = isArray ? ']' : '}';
+    const last = candidate.lastIndexOf(endChar);
+    if (last > 0) {
+      parsed = tryParse(candidate.slice(0, last + 1));
+      if (parsed) return parsed;
+    }
+    return {};
+  }
+  private normalizeParsed(parsed: any): { score: number; summary: string; suggestions: string[] } {
+    const obj = Array.isArray(parsed) ? parsed[0] : parsed || {};
+    const scoreNum = Number(obj.score);
+    const summaryStr = typeof obj.summary === 'string' ? obj.summary : '';
+    const suggArr = Array.isArray(obj.suggestions) ? obj.suggestions.filter((s: any) => typeof s === 'string') : [];
 
-"summary": "" (uma string vazia)
+    const score = Number.isFinite(scoreNum) ? Math.max(0, Math.min(100, scoreNum)) : 0;
+    const summary = summaryStr.slice(0, 1000);
+    const suggestions = suggArr.slice(0, 8);
 
-"suggestions": [ "Sugerir adicionar este documento ao repositório atendendo as boas práticas de escrita técnica." ]
-
-Regra 2: O Arquivo EXISTE (Análise Padrão)
-Esta regra se aplica a todos os arquivos que existem, EXCETO o arquivo LICENSE.
-
-"exists": true
-
-"summary": Leia e analise o conteúdo completo do arquivo e, em seguida, escreva um breve resumo (1-2 frases) explicando por que este tipo de documento é essencial para um projeto de software.
-
-"score": Atribua uma pontuação de 0 a 100.
-
-A pontuação deve avaliar a qualidade e completude do conteúdo com base nas boas práticas de escrita técnica para aquele tipo específico de documento.
-
-Por exemplo: Um README.md deve ter descrição do projeto, instruções de instalação, exemplos de uso, etc. Um CONTRIBUTING.md deve ter guia de ambiente, fluxo de pull request, etc.
-
-Um arquivo vazio ou com conteúdo mínimo deve receber uma pontuação baixa (próxima de 0).
-
-Um arquivo completo, claro e bem estruturado deve receber uma pontuação alta (próxima de 100).
-
-"suggestions": Gere uma lista de strings contendo sugestões de melhoria claras e acionáveis para o documento, com base no que foi observado na análise de conteúdo.
-
-Regra 3: Caso Especial - Pontuação Máxima
-Se a análise da Regra 2 resultar em um "score" de 100 (ou seja, o documento é considerado perfeito e atende a todos os requisitos de boas práticas):
-
-O campo "suggestions" deve ser: [ "Documento OK." ]
-
-Regra 4: Caso Especial - O Arquivo LICENSE
-O arquivo LICENSE (ou LICENSE.md) segue regras binárias e não deve ter seu conteúdo analisado para qualidade, apenas para existência.
-
-Se o arquivo LICENSE EXISTIR:
-
-"exists": true
-
-"score": 100
-
-"summary": "Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído."
-
-"suggestions": [ "Documento OK." ]
-
-Se o arquivo LICENSE NÃO EXISTIR:
-
-"exists": false
-
-"score": 0
-
-"summary": ""
-
-"suggestions": [ "Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários." ]
-
-Document name: ${name}.
-CONTENT_START
-${content}
-CONTENT_END`;
+    return { score, summary, suggestions };
   }
 
-  // Faz análise com o LLM Gemini. Retorna { score, summary, suggestions }
+  //  chamada ao Gemini 
   private async analyzeWithGemini(
     name: string,
     content: string
   ): Promise<Pick<DocAnalysis, 'score' | 'summary' | 'suggestions'>> {
-    const axios = require('axios');
     const prompt = this.buildPrompt(name, content);
 
-    // Tenta via SDK oficial (@google/generative-ai) se inicializado
-    if (this.client) {
-      try {
-        const model = this.client.getGenerativeModel({
-          model: this.model,
-          generationConfig: {
-            temperature: 0.6,
-            maxOutputTokens: 1024,
-            responseMimeType: 'application/json',
-          } as any,
-        });
-
-        const result = await model.generateContent({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        });
-
-        const text = result?.response?.text?.() ?? '';
-        const json = this.extractJson(text);
-        return this.normalizeParsed(json);
-      } catch (libErr) {
-        this.logger.warn('Library call to Gemini falhou', libErr as any);
-        throw libErr;
-      }
+    if (!this.client) {
+      throw new Error('Gemini não configurado: defina GEMINI_API_KEY.');
     }
 
-    // Se SDK não estiver disponível, usa REST v1
-    if (!this.apiKey) {
-      throw new Error('No Gemini/Google API key found in env (GEMINI_API_KEY or GOOGLE_API_KEY)');
-    }
-
-    const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(
-      this.model
-    )}:generateContent?key=${this.apiKey}`;
-
-    const body = {
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    const model = this.client.getGenerativeModel({
+      model: this.model,
+      systemInstruction:
+        'Você é um especialista em documentação técnica. Responda SEMPRE com um ÚNICO OBJETO JSON válido contendo as chaves: score, summary, suggestions. Não use cercas de código.',
       generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 1024,
-        response_mime_type: 'application/json',
+        temperature: 0.2,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            score: { type: SchemaType.NUMBER },
+            summary: { type: SchemaType.STRING },
+            suggestions: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+          },
+          required: ['score', 'summary', 'suggestions'],
+        } as any,
       },
-    };
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      ],
+    });
 
-    try {
-      const res = await axios.post(url, body, { timeout: 25000 });
-      const data = res.data;
+    // Passei instruções numa primeira mensagem e o documento na segunda (ajuda o modelo a manter o foco no contrato)
+    const req = {
+      contents: [
+        { role: 'user', parts: [{ text: this.buildPrompt('N/A', '') }] },
+        { role: 'user', parts: [{ text: prompt }] },
+      ],
+    } as any;
 
-      const text =
-        data?.candidates?.[0]?.content?.parts?.[0]?.text ??
-        data?.candidates?.[0]?.content?.parts?.[0]?.stringValue ??
-        '';
+    const result = await model.generateContent(req);
+    const text = result?.response?.text?.() ?? '';
 
-      const json = this.extractJson(text);
-      return this.normalizeParsed(json);
-    } catch (err: any) {
-      const status = err?.response?.status;
-      const bodyResp = err?.response?.data;
-      this.logger.warn(
-        `Generative API REST attempt failed (v1, model=${this.model}, status=${status})`,
-        bodyResp
-      );
-
-      if (status === 401 || status === 403) {
-        throw new Error(
-          `Authentication/permission error calling Generative API (status ${status}). Check API key and IAM permissions.`
-        );
-      }
-      throw err;
+    if (process.env.DEBUG_DOCS === '1') {
+      this.logger.debug(`[Gemini] raw head: ${String(text).slice(0, 400)}`);
     }
+
+    const json = this.extractJson(text);
+    return this.normalizeParsed(json);
   }
 
-  // helper: extract JSON object from text block
-  private extractJson(text: string): any {
-    if (!text) return {};
-    const idx = text.indexOf('{');
-    const candidate = idx >= 0 ? text.slice(idx) : text;
-    try {
-      return JSON.parse(candidate);
-    } catch {
-      const last = candidate.lastIndexOf('}');
-      if (last > 0) {
-        try {
-          return JSON.parse(candidate.slice(0, last + 1));
-        } catch {
-          return {};
-        }
-      }
-      return {};
-    }
-  }
-
-  // helper: normalize parsed JSON to expected output
-  private normalizeParsed(parsed: any): { score: number; summary: string; suggestions: string[] } {
-    return {
-      score: Math.max(0, Math.min(100, Number(parsed?.score) || 0)),
-      summary: String(parsed?.summary || '').slice(0, 1000),
-      suggestions: Array.isArray(parsed?.suggestions) ? parsed.suggestions.slice(0, 6).map(String) : [],
-    };
-  }
-
-
-
-  // Public API: analyzeText -> usa somente Gemini
+  //   API pública
   async analyzeText(name: string, content: string | null): Promise<DocAnalysis> {
-    // Caso 1: Arquivo NÃO EXISTE (Regra 1 do prompt)
-    if (content === null) {
-      // O arquivo "LICENSE" é um caso especial
-      if (name.toUpperCase() === 'LICENSE' || name.toUpperCase() === 'LICENSE.MD') {
+    // Regra LICENSE binária
+    if (this.isLicense(name)) {
+      if (content === null) {
         return {
-          name,
-          exists: false,
-          score: 0,
-          summary: '',
-          suggestions: [
-            'Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários.',
-          ],
+          name, exists: false, score: 0, summary: '',
+          suggestions: ['Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários.'],
+          content_evidence: { non_empty: false, length: 0, sha256: '' },
         };
       }
-      // Demais arquivos
+      const normalized = this.normalizeNewlines(content);
+      const trimmed = normalized.trim();
+      const evidence = {
+        non_empty: trimmed.length > 0,
+        length: normalized.length,
+        sha256: trimmed.length > 0 ? this.sha256Hex(normalized) : '',
+      };
       return {
-        name,
-        exists: false,
-        score: 0,
-        summary: '',
+        name, exists: true, score: 100,
+        summary: 'Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído.',
+        suggestions: ['Documento OK.'],
+        content_evidence: evidence,
+      };
+    }
+
+    // Não existe
+    if (content === null) {
+      return {
+        name, exists: false, score: 0, summary: '',
+        suggestions: ['Sugerir adicionar este documento ao repositório atendendo às boas práticas de escrita técnica.'],
+        content_evidence: { non_empty: false, length: 0, sha256: '' },
+      };
+    }
+
+    const normalized = this.normalizeNewlines(content);
+    const trimmed = normalized.trim();
+    const evidence = {
+      non_empty: trimmed.length > 0,
+      length: normalized.length,
+      sha256: trimmed.length > 0 ? this.sha256Hex(normalized) : '',
+    };
+
+    // Existe mas vazio
+    if (!evidence.non_empty) {
+      return {
+        name, exists: true, score: 0,
+        summary: 'O arquivo existe, porém está vazio ou contém conteúdo mínimo.',
         suggestions: [
-          'Sugerir adicionar este documento ao repositório atendendo as boas práticas de escrita técnica.',
+          'Adicionar uma visão geral clara do documento e seu objetivo',
+          'Incluir seções essenciais conforme o tipo do documento',
+          'Fornecer exemplos práticos e links úteis quando aplicável',
         ],
+        content_evidence: evidence,
       };
     }
 
-    // Caso 2: Arquivo EXISTE, MAS ESTÁ VAZIO
-    if (content.trim() === '') {
+    // Existe e não vazio - chamar LLM
+    let llm;
+    try {
+      llm = await this.analyzeWithGemini(name, normalized);
+    } catch (e: any) {
+      if (process.env.DEBUG_DOCS === '1') {
+        this.logger.warn(`[LLM ERROR] ${e?.message || e}`);
+      }
       return {
-        name,
-        exists: true,
-        score: 0,
-        summary: 'O arquivo existe, mas está vazio.',
-        suggestions: ['Preencher o documento com conteúdo relevante seguindo as boas práticas.'],
+        name, exists: true, score: 20,
+        summary: 'Documento presente; a análise automática falhou. Recomenda-se revisão manual das seções essenciais.',
+        suggestions: [
+          'Adicionar/confirmar seção de objetivos/escopo',
+          'Incluir instruções de instalação/uso (se aplicável)',
+          'Referenciar licença e diretrizes de contribuição',
+        ],
+        content_evidence: evidence,
       };
     }
 
-    // Caso 3: Arquivo EXISTE e tem conteúdo (Chamar a IA)
-    if (!this.client && !this.apiKey) {
-      throw new Error('Gemini is not configured. Set GEMINI_API_KEY or initialize the SDK client.');
+    // Pós-processamento
+    let { score, summary, suggestions } = llm;
+    if (score === 100) {
+      suggestions = ['Documento OK.'];
+    } else if (!suggestions || suggestions.length === 0) {
+      suggestions = [
+        'Adicionar seção de objetivos/escopo',
+        'Incluir instruções de instalação e uso',
+        'Referenciar licença e diretrizes de contribuição',
+      ];
     }
 
-    // Caso especial LICENSE (Regra 4) - Se existe e tem conteúdo, não precisa analisar
-    if (name.toUpperCase() === 'LICENSE' || name.toUpperCase() === 'LICENSE.MD') {
-      return {
-        name,
-        exists: true,
-        score: 100,
-        summary:
-          'Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído.',
-        suggestions: ['Documento OK.'], // Alterado de "Tudo certo." para "Documento OK." para bater com a Regra 3
-      };
-    }
-
-    // Somente chama a IA para arquivos normais que têm conteúdo
-    const llm = await this.analyzeWithGemini(name, content);
     return {
-      name,
-      exists: true,
-      score: llm.score,
-      summary: llm.summary,
-      suggestions: llm.suggestions,
+      name, exists: true, score,
+      summary: summary || 'Documento presente; resumo ausente.',
+      suggestions,
+      content_evidence: evidence,
     };
   }
 
-  // Analisa múltiplos documentos de uma só vez
   async analyzeMany(docs: { name: string; content: string | null }[]) {
-    const promises = docs.map(d => this.analyzeText(d.name, d.content));
-    return Promise.all(promises);
+    return Promise.all(docs.map(d => this.analyzeText(d.name, d.content)));
   }
 }
