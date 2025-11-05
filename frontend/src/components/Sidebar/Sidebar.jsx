@@ -77,6 +77,7 @@ function SideBar() {
           <IconBuscar />
           <a>Buscar</a>
         </div>
+        <div className="sidebar-header">Configuração</div>
           <div className="btn-nav" onClick={() => setConfigOpen(true)} role="button" tabIndex={0}>
         
           <IconConfiguracoes />
