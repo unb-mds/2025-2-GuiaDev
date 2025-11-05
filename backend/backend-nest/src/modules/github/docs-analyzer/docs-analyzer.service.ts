@@ -9,11 +9,11 @@ export type DocAnalysis = {
   summary: string;
   suggestions: string[];
   // compatível para frente: opcional; quem não usar, ignora
-  content_evidence?: {
-    non_empty: boolean;
-    length: number;
-    sha256: string;
-  };
+ // content_evidence?: {
+   // non_empty: boolean;
+   // length: number;
+   // sha256: string;
+ // };
 };
 
 @Injectable()
@@ -189,7 +189,7 @@ export class DocsAnalyzerService {
         return {
           name, exists: false, score: 0, summary: '',
           suggestions: ['Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários.'],
-          content_evidence: { non_empty: false, length: 0, sha256: '' },
+         // content_evidence: { non_empty: false, length: 0, sha256: '' },
         };
       }
       const normalized = this.normalizeNewlines(content);
@@ -203,7 +203,7 @@ export class DocsAnalyzerService {
         name, exists: true, score: 100,
         summary: 'Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído.',
         suggestions: ['Documento OK.'],
-        content_evidence: evidence,
+       // content_evidence: evidence,
       };
     }
 
@@ -212,7 +212,7 @@ export class DocsAnalyzerService {
       return {
         name, exists: false, score: 0, summary: '',
         suggestions: ['Sugerir adicionar este documento ao repositório atendendo às boas práticas de escrita técnica.'],
-        content_evidence: { non_empty: false, length: 0, sha256: '' },
+       // content_evidence: { non_empty: false, length: 0, sha256: '' },
       };
     }
 
@@ -234,7 +234,7 @@ export class DocsAnalyzerService {
           'Incluir seções essenciais conforme o tipo do documento',
           'Fornecer exemplos práticos e links úteis quando aplicável',
         ],
-        content_evidence: evidence,
+       // content_evidence: evidence,
       };
     }
 
@@ -254,7 +254,7 @@ export class DocsAnalyzerService {
           'Incluir instruções de instalação/uso (se aplicável)',
           'Referenciar licença e diretrizes de contribuição',
         ],
-        content_evidence: evidence,
+       // content_evidence: evidence,
       };
     }
 
@@ -274,7 +274,7 @@ export class DocsAnalyzerService {
       name, exists: true, score,
       summary: summary || 'Documento presente; resumo ausente.',
       suggestions,
-      content_evidence: evidence,
+     // content_evidence: evidence,
     };
   }
 
