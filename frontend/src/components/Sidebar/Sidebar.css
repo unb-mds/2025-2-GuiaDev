@@ -52,7 +52,7 @@
 }
 
 .btn-nav:hover {
-  background-color: #6c757d;
+  background-color: #6c757d69;
 }
 
 .btn-nav:hover svg {
@@ -60,6 +60,14 @@
 }
 .btn-nav:hover a {
   color: white;
+}
+
+.logout:hover a {
+  color: red;
+}
+
+.logout:hover svg {
+  fill: red;
 }
 
 /* Toggle button - hidden on desktop */
