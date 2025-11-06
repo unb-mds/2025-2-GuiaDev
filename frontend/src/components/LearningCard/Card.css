@@ -1,0 +1,104 @@
+.card-conteudo {
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribui conteúdo verticalmente */
+    
+    /* Estilos Visuais da Borda e Fundo */
+    background-color: #ffffff; 
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); 
+    padding: 1rem;
+    
+  
+   
+    height: 120px; 
+    overflow: hidden; 
+    /* width: 100%; */
+    color: black;
+    
+    transition: all 0.4s ease-in-out; 
+    overflow: hidden;
+}
+
+.card-conteudo:hover{
+   
+    border-color: #0f62fe;
+    background-color: #fbfdff; 
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.card-conteudo.expanded {
+    height: auto;
+    max-height: 500px; 
+}
+
+/* estado persistente quando o card foi selecionado (via JS/React) */
+.card-conteudo.selected {
+    border-color: #0f62fe;
+    box-shadow: 0 8px 24px rgba(15,98,254,0.08);
+}
+
+
+.card-top {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 5px 0;
+}
+
+.card-top span {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.titulo-stories {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilos do Botão de Expansão (o '+') */
+.mais {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #333;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    align-self: flex-end; 
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0.8; /* Ajuste para centralizar o texto/símbolo */
+}
+
+/* Estilos do Conteúdo Expansível (o Texto) */
+.card-expansivel {
+    max-height: 0px;
+    /* font-size: 0px; */
+    opacity: 0; 
+    transition: max-height 0.4s ease-in-out, opacity 0.1s ease; 
+    /* margin-top: 5px; */
+    padding-top: 0;
+    border-top: none;
+    width: 100%;
+    
+}
+
+/* Quando o card está expandido, revela o conteúdo */
+.card-conteudo.expanded .card-expansivel {
+    max-height: 300px; 
+    opacity: 1; 
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}

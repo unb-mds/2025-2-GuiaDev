@@ -1,48 +1,185 @@
-/* Layout geral */
-.learning-wrapper {
+/* Cleaned and consolidated LearningPage styles */
+
+
+.learningPage {
   display: flex;
-  flex-direction: row;
-  height: 100vh;
-  background-color: #fff;
-  color: #000;
-  font-family: 'Segoe UI', sans-serif;
-  box-sizing: border-box; /* ✅ correção pequena, evita overflow inesperado */
+  /* margin-left: 260px; */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* Barra lateral */
-.sidebar {
-  width: 70px;
-  border-right: 1px solid #000;
-  margin-left: 20px;
+
+.learning {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: 1 1 auto;
+  max-width: calc(100% - 340px);
+  min-width: 100%;
+  padding: 2rem;
+  margin: 0;
+  gap: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
-/* Conteúdo principal */
-.main-content {
-  flex: 1;
+@media (min-width:1201px) {
+  .chat-container {
+    width: 25%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .learning {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: calc(100% - 300px);
+  }
+
+  .chat-container {
+    width: 300px;
+  }
+}
+
+@media (max-width: 900px) {
+  .learning {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+
+  .chat-container {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .learning {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .learningPage {
+    margin-left: 0;
+  }
+}
+
+
+.renderPage {
+  display: grid;
+  justify-items: stretch;
+  margin-top: 30px;
+  color: #344256;
+}
+
+.textTitle {
+  font-size: 36px;
+  font-weight: bold;
+  margin-left: 2rem
+}
+
+.subtitle {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.docsExplain {
+  /* display: grid; */
+  height: 50vh;
+  border: 1px solid #e2e8f0;
+  width: 95%;
+  border-radius: 12px;
+  padding: 2rem;
+  
+  font-size: 25px;
+}
+
+.estructureDocs {
+  display: block;
+  font-size:20px;
+  font-weight: 600;
+  width: 100%;
+  color: #374151;
+  
+}
+
+
+.panel {
+  overflow: hidden;
+}
+
+.panel>.estructureDocs:first-child {
+  position: relative;
   display: flex;
-  flex-direction: row;
-  padding: 20px;
-  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 1);
+  box-sizing: border-box;
 }
 
-/* Coluna de blocos */
-.learning-list {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.panel>.estructureDocs:first-child button {
+  background: transparent;
+  border: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0 2.5rem 0 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-/* Cada bloco retangular */
-.learning-item {
-  height: 50px;
-  border: 1px solid #000;
-  border-radius: 7px;
+.panel>.estructureDocs:first-child::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-45deg);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transition: transform 260ms ease;
+  opacity: 0.8;
 }
 
-/* Painel lateral direito */
-.side-panel {
-  flex: 1;
-  border: 1px solid #000;
-  border-radius: 6px;
+.panel.active>.estructureDocs:first-child::after {
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.panel>.estructureDocs:first-child+.estructureDocs {
+  overflow: hidden;
+  max-height: 0;
+  padding: 0 1rem;
+  transition: max-height 360ms cubic-bezier(.2, .8, .2, 1), padding 300ms ease;
+  box-sizing: border-box;
+}
+
+.panel.active>.estructureDocs:first-child+.estructureDocs {
+  max-height: 800px;
+  padding: 0.75rem 1rem;
+}
+
+.contentLearning {
+  color: #374151;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.boxDocsLearning {
+  min-width: 100%;
+  /* background-color: red; */
+}
+
+.titleBox{
+  height: 40px;
+  /* background-color: aqua; */
+}
+
+.test {
+  display: grid;
+  justify-items: center;
+  width: calc(100% - 360px);
+  /* background-color: red; */
 }

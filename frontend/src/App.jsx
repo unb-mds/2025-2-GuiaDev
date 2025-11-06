@@ -5,21 +5,37 @@ import "./App.css";
 
 function App() {
   const location = useLocation();
-  const  hiddenSideBarPaths = ["/login"];
-  const showSideBar = !hiddenSideBarPaths.includes(location.pathname); 
+  const hiddenSideBarPaths = ["/login"];
+  const showSideBar = !hiddenSideBarPaths.includes(location.pathname);
 
   return (
     <div className="AppContainer">
       <div>
-      <Header />
+        <Header />
       </div>
-      <div className="Main">
-       {showSideBar && <SideBar />}
+      <div className="ajustCente">
 
-        <div className="content">
-          <Outlet />
+        <div className="Main">
+
+        {showSideBar && (
+          <div className="sideBar">
+            <SideBar />
+          </div>
+        )}
+
+          {/* <div className="sideBar">{showSideBar && <SideBar />}</div> */}
+
+
+          <div className="content">
+
+            
+              <Outlet />
+            
+          </div>
+
         </div>
       </div>
+
     </div>
   );
 }

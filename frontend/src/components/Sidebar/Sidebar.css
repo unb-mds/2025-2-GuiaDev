@@ -1,13 +1,15 @@
 .sidebar-container {
+  position: fixed;
   width: 260px;
-  height: 100vh;
+  height: 100%;
   background-color: #fafafa;
   padding: 24px 12px;
   box-sizing: border-box;
   min-width: 255px;
-  position: fixed;
+  position: fixed; /* keep in document flow on desktop so it doesn't overlay content */
   /* margin-top: 65px; */
-  
+
+
 }
 
 .sidebar-header {
@@ -58,4 +60,36 @@
 }
 .btn-nav:hover a {
   color: white;
+}
+
+/* Toggle button - hidden on desktop */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  left: 12px;
+  top: 600px;
+  z-index: 1100;
+  background: #393d42;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 10px;
+  
+}
+
+/* Responsive: hide sidebar by default on small screens and enable toggle */
+@media (max-width: 900px) {
+  .sidebar-container {
+    transform: translateX(-110%);
+    transition: transform 300ms ease;
+    position: fixed;
+    z-index: 1050;
+  }
+
+  .sidebar-container.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle {
+    display: inline-block;
+  }
 }

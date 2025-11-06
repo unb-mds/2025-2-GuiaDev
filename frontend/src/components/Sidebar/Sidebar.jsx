@@ -1,5 +1,6 @@
-import React, { useStates } from "react";
+import React, { useState } from "react";
 import "./Sidebar.css";
+import { useNavigate } from "react-router-dom";
 
 const IconDashboard = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -33,44 +34,54 @@ const IconConfiguracoes = () => (
   </svg>
 );
 
-
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=settings" />
-
 function SideBar() {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
   return (
-    <div className="sidebar-container">
-      <div className="sidebar-header">Navegação</div>
+    <>
+      <button
+        className="sidebar-toggle"
+        aria-label="Toggle sidebar"
+        onClick={() => setOpen((v) => !v)}
+      >
+        {open ? "✕" : "☰"}
+      </button>
 
-      <div className="btn-nav">
-        <IconDashboard />
-        <a>Dashboard</a>
-      </div>
+      <div className={`sidebar-container ${open ? "open" : ""}`}>
+        <div className="sidebar-header">Navegação</div>
 
-      <div className="btn-nav">
-        <IconRepositorios />
-        <a>Repositórios</a>
-      </div>
+        <div className="btn-nav" onClick={() => navigate("/home")}>
+          <IconDashboard />
+          <a>Dashboard</a>
+        </div>
 
-      <div className="btn-nav">
-        <IconDocumentacao />
-        <a>Documentação</a>
-      </div>
+        <div className="btn-nav">
+          <IconRepositorios />
+          <a>Repositórios</a>
+        </div>
 
-      <div className="btn-nav">
-        <IconAnalises />
-        <a>Análises</a>
-      </div>
+        <div className="btn-nav" onClick={() => navigate("/aprendizado")}>
+          <IconDocumentacao />
+          <a>Documentação</a>
+        </div>
 
-      <div className="btn-nav">
-        <IconBuscar />
-        <a>Buscar</a>
+        <div className="btn-nav">
+          <IconAnalises />
+          <a>Análises</a>
+        </div>
+
+        <div className="btn-nav">
+          <IconBuscar />
+          <a>Buscar</a>
+        </div>
+        <div className="sidebar-header">Sistema</div>
+        <div className="btn-nav">
+          <IconConfiguracoes />
+          <a>Configurações</a>
+        </div>
       </div>
-      <div className="sidebar-header">Sistema</div>
-      <div className="btn-nav">
-        <IconConfiguracoes />
-        <a>Configurações</a>
-      </div>
-    </div>
+    </>
   );
 }
 
