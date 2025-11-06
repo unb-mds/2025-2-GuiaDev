@@ -100,3 +100,48 @@
     display: flex;
     flex-direction: column;
 }
+
+
+/* Estilos para os três pontos animados */
+.typing-indicator .msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+}
+
+
+.typing-indicator .dot {
+  width: 6px;
+  height: 6px;
+  background: #2e2be9; 
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.2;
+  transform: translateY(0);
+  animation: typing-dot 1s infinite;
+}
+
+
+.typing-indicator .dot-1 { animation-delay: 0s; }
+.typing-indicator .dot-2 { animation-delay: 0.16s; }
+.typing-indicator .dot-3 { animation-delay: 0.32s; }
+
+
+@keyframes typing-dot {
+  0%   { opacity: 0.2; transform: translateY(0); }
+  30%  { opacity: 1;   transform: translateY(-4px); }
+  60%  { opacity: 0.6; transform: translateY(0); }
+  100% { opacity: 0.2; transform: translateY(0); }
+}
+
+
+.chat-bubble.typing-indicator {
+    display: flex;
+    justify-items: start;
+    align-items: center;
+
+    border-radius: 90%;
+   
+
+}
