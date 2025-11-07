@@ -1,7 +1,7 @@
-# Documento de requisitos de software para o projeto "portal para escrita técnica em software"
+# Documento de requisitos de software para o projeto "GuiaDev"
 
-## Versão 1.0 (14/09/2025) Autor: Filipe Brito
-Elaboração para análise da primeira versão do documento
+## Versão 1.1 (06/11/2025) Autor: Filipe Brito
+Segunda versão do documento. Alterações de requisitos funcionais e não-funcionais.
 
 
 ## Introdução
@@ -14,12 +14,6 @@ O documento de requisitos descreve os requisitos funcionais e não funcionais qu
 * Requisitos funcionais: especifica todos os requisitos funcionais do sistema, descrevendo os fluxos de eventos, prioridades, atores, entradas e saídas de cada uso a ser implementado.
 * Requisitos não-funcionais: especifica todos os requisitos não-funcionais do sistema, divididos em requisitos de usabilidade, Confiabilidade, Desempenho, Segurança, Portabilidade, Manutenibilidade e adequações a padrões e requisitos de hardware e software.
 
-## Prioridade dos requisitos
-Para estabelecer a prioridade dos requisitos, foram adotadas as denominações "Essencial","importante" e "desejável".
-
-* "Essencial" é o requisito sem o qual o sistema não entra em funcionamento. Requisitos essenciais são requisitos imprescindíveis, que devem ser implementados obrigatoriamente.
-* "Importante" é o requisito sem o qual o sistema entra em funcionamento, mas de forma não satisfatória. Requisitos importantes devem ser implementadis, porém, se não forem, o sistema poderá ser implantado e utilizado mesmo assim.
-* "Desejável" é o requisito que não compromete as funcionalidades básicas do sistema, isto é, o sistema pode funcionar de forma satisfatória sem ele. Requisitos desejáveis são requisitos que podem ser deixados para versões posteriores do sistema, casa não haja tempo hábil para implementá-los na versão que está sendo especificada.
 
 ## análise de portais existentes
 A análise de portais técnicos amplamente utilizados (como **GitLab Handbook**, **Microsoft Docs** e **Google Engineering Practices**) revela pontos em comum que são indispensáveis para a efetividade de um portal de escrita técnica em software:
@@ -82,204 +76,121 @@ processos**.
 
 ## Requisitos funcionais (Revisados para a Stack React/NestJS/Prisma)
 
+Requisitos funcionais descrevem as funcionalidades e as ações que um sistema ou produto deve ser capaz de executar. Eles detalham as tarefas específicas que este produto deve realizar para atender às necessidades do usuário.
 
-### Módulo 1: Backend (API com NestJS + Prisma)
+A seguir, os requisitos funcionais do projeto:
 
-Estes são os requisitos para a sua aplicação servidora.
+RF-01: O usuário deverá ser capaz de cadastrar conta no sistema.
 
-RF-B01 (API de Análise): O sistema deve expor um endpoint de API (ex: POST /api/analysis) que recebe a URL de um repositório GitHub e dispara o processo de análise.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-RF-B02 (Persistência de Dados): O sistema deve usar o Prisma para salvar os resultados da análise (repositório, arquivos encontrados, pontuações, recomendações) no banco de dados.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RF-02: O usuário deverá ser capaz de entrar e sair de sua conta no sistema.
 
-RF-B03 (API de Consulta): O sistema deve expor endpoints para consultar os dados salvos (ex: GET /api/reports para listar todas as análises, GET /api/reports/:id para ver um resultado específico).
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-RF-B04 (Lógica de Negócio - Scanner): O sistema deve conter a lógica para clonar um repositório, varrer seus arquivos e identificar a documentação relevante.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RF-03: O usuário deverá ser capaz de editar seus dados pessoais.
 
-RF-B05 (Lógica de Negócio - IA): O sistema deve se comunicar com a API de um serviço de IA externo, enviando o conteúdo dos documentos e processando a resposta (pontuação e recomendações).
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-RF-B06 (Processamento em Segundo Plano): O sistema deve ser capaz de executar a análise (que pode ser demorada) em segundo plano (asynchronous job/task) para não bloquear a API. O endpoint inicial pode retornar um 202 Accepted e o frontend pode consultar o status depois.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RF-04: O usuário deverá ser capaz de excluir sua conta do sistema.
 
-RF-B07 (Gerenciamento de Conteúdo): O sistema deve expor endpoints CRUD (Create, Read, Update, Delete) para gerenciar o conteúdo educacional (os guias e tutoriais).
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-### Módulo 2: Frontend (Portal com React)
+RF-05: O usuário deverá ser capaz de realizar login social com google e github.
 
-Estes são os requisitos para a sua aplicação cliente (o que roda no navegador).
 
-RF-F01 (Comunicação com API): O portal deve se comunicar exclusivamente com a API do backend (NestJS) para buscar e enviar todos os dados dinâmicos.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RF-06: O sistema deverá ser capaz de analisar um projeto por meio do link do repositório do projeto.
 
-RF-F02 (Submissão de Análise): O portal deve fornecer um formulário onde o usuário pode inserir a URL de um repositório GitHub e enviá-la para o endpoint POST /api/analysis.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-RF-F03 (Visualização de Resultados): O portal deve chamar a API (GET /api/reports) e renderizar a lista de análises concluídas e seus dashboards de resultados.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RF-07: O sistema deverá ser capaz de buscar os repositórios de um usuário autenticado com o github.
 
-RF-F04 (Exibição em Tempo Real): O portal deve ser capaz de atualizar o status de uma análise em andamento, consultando a API periodicamente ou usando tecnologias em tempo real como WebSockets (um requisito mais avançado).
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-RF-F05 (Visualização do Guia): O portal deve buscar os dados do conteúdo educacional da API e renderizar os guias, passos e animações.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RF-08: O usuário deverá ser capaz de se autenticar com o github sem fazer login social.
 
-RF-F06 (Autenticação de Usuário): O portal deve permitir que usuários se cadastrem e façam login. As requisições para a API deverão ser autenticadas (ex: via JWT). Essa arquitetura torna a autenticação um passo natural.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-### Módulo 3: Worker / Tarefas Agendadas (Ainda pode usar GitHub Actions)
+RF-09 (Submissão de Análise): O usuário deverá ser capaz de visualizar todos os seus repositórios acessados pelo sistema.
 
-O papel da GitHub Action muda. Em vez de ser o "backend", ela se torna um simples "cliente" ou "trigger" para o seu backend real.
 
-RF-W01 (Disparo de Tarefas): O sistema deve ter um mecanismo para acionar análises recorrentes de repositórios pré-configurados. Isso pode ser uma GitHub Action rodando com cron que simplesmente faz uma chamada para o endpoint POST /api/analysis do seu backend.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RF-010: O usuário deve ser capaz de solicitar a análise de um dos repositórios.
+
+
+RF-11: A aplicação deverá apresentar uma análise automática do projeto em termos de arquitetura, documentação e boas práticas, fornecendo sugestões de arquivos, pastas e boas práticas.
+(ex.: README, CONTRIBUTING, LICENSE, CHANGELOG, docs/)
+
+
+RF-12: O sistema deve permitir que o usuário exporte um relatório em PDF para cada projeto analisado.
+
+
+RF-13: O sistema deve exibir de forma visual o nível de completude das práticas recomendadas, para cada projeto analisado.
+
+
+RF-14: O sistema deve avisar o usuário de forma visual de que a análise do projeto está em andamento.
+
+
+RF-15: O sistema deve possuir persistência de dados com relação aos projetos acessados.
+
+
+RF-16: O sistema deve possuir uma barra de pesquisa para buscar os projetos acessados.
+
+
+RF-17: O sistema deverá possuir uma seção de aprendizado com elementos interativos.
+
+
+RF-18: A seção de aprendizado deve possuir um campo de texto para tirar dúvidas com o agente de IA.
+
+
+RF-19: O sistema deverá fornecer o contexto de aprendizado ao agente de IA e retornar a resposta da dúvida.
+
+
+RF-20: O sistema deve retornar a análise de um projeto no formato de  texto, evidenciando cada ponto do checklist utilizado para tal.
+
 
 ## Requisitos não-funcionais
 
+Requisitos não funcionais descrevem características e qualidades do sistema ou produto. Eles estão relacionados a aspectos como desempenho, confiabilidade, segurança, usabilidade e compatibilidade.
+
+A seguir, os requisitos não-funcionais do projeto:
+
 **Usabilidade**
 
-Esta seção descreve os requisitos não-funcionais associados à facilidade de uso da interface com o usuário, material de treinamento e documentação do sistema.
 
-RNF001 (Interface amigável): O portal deve ter uma interface intuitiva e fácil de entendimento, interface simples, com destaque para os guia e recomendações.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RNF-01: A aplicação deverá ter design intuitivo e interativo, proporcionando uma experiência visual agradável.
 
 
-RNF002 (facilidade de acesso)O sistema deve ser fácil de utilização: pelo menos 80% dos usuários devem conseguir utilizá-lo sem necessidade de treinamento.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RNF-02: O sistema será uma aplicação web.
+
 
 **Acessibilidade**
 
-RNF003 (inclusão): O portal deve seguir padrões WCAG, incluindo contraste adequado, navegação por teclado e suporte a leitores de telas para pessoas PCD.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RNF-03 : a aplicação deverá ser acessível em diferentes dispositivos (desktop e mobile).
 
-**3. Confiabilidade**
 
-RNF004 (acertividade): O sistema deve exibir recomendações quando algum usuário pesquisar algo dentro do portal, recomendações corretas em pelo menos 95% das varreduras realizadas em repositórios.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RNF-04: O sistema deverá realizar as análises usando o agente de IA do Gemini.
 
-RNF005 (consistência): Deve ser capaz de processar repositórios simulados e retornar resultados consistentes.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-**4. Desempenho**
+**Desempenho**
 
-RNF006 (Performance): O tempo de carregamento da página deve demorar no máximo 3 segundos.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RNF-05: o sistema deve realizar a análise de forma assíncrona e retornar o resultado.
 
-RNF007 (performance de varredura): A execução dos bots no GitHub deve demorar no máximo 2 minutos para processar os repositórios.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-**5. Segurança**
+RNF-06 (performance de varredura): A execução dos bots no GitHub deve demorar no máximo 2 minutos para processar os repositórios.
 
-RNF008 (): Toda comunicação entre o usuário e o servidor deve ser feito via protocolo seguro HTTPS.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-**6. Portabilidade**
+**Segurança**
 
-RNF009 (acesso web): O portal deve rodar em diferentes navegadores, exemplos: Google Chrome, Firefox, Edge, Opera… etc.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RNF-07: o sistema deverá autenticar os usuários via token.
 
-RNF010 (adaptação): A interface deve se adaptar a cada desktop conforme o tamanho da tela, exemplos: tablets e celulares.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+
+RNF-08: as senhas devem ser armazenadas criptografadas.
+
+
+**Integrabilidade**
+
+RNF-09: o sistema deve se comunicar exclusivamente com a API do backend. 
+
 
 **7. Manutenibilidade**
 
-RNF011 (controle de versões): O código do sistema deve estar versionado no GitHub com documentação clara e atualizada.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+RNF-10: O código do sistema deve estar versionado no GitHub com documentação clara e atualizada.
 
-RNF012 (modularização): A estrutura dos arquivos JSON deve ser modular, facilitando a manutenção e evolução futura dos sistema.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
 
-**8. Escalabilidade**
+### Resumo geral dos requisitos
 
-RNF013 (updates): O sistema deve ser projetado para suportar expansão futura, como inclusão de novos tipos de análises de documentos.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável
+O sistema contará com cadastro de usuários (proprietário e social), análise automatizada da documentação e arquitetura de projetos, e uma página interativa de aprendizado de boas práticas de documentação de projetos de software, entre outras funcionalidades. Seu objetivo é ser uma aplicação que auxilia desenvolvedores no desenvolvimento de projetos organizados, bem documentados e escaláveis.
 
-RNF014 (atualização de checklist): Deve ser possível adicionar novos checklist sem necessidade de reescrever o sistema inteiros.
-#### PRIORIDADE:
-- [] 🔴 Essencial
-- [] 🟡 Importante
-- [] 🟢 Desejável

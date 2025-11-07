@@ -1,7 +1,10 @@
 # **GuiaDev**
 
-Plataforma completa para **escrita técnica em projetos de software**, desenvolvida no contexto da disciplina **MDS – UnB (2025.2)**.  
-O objetivo é facilitar a criação, organização e manutenção de documentação técnica, alinhada a boas práticas de Engenharia de Software.
+Plataforma completa para **escrita técnica em projetos de software**, desenvolvida no contexto da disciplina **MDS – UnB (2025.2)**.
+
+O objetivo é facilitar a criação, organização e manutenção de documentação técnica, alinhada a boas práticas de documentação para Engenharia de Software.
+
+O GuiaDev analisa a documentação presente nos repositórios do github utilizando bots de IA, que resulta em análises eficientes e acertivas para a documentação técnica presente em projetos de pequeno,médio ou grande porte.
 
 ---
 
@@ -28,7 +31,7 @@ O objetivo é facilitar a criação, organização e manutenção de documentaç
 
 **Arquitetura:** [clique aqui](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/Docs/Diagrama%20modelo%20C4.pdf)
 
-**Protótipo:**: [clique aqui](https://www.figma.com/design/NSQw0YsJVA1PZDF9cclfxQ/Alta-Fidelidade?node-id=0-1&p=f&t=0bIOylbBO4zvvhBF-0)
+**Protótipo:** [clique aqui](https://www.figma.com/design/NSQw0YsJVA1PZDF9cclfxQ/Alta-Fidelidade?node-id=0-1&p=f&t=0bIOylbBO4zvvhBF-0)
 
 
 ## Equipe 
