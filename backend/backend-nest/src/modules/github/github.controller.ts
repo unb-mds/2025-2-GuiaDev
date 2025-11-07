@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Logger, HttpException,HttpStatus, Query} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Logger, HttpException,HttpStatus} from '@nestjs/common';
 import { GithubService } from './github.service';
 
 @Controller('github')
@@ -41,13 +41,6 @@ export class GithubController {
     async getRoadmap(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getRoadmap(owner, repo);
     }
-    
-/** 
-    @Post('analyze')
-    async analyzeRepo(@Body('url') url: string) {
-        return this.githubService.AnalyzeRepo(url);
-    }
-**/
 
     @Get('licenses/:owner/:repo')
     async getLicenses(@Param('owner') owner: string, @Param('repo') repo: string){
@@ -79,6 +72,7 @@ export class GithubController {
     return this.githubService.getDocs(owner, repo);
     }
 
+
     @Get('content/docs/:owner/:repo')
     async getDocsContent(@Param('owner') owner: string, @Param('repo') repo: string) {
     return this.githubService.getDocsContent(owner, repo);
@@ -94,7 +88,6 @@ export class GithubController {
         } catch (error: any) {
         this.logger.error(`Falha ao analisar repositórios para ${username}: ${error.message}`, error.stack);
 
-        // Trata erros de 404 de forma específica para o GitHub
         if (error?.original?.response?.status === 404) {
             throw new HttpException(
             `Usuário do GitHub "${username}" não encontrado.`,
@@ -114,27 +107,4 @@ export class GithubController {
         return this.githubService.getRepoTree(owner, repo);
     }
 
-    @Get('cache')
-    async getCache(
-    @Query('owner') owner?: string,
-    @Query('repo') repo?: string,
-    @Query('url') url?: string,
-     ){
-    if (url) {
-      return this.githubService.getCacheByUrl(url);
-    }
-
-    if (owner && repo) {
-      const fullUrl = `https://api.github.com/repos/${owner}/${repo}`;
-      return this.githubService.getCacheByUrl(fullUrl);
-    }
-
-    return this.githubService.getAllCache();
-  }
-
-  @Get('repos')
-  async getCachedRepos() {
-    return this.githubService.getFormattedCachedRepos();
-  }
 }
-

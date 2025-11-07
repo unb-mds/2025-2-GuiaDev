@@ -4,7 +4,9 @@ import { Buffer } from 'buffer';
 import path from 'path';
 import { AxiosResponse } from 'axios';
 import { PrismaService } from '../../database/prisma.service';
-import { GithubCache } from '@prisma/client'; 
+import { GithubCache, GithubRepoData } from '@prisma/client'; 
+import { randomUUID } from 'crypto'; 
+
 
 @Injectable()
 export class GithubService {
@@ -17,7 +19,6 @@ export class GithubService {
 
   private token = process.env.GITHUB_TOKEN;
   private readonly MAX_BYTES = Number(process.env.GH_MAX_BYTES || 200 * 1024);
-  // Aumentei a concorrência para 10 para ser mais rápido
   private readonly CONCURRENCY = Number(process.env.GH_CONCURRENCY || 10);
 
   private defaultHeaders() {
@@ -278,44 +279,17 @@ export class GithubService {
     return { patternResults, resultsByPath, summary };
   }
 
- 
   async getFormattedCachedRepos() {
-    this.logger.debug(`[Cache Read] Buscando todos os resultados de 'analysis_v1/'...`);
-    const allCache = await this.prisma.githubCache.findMany({
-      where: {
-        url: {
-          startsWith: 'analysis_v1/'
-        }
+    this.logger.debug(`[Cache Read] Buscando todos os repositórios da tabela 'GithubRepoData'...`);
+    const allCache = await this.prisma.githubRepoData.findMany({
+      orderBy: {
+        updatedAt: 'desc'
       }
     });
 
-    this.logger.debug(`[Cache Read] Encontrados ${allCache.length} resultados. Formatando...`);
-    const reposMap: Record<string, any> = {};
-
-    for (const c of allCache) {
-      const data = c.data as any;
-      if (!data) continue;
-
-      const match = c.url.match(/analysis_v1\/([^/]+)\/([^/?]+)/);
-      if (!match) continue;
-
-      const owner = data.owner || match[1];
-      const repo = data.repo || match[2];
-      
-      if (!owner || !repo) continue;
-
-      const key = `${owner}/${repo}`;
-
-      if (!reposMap[key] || c.updatedAt > reposMap[key].updatedAt) {
-        reposMap[key] = {
-          ...data, 
-          updatedAt: c.updatedAt,
-        };
-      }
-    }
-
-    const reposData = Object.values(reposMap);
-    return this.formatRepoData(reposData);
+    this.logger.debug(`[Cache Read] Encontrados ${allCache.length} resultados. Retornando dados formatados...`);
+    
+    return allCache.map(repoData => repoData.data);
   }
 
   formatRepoData(reposData: any[]) {
@@ -441,23 +415,23 @@ export class GithubService {
     const name = repo.name; 
     const defaultBranch = repo.default_branch;
 
-    const analysisCacheUrl = `analysis_v1/${owner}/${name}`;
-
     const { changed: repoChanged, etag: repoEtag } = await this.checkRepoChanged(owner, name);
 
-    if (!repoChanged) {
-      this.logger.debug(`[Analyze] Repo ${owner}/${name} sem mudanças. Verificando cache de análise...`);
-      const cachedAnalysis = await this.prisma.githubCache.findUnique({
-        where: { url: analysisCacheUrl },
-      });
+    const cachedRepoData = await this.prisma.githubRepoData.findUnique({
+      where: { 
+        owner_repo: {
+          owner: owner,
+          repo: name 
+        } 
+      },
+    });
 
-      if (cachedAnalysis && cachedAnalysis.etag === repoEtag) {
-        this.logger.debug(`[Analyze] Cache de análise HIT para ${owner}/${name}.`);
-        return cachedAnalysis.data;
-      }
-      
-      this.logger.debug(`[Analyze] Cache de análise 'stale' ou ausente para ${owner}/${name}. Re-analisando...`);
+    if (!repoChanged && cachedRepoData && cachedRepoData.etag === repoEtag) {
+      this.logger.debug(`[Analyze] Cache HIT para ${owner}/${name} na tabela 'GithubRepoData'.`);
+      return cachedRepoData.data;
     }
+    
+    this.logger.debug(`[Analyze] Cache MISS ou 'stale' para ${owner}/${name}. Re-analisando...`);
 
     try {
       let patterns: string[] = ['/'];
@@ -506,43 +480,58 @@ export class GithubService {
         checklistMatches: patternResults,
       };
 
-      await this.prisma.githubCache.upsert({
-        where: { url: analysisCacheUrl },
-        update: { 
-          etag: repoEtag, 
-          data: analysisResult as any 
+      const formattedData = this.formatRepoData([analysisResult])[0];
+      
+      await this.prisma.githubRepoData.upsert({
+        where: {
+          owner_repo: {
+            owner: repo.owner.login,
+            repo: repo.name
+          }
         },
-        create: { 
-          url: analysisCacheUrl, 
-          etag: repoEtag, 
-          data: analysisResult as any 
+        create: {
+          id: randomUUID(),
+          owner: repo.owner.login,
+          repo: repo.name,
+          etag: repoEtag ?? null,
+          data: formattedData,
+          lastDiff: {}
         },
+        update: {
+          data: formattedData,
+          etag: repoEtag ?? null
+        }
       });
 
-      return analysisResult;
+      try {
+        await this.prisma.githubCache.delete({ where: { url: `analysis_v1/${owner}/${name}` }});
+      } catch (e) {
+        // Ignora
+      }
+
+      return formattedData;
 
     } catch (err: any) { 
       this.logger.warn(`analyzeUserRepos per-repo error ${owner}/${name}: ${err?.message || err}`); 
-      return { repo: name, owner: owner, commits: [], issues: [], releases: [], readme: { content: null }, changelog: { content: null }, conductcode: { content: null }, license: { name: 'Unlicensed' }, gitignore: { content: null }, docs: [], contributing: { content: null }, docsContent: [], checkFolders: [] }; 
+      return null;
     }
   }
 
   async analyzeUserRepos(username: string) {
     let repos = await this.getUserRepos(username);
-    repos = repos.slice(0, 45); // Pega os (0,n de repos) mais recentes
+    repos = repos.slice(0, 45); 
 
     this.logger.debug(`[Analyze] Iniciando análise paralela para ${repos.length} repositórios com concorrência ${this.CONCURRENCY}...`);
 
-    // Roda a análise dos 30 mais recentes em paralelo
     const allResults = await this.mapWithConcurrency(
       repos,
       this.CONCURRENCY,
       (repo) => this._analyzeSingleRepo(repo)
     );
 
-    this.logger.debug(`[Analyze] Análise paralela concluída. Formatando ${allResults.length} resultados.`);
+    this.logger.debug(`[Analyze] Análise paralela concluída. ${allResults.length} resultados.`);
 
-    return this.formatRepoData(allResults.filter(Boolean));
+    return allResults.filter(Boolean);
   }
 
   async getAllCache() {
