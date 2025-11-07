@@ -35,13 +35,9 @@ const IconLogOut = () => (
   </svg>
 );
 
-const handleLogout = async () => {
-  try{ //tem que lidar com o token
-    
-
-  } catch(erro){
-    console.log("Erro ao fazer logout:", erro)
-  }
+const handleLogout = () => {
+  localStorage.removeItem("authToken");
+  window.location.href = "/login";
 }
 
 
