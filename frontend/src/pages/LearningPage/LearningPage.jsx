@@ -4,13 +4,12 @@ import LearningCard from '../../components/LearningCard/Card';
 import Chat from '../../components/Chat/Chat';
 
 const ExplainDoc = ({ name, card }) => {
-  // Two independent panels: Estrutura and Boas práticas
   const [openStructure, setOpenStructure] = useState(false);
   const [openPractices, setOpenPractices] = useState(false);
 
   return (
     <>
-      {/* Estrutura panel */}
+      {/* Estrutura */}
       <div className={`panel ${openStructure ? 'active' : ''}`}>
         <div className="estructureDocs">
           <button
@@ -27,14 +26,17 @@ const ExplainDoc = ({ name, card }) => {
               {card?.expandedText ? (
                 <p>{card.expandedText}</p>
               ) : (
-                <p>Conteúdo da estrutura do {name} (ex.: seções, títulos e exemplos).</p>
+                <p>
+                  O arquivo {name} contém informações essenciais para o projeto, incluindo seções,
+                  objetivos e exemplos que auxiliam na documentação e organização.
+                </p>
               )}
             </div>
           ) : null}
         </div>
       </div>
 
-      {/* Boas práticas panel */}
+      {/* Boas práticas */}
       <div className={`panel ${openPractices ? 'active' : ''}`}>
         <div className="estructureDocs">
           <button
@@ -48,7 +50,11 @@ const ExplainDoc = ({ name, card }) => {
         <div className="estructureDocs">
           {openPractices ? (
             <div className='contentLearning'>
-              <p>Conteúdo de boas práticas (ex.: convenções, exemplos e recomendações).</p>
+              <p>
+                As boas práticas para o arquivo {name} incluem padronização de formatação, 
+                clareza nas informações, uso de exemplos atualizados e alinhamento com 
+                as diretrizes do GuiaDev. Sempre mantenha o conteúdo revisado e acessível.
+              </p>
               {card?.expandedText && (
                 <p className='note'>Dica: {card.expandedText}</p>
               )}
@@ -63,27 +69,21 @@ const ExplainDoc = ({ name, card }) => {
 const MockIcon = ({ children }) => <>{children}</>;
 
 export default function LearningPage() {
-  const [docs] = useState([{ id: 1, name: 'README' }]);
   const [selectedCard, setSelectedCard] = useState(null);
 
   const cardData = [
-    { title: 'Stories Maps', icon: <MockIcon>📊</MockIcon>, expandedText: 'Introdução aos Stories Maps e sua aplicação em projetos front-end' },
-    { title: 'CODE_OF_CONDUCT.md', expandedText: 'Diretrizes de comportamento para a comunidade GuiaDev. Leia antes de contribuir.' },
-    { title: 'CHANGELOG.md', expandedText: 'Histórico de todas as mudanças e novas funcionalidades do projeto.' },
-    { title: 'CONTRIBUTING.md', expandedText: 'Guia completo para quem deseja fazer contribuições ao código.' },
-    { title: '.gitignore', expandedText: 'Lista de arquivos e pastas que o Git deve ignorar ao fazer um commit.' },
-    { title: 'README.md', expandedText: 'Ponto de partida do projeto, contém informações essenciais e instalação.' },
-    { title: 'SUPPORT.md', expandedText: 'Informações sobre como obter suporte ou reportar problemas.' },
-    { title: 'SECURITY.md', expandedText: 'Política de segurança e como relatar vulnerabilidades de forma responsável.' },
-    { title: 'GOVERNANCE.md', expandedText: 'Estrutura de governança e tomada de decisões do projeto.' },
-    { title: 'Testes/CI', expandedText: 'Documentação sobre a suíte de testes e o pipeline de Integração Contínua (CI).' },
-    { title: 'docs/', expandedText: 'Pasta que contém toda a documentação adicional do projeto.' },
+    { title: 'Stories Maps', icon: <MockIcon>📊</MockIcon>, expandedText: 'Documento visual que mostra a jornada do usuário e ajuda a priorizar funcionalidades do projeto GuiaDev.' },
+    { title: 'CODE_OF_CONDUCT.md', expandedText: 'Define diretrizes de comportamento e respeito entre colaboradores do projeto, promovendo um ambiente inclusivo e acolhedor.' },
+    { title: 'CHANGELOG.md', expandedText: 'Registra o histórico de mudanças, correções e novas funcionalidades implementadas em cada versão do projeto.' },
+    { title: 'CONTRIBUTING.md', expandedText: 'Guia completo para novos contribuidores: explica como criar branches, abrir pull requests e seguir o padrão de commits do GuiaDev.' },
+    { title: '.gitignore', expandedText: 'Lista de arquivos e diretórios que o Git deve ignorar (ex: node_modules, logs e builds temporários).' },
+    { title: 'README.md', expandedText: 'Documento principal do repositório. Apresenta a visão geral do projeto, instruções de instalação, uso com Docker e tecnologias utilizadas.' },
+    { title: 'SUPPORT.md', expandedText: 'Orienta como obter suporte, abrir issues ou relatar problemas, garantindo organização e comunicação eficaz entre os membros da equipe.' },
+    { title: 'SECURITY.md', expandedText: 'Define a política de segurança, incluindo boas práticas de autenticação e como reportar vulnerabilidades de forma responsável.' },
+    { title: 'GOVERNANCE.md', expandedText: 'Descreve a estrutura de governança, papéis da equipe, responsáveis pelas decisões e fluxo de aprovação de mudanças.' },
+    { title: 'Testes/CI', expandedText: 'Documenta a suíte de testes e o pipeline de Integração Contínua (CI), garantindo qualidade e consistência nas entregas.' },
+    { title: 'docs/', expandedText: 'Pasta dedicada à documentação técnica, contendo diagramas, relatórios de sprint e requisitos do projeto GuiaDev.' },
   ];
-
-
-  const handleDoc = () =>{
-    
-  }
 
   return (
     <div className='renderPage'>
