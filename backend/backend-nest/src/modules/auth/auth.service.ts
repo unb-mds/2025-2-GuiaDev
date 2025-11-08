@@ -60,15 +60,45 @@ export class authService {
         return user;
     }
 
-    async loginGithub(user: any) {
-        const payload = { username: user.username, sub: user.githubId };
+    // async loginGithub(user: any) {
+    //     const payload = { username: user.username, sub: user.githubId };
+    //     return {
+    //         access_token: this.jwtService.sign(payload),
+    //     };
+    // }
+
+    async loginGithub(githubUser: any) {
+        let user = await this.prisma.user.findUnique({ where: { email: githubUser.email } });
+
+        // Se o usuário ainda não existe, cria
+        if (!user) {
+            user = await this.prisma.user.create({
+                data: {
+                    email: githubUser.email,
+                    usernameGit: githubUser.username,
+                    githubId: githubUser.providerId,
+                    provider: 'github',
+                }
+            });
+        }
+
+        // Gera token JWT
+        // const payload = { sub: user.id, email: user.email };
+        // const access_token = this.jwtService.sign(payload);
+        // return { access_token, user };
+
+        const payload = {sub: user.id, email: user.email};
         return {
             access_token: this.jwtService.sign(payload),
         };
     }
 
-    getUser() {
-        return 'Você fez um get na rota auth/get'
+    async verifyToken(token: string) {
+        try {
+            return this.jwtService.verify(token); // retorna payload decodificado
+        } catch (error) {
+            return null; // inválido ou expirado
+        }
     }
 
 }

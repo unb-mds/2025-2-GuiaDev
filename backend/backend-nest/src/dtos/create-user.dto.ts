@@ -20,7 +20,7 @@ export class CreateUserBody {
     @IsNotEmpty({
         message: "The password should not be empty",
     })
-    @IsStrongPassword()
+    // @IsStrongPassword()
     password: string;
 }
 

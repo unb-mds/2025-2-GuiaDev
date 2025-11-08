@@ -80,17 +80,21 @@ useEffect(() => {
       <h2>Acompanhe o progresso da documentação dos seus repositórios!</h2>
       <div className="scroll">
         <div className="boxes-list">
-          {stats.length === 0 ? (
-            <p>Carregando estatísticas...</p>
+          {!owner ? (
+            <p>Digite o nome de usuário do GitHub no campo acima e clique em "Buscar".</p>
+          ) : loading ? (
+            <p>Buscando repositórios de "{owner}"...</p>
+          ) : stats.length === 0 ? (
+            <p>Ainda não há estatísticas disponíveis para este usuário.</p>
           ) : (
             // 3. RENDERIZAR USANDO O ESTADO 'stats'
-            repos.map(() => (
+            stats.map((s) => (
               <BoxStat
-                key={repos.id}
-                nome={repos.nome}
-                num={repos.num}
-                comment={repos.comment}
-                icon={repos.icon}
+                key={s.id}
+                nome={s.nome}
+                num={s.num}
+                comment={s.comment}
+                icon={s.icon}
               />
             ))
           )}
@@ -103,8 +107,18 @@ useEffect(() => {
 
         <div className="repo-scroll">
           <div className="boxes-list-repo" id="repo-list">
-            {repos.length === 0 ? (
-              <p>Carregando repositórios...</p>
+            {!owner ? (
+              <span className="empty-placeholder">
+                <p>Digite o nome de usuário do GitHub no campo acima e clique em "Buscar".</p>
+              </span>
+            ) : loading ? (
+              <span className="empty-placeholder">
+                <p>Buscando repositórios de "{owner}"...</p>
+              </span>
+            ) : repos.length === 0 ? (
+              <span className="empty-placeholder">
+                <p>Nenhum repositório encontrado para "{owner}". Verifique o nome e tente novamente.</p>
+              </span>
             ) : (
               // 4. RENDERIZAR USANDO O ESTADO 'repos'
               repos.map((repo) => (

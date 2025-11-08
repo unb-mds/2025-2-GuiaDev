@@ -10,21 +10,35 @@
     border: 1px solid #e2e8f0;
 
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); 
-    padding: 10px;
+    padding: 1rem;
     
-    /* Configurações para a Animação */
-    /* height: 120px; 
-    overflow: hidden; /* Esconde o conteúdo que transborda */
+  
+   
+    height: 120px; 
+    overflow: hidden; 
     /* width: 100%; */
     color: black;
     
     transition: all 0.4s ease-in-out; 
+    overflow: hidden;
 }
 
+.card-conteudo:hover{
+   
+    border-color: #0f62fe;
+    background-color: #fbfdff; 
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
 
 .card-conteudo.expanded {
     height: auto;
     max-height: 500px; 
+}
+
+/* estado persistente quando o card foi selecionado (via JS/React) */
+.card-conteudo.selected {
+    border-color: #0f62fe;
+    box-shadow: 0 8px 24px rgba(15,98,254,0.08);
 }
 
 
@@ -70,19 +84,21 @@
 
 /* Estilos do Conteúdo Expansível (o Texto) */
 .card-expansivel {
-    max-height: 0;
-    opacity: 0; /* Começa invisível */
-    transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out 0.1s; 
-    margin-top: 5px;
+    max-height: 0px;
+    /* font-size: 0px; */
+    opacity: 0; 
+    transition: max-height 0.4s ease-in-out, opacity 0.1s ease; 
+    /* margin-top: 5px; */
     padding-top: 0;
     border-top: none;
     width: 100%;
+    
 }
 
 /* Quando o card está expandido, revela o conteúdo */
 .card-conteudo.expanded .card-expansivel {
-    max-height: 300px; /* Valor alto para animar a altura */
-    opacity: 1; /* Torna o texto visível */
+    max-height: 300px; 
+    opacity: 1; 
     padding-top: 10px;
     border-top: 1px solid #ccc;
 }

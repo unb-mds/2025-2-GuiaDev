@@ -38,7 +38,7 @@ export default function Login() {
           <Sign_in/>
         </div>
       </div>
-      <Footer />
+      <Footer/>
     </div>
   );
 }

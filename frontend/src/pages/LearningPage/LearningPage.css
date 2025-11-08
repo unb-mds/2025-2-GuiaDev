@@ -3,7 +3,7 @@
 
 .learningPage {
   display: flex;
-  margin-left: 260px;
+  /* margin-left: 260px; */
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -73,7 +73,7 @@
 .textTitle {
   font-size: 36px;
   font-weight: bold;
-  margin-left: 280px;
+  margin-left: 2rem
 }
 
 .subtitle {
@@ -181,4 +181,5 @@
   display: grid;
   justify-items: center;
   width: calc(100% - 360px);
+  /* background-color: red; */
 }

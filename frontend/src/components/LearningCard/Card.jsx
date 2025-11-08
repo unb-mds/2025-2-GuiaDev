@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./Card.css";
 
-export default function LearningCard({title, icon, expandedText}) {
+export default function LearningCard({title, icon, expandedText, onSelect, selected}) {
 
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -13,7 +13,7 @@ export default function LearningCard({title, icon, expandedText}) {
 
     return (
         
-        <div className={`card-conteudo ${isExpanded ? 'expanded' : ''}`}>
+        <div className={`card-conteudo ${isExpanded ? 'expanded' : ''} ${selected ? 'selected' : ''}`}  onClick={() => onSelect && onSelect({ title, icon, expandedText })}>
             <div className="card-top">
                 {icon &&
                     <span role="img" aria-label="ícone">{icon}</span>

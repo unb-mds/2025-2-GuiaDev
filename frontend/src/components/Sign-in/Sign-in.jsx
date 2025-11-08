@@ -12,24 +12,10 @@ function Sign_in() {
 
   const navigate = useNavigate();
 
-  const handleGitHubLogin = async () => {
-    try {
-      // Inicia o fluxo de autenticação OAuth do GitHub
-      const response = await api.get("/auth/github");
-      
-      if (response.data.git_token) {
-        localStorage.setItem("authToken", response.data.git_token);
-        console.log("Token GitHub salvo:", response.data.git_token);
-        navigate("/home");
-      } else if (response.data.redirect_url) {
-        // Se o backend retornar URL de redirecionamento OAuth
-        window.location.href = response.data.redirect_url;
-      }
-    } catch (err) {
-      console.error("Erro no login GitHub:", err);
-      alert("Erro ao fazer login com GitHub. Tente novamente.");
-    }
-  };
+const handleGithubLogin = () => {
+  window.open('http://localhost:3000/auth/github', '_self'); // ou '_blank'
+
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,10 +23,10 @@ function Sign_in() {
     try {
       const response = await api.post("/auth/login", {
         email: email,
-        password: senha, // Corrigido para 'password'
+        password: senha, 
       });
 
-      const { access_token } = response.data; // Corrigido para 'access_token'
+      const { access_token } = response.data; 
 
       localStorage.setItem("authToken", access_token);
       console.log("Token salvo:", access_token);
@@ -84,10 +70,7 @@ function Sign_in() {
           required
         />
         <div className="options">
-          <label>
-            <input type="checkbox" /> Lembrar de mim
-          </label>
-          <a href="#">Esqueci minha senha</a>
+          <a href="#" className="forgot-pass">Esqueci minha senha</a>
         </div>
         <button type="submit" className="btn-entrar">
           Entrar
@@ -96,10 +79,10 @@ function Sign_in() {
       <div className="divider">ou continue com</div>
 
       <div className="social-login">
-        <button className="btn-social google">
+        {/* <button className="btn-social google">
           <i className="fab fa-google social-icon"></i>
           Google
-        </button>
+        </button> */}
         <button className="btn-social github" onClick={() => handleGithubLogin()}>
           <i className="fab fa-github social-icon"></i>
            

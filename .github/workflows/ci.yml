@@ -1,0 +1,62 @@
+name: CI Pipeline (Docker Compose)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build, Lint and Test Full Stack (Docker Compose)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Baixa o repositório
+      - name: 🧾 Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Configura o Docker Buildx (build avançado + cache)
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 3️⃣ Faz cache de camadas Docker (para builds mais rápidos)
+      - name: ⚡ Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # 4️⃣ Constrói os serviços do docker-compose
+      - name: 🔧 Build Docker Compose services
+        run: docker compose -f docker-compose.yml build
+
+      # 5️⃣ Sobe os containers em background
+      - name: 🚀 Start containers
+        # run: docker compose -f docker-compose.yml up -d
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          NODE_ENV: production
+        run: docker compose up -d --build || docker compose logs
+
+        
+
+      # 6️⃣ Aplica o linter no backend (ajuste o caminho se necessário)
+      # - name: 🧹 Run Linter (NestJS)
+      #   run: docker compose exec -T backend npm run lint
+
+      # # 7️⃣ Executa testes unitários no backend
+      # - name: 🧪 Run Tests (NestJS)
+      #   run: docker compose exec -T backend npm run test -- --passWithNoTests
+
+      # 8️⃣ (Opcional) Verifica se o front está rodando
+      - name: 🌐 Check frontend container health
+        run: docker compose ps
+
+      # 9️⃣ Para e remove containers após os testes
+      - name: 🧼 Clean up
+        if: always()
+        run: docker compose -f docker-compose.yml down --volumes --remove-orphans

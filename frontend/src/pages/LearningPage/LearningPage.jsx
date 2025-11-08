@@ -3,7 +3,7 @@ import './LearningPage.css';
 import LearningCard from '../../components/LearningCard/Card';
 import Chat from '../../components/Chat/Chat';
 
-const ExplainDoc = ({ name }) => {
+const ExplainDoc = ({ name, card }) => {
   // Two independent panels: Estrutura and Boas práticas
   const [openStructure, setOpenStructure] = useState(false);
   const [openPractices, setOpenPractices] = useState(false);
@@ -23,7 +23,13 @@ const ExplainDoc = ({ name }) => {
 
         <div className="estructureDocs">
           {openStructure ? (
-            <div className='contentLearning'>Conteúdo da estrutura do {name} (ex.: seções, títulos e exemplos).</div>
+            <div className='contentLearning'>
+              {card?.expandedText ? (
+                <p>{card.expandedText}</p>
+              ) : (
+                <p>Conteúdo da estrutura do {name} (ex.: seções, títulos e exemplos).</p>
+              )}
+            </div>
           ) : null}
         </div>
       </div>
@@ -41,7 +47,12 @@ const ExplainDoc = ({ name }) => {
 
         <div className="estructureDocs">
           {openPractices ? (
-            <div className='contentLearning'>Conteúdo de boas práticas (ex.: convenções, exemplos e recomendações).</div>
+            <div className='contentLearning'>
+              <p>Conteúdo de boas práticas (ex.: convenções, exemplos e recomendações).</p>
+              {card?.expandedText && (
+                <p className='note'>Dica: {card.expandedText}</p>
+              )}
+            </div>
           ) : null}
         </div>
       </div>
@@ -53,6 +64,7 @@ const MockIcon = ({ children }) => <>{children}</>;
 
 export default function LearningPage() {
   const [docs] = useState([{ id: 1, name: 'README' }]);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   const cardData = [
     { title: 'Stories Maps', icon: <MockIcon>📊</MockIcon>, expandedText: 'Introdução aos Stories Maps e sua aplicação em projetos front-end' },
@@ -68,6 +80,11 @@ export default function LearningPage() {
     { title: 'docs/', expandedText: 'Pasta que contém toda a documentação adicional do projeto.' },
   ];
 
+
+  const handleDoc = () =>{
+    
+  }
+
   return (
     <div className='renderPage'>
       <div className='textTitle'>
@@ -79,16 +96,25 @@ export default function LearningPage() {
         <div className='test'>
           <div className="learning">
             {cardData.map((data, index) => (
-              <LearningCard key={index} title={data.title} icon={data.icon} expandedText={data.expandedText} />
+              <LearningCard
+                key={index}
+                title={data.title}
+                icon={data.icon}
+                expandedText={data.expandedText}
+                onSelect={(card) => setSelectedCard(card)}
+                selected={selectedCard?.title === data.title}
+              />
             ))}
           </div>
 
           <div className='docsExplain'>
             <div className='titleBox'>Conteúdo Detalhado</div>
             <div className='boxDocsLearning'>
-              {docs.map((doc) => (
-                <ExplainDoc key={doc.id} name={doc.name} />
-              ))}
+              {selectedCard ? (
+                <ExplainDoc key={selectedCard.title} name={selectedCard.title} card={selectedCard} />
+              ) : (
+                <div className='placeholder'>Selecione um card à esquerda para ver os detalhes.</div>
+              )}
             </div>
           </div>
         </div>
