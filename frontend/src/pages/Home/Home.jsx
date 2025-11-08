@@ -16,7 +16,7 @@ const Home = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("authToken"); // Corrigido para usar a mesma chave
-    if (!token) {
+    if (token) {
       navigate("/login"); // Exemplo: redireciona se não houver token
     }
   }, [navigate]);
