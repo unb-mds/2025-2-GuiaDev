@@ -1,11 +1,22 @@
-import { Body, Controller, Get, Param, Post, Logger, HttpException,HttpStatus} from '@nestjs/common';
+import { UseGuards, Req, Body, Controller, Get, Param, Post, Logger, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { GithubService } from './github.service';
+import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import { PrismaService } from 'src/database/prisma.service';  
+import { Request } from 'express';
+
+interface RequestWithUser extends Request {
+  user: {
+      userId: number;
+  };
+}
 
 @Controller('github')
 export class GithubController {
 
     private readonly logger = new Logger(GithubController.name);
-    constructor(private readonly githubService: GithubService) {}
+    constructor(private readonly githubService: GithubService, private readonly prisma: PrismaService,) {}
+
+    
     
     @Get('commits/:owner/:repo')
     async getCommits(@Param('owner') owner: string, @Param('repo') repo: string) {
@@ -79,26 +90,26 @@ export class GithubController {
     }
 
     @Get('analyze/user/:username')
-    async analyzeUserRepos(@Param('username') username: string) {
+    async analyzeUserReposByUsername(@Param('username') username: string) {
         try {
-        this.logger.log(`Iniciando análise para o usuário: ${username}`);
-        const analysisResults = await this.githubService.analyzeUserRepos(username);
-        this.logger.log(`Análise concluída para: ${username}`);
-        return analysisResults;
+            this.logger.log(`Iniciando análise para o usuário: ${username}`);
+            const analysisResults = await this.githubService.analyzeUserRepos(username);
+            this.logger.log(`Análise concluída para: ${username}`);
+            return analysisResults;
         } catch (error: any) {
-        this.logger.error(`Falha ao analisar repositórios para ${username}: ${error.message}`, error.stack);
+            this.logger.error(`Falha ao analisar repositórios para ${username}: ${error.message}`, error.stack);
 
-        if (error?.original?.response?.status === 404) {
+            if (error?.original?.response?.status === 404) {
+                throw new HttpException(
+                    `Usuário do GitHub "${username}" não encontrado.`,
+                    HttpStatus.NOT_FOUND,
+                );
+            }
+            
             throw new HttpException(
-            `Usuário do GitHub "${username}" não encontrado.`,
-            HttpStatus.NOT_FOUND,
+                'Falha ao buscar dados do GitHub. Tente novamente mais tarde.',
+                HttpStatus.INTERNAL_SERVER_ERROR,
             );
-        }
-        
-        throw new HttpException(
-            'Falha ao buscar dados do GitHub. Tente novamente mais tarde.',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-        );
         }
     }
 
@@ -107,4 +118,45 @@ export class GithubController {
         return this.githubService.getRepoTree(owner, repo);
     }
 
+    @Post('analyze') 
+    @UseGuards(JwtAuthGuard) 
+    async analyzeUserRepos(@Req() req: RequestWithUser) {
+    
+    const userId = req.user.userId;
+    const user = await this.prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!user || !(user.usernameGit)) {
+      throw new NotFoundException(
+        'Usuário não encontrado ou username do GitHub não configurado no perfil.',
+      );
+    }
+    const usernameToAnalyze = user.usernameGit;
+
+    try {
+      const analysisResults = await this.githubService.analyzeUserRepos(
+        usernameToAnalyze,
+      );
+      
+      return {
+        message: `Análise de ${usernameToAnalyze} concluída.`,
+        count: analysisResults.length,
+        data: analysisResults,
+      };
+
+    } catch (error: any) {
+
+      if (error?.original?.response?.status === 404) {
+          throw new HttpException(
+          `Usuário do GitHub "${usernameToAnalyze}" não foi encontrado.`,
+          HttpStatus.NOT_FOUND,
+          );
+      }
+      
+      throw new HttpException(
+          'Falha ao buscar dados do GitHub.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    }
 }
