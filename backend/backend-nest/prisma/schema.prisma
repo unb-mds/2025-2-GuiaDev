@@ -8,19 +8,43 @@ datasource db {
 }
 
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name  String
-  lastName String
-  password String 
-  projects Project[]
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  name        String?
+  lastName    String?
+  password    String?
+  usernameGit String?
+  githubId String?
+  provider String @default("own")
+  projects    Project[]
 }
 
 model Project {
-  id        Int      @default(autoincrement()) @id
-  title     String
+  id          Int     @id @default(autoincrement())
+  title       String
   description String?
-  url String
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  url         String
+  authorId    Int?
+  author      User?   @relation(fields: [authorId], references: [id])
+}
+
+model GithubCache {
+  url       String   @id
+  etag      String?
+  data      Json?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model GithubRepoData {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  owner     String
+  repo      String
+  etag      String?
+  data      Json?
+  lastDiff  Json?
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([owner, repo])
 }
