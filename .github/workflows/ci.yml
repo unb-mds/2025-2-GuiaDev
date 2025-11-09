@@ -16,6 +16,17 @@ jobs:
       - name: 🧾 Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create .env file for backend
+        run: |
+        
+          mkdir -p ./backend/backend-nest
+          
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> ./backend/backend-nest/.env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> ./backend/backend-nest/.env
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> ./backend/backend-nest/.env
+          echo "GITHUB_CLIENT_ID=${{ secrets.GITHUB_CLIENT_ID }}" >> ./backend/backend-nest/.env
+          echo "GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}" >> ./backend/backend-nest/.env
+
       # 2️⃣ Configura o Docker Buildx (build avançado + cache)
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
