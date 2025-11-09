@@ -57,26 +57,25 @@ form input {
   margin-bottom: 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
+  background-color: #ddd; /*cor de fundo do input*/
+  color: black;
 }
+
+form input:focus {
+  outline: 2px solid #0f47c0; /* espessura, tipo e cor */
+  outline-offset: 2px;        /* opcional: afasta o contorno da borda */
+}
+
 
 /* opções (lembrar/esqueci a senha) */
-.options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
 
-.option a {
-  font-size: 0.85rem;
-  color: #0f47c0;
-  text-decoration: none;
-}
+
 
 /* botão de entrar */
 .btn-entrar,
 .btn-cadastrar {
   width: 100%;
+  margin-top: 10px;
   padding: 0.7rem;
   background: #0f47c0;
   color: white;
@@ -92,50 +91,10 @@ form input {
   background: #093599;
 }
 
-.divider {
-  margin: 1.2rem 0;
-  color: #778;
-  font-size: 0.85rem;
-  position: relative;
-  text-align: center;
+.register-divider{
+  border: none;
+  height: 2px;
+  background: rgba(102, 102, 119, 0.534);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin: 1.5rem 0;
 }
-
-.divider::before,
-.divider::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 40%;
-  height: 1px;
-  background: #ddd;
-}
-.divider::before {
-  left: 0;
-}
-.divider::after {
-  right: 0;
-}
-
-/* .social-login {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-} */
-
-/* .btn-social {
-    flex: 1;
-    padding: 0.6rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.google {
-    color: #db4437;
-}
-
-.github {
-    color: #333;
-} */

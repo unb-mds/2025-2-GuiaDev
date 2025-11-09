@@ -1,25 +1,50 @@
 // src/pages/Home/Home.jsx
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import BoxRepo from "../../components/BoxRepo/Boxrepo";
 import "./Home.css";
 // import GitHubAPI from "../../../services/github";
+import api from "../../../services/api";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [ownerInput, setOwnerInput] = useState("");
   const [owner, setOwner] = useState("");
-
   const [search, setSearch] = useState(false);
+  const urlToken = searchParams.get("token");
   // const [repo, setRepos] = useState("");
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken"); // Corrigido para usar a mesma chave
-    if (!token) {
-      navigate("/login"); // Exemplo: redireciona se não houver token
+  const handleToken = async (token)=>{
+    try{
+      const response = await api.post("/auth/checkToken",{
+        token,
+      })
+      console.log("Token válido", response)
+    } catch(error) {
+      console.log("Erro ao validar token:", error);
     }
-  }, [navigate]);
+  }
+  
+  useEffect(() => {
+    let token = urlToken;
+
+    if (token) {
+      localStorage.setItem("authToken", token);
+    } else {
+      token = localStorage.getItem("authToken");
+    }
+
+    // se ainda não houver token, redireciona pro login
+    if (!token) {
+      navigate("/login");
+    } else{
+      handleToken(token);
+    }
+  
+  }, [urlToken, navigate]);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();                // evita reload
