@@ -1,9 +1,13 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { GithubService } from './github.service';
+import { DocsAnalyzerService } from './docs-analyzer/docs-analyzer.service';
 
 @Controller('github')
 export class GithubController {
-    constructor(private readonly githubService: GithubService) {}
+    constructor(
+        private readonly githubService: GithubService,
+        private readonly docsAnalyzer: DocsAnalyzerService,
+    ) {}
     
     @Get('commits/:owner/:repo')
     async getCommits(@Param('owner') owner: string, @Param('repo') repo: string) {
@@ -92,6 +96,35 @@ export class GithubController {
     return this.githubService.analyzeUserRepos(username);
     }
 
+    @Get('analyze/:owner/:repo')
+    async analyzeRepoDocs(@Param('owner') owner: string, @Param('repo') repo: string) {
+        // Gather docs que o serviço pode buscar
+        const [readme, contributing, changelog, conduct, license, docsContent] = await Promise.all([
+            this.githubService.getReadme(owner, repo).catch(() => ({ name: 'README.md', content: null })),
+            this.githubService.getContributing(owner, repo).catch(() => ({ content: null })),
+            this.githubService.getChangelog(owner, repo).catch(() => ({ content: null })),
+            this.githubService.getConductCode(owner, repo).catch(() => ({ content: null })),
+            this.githubService.getLicenses(owner, repo).catch(() => ({ name: null })),
+            this.githubService.getDocsContent(owner, repo).catch(() => []),
+        ]);
+
+        // constrói o array de documentos
+        const docs: { name: string; content: string | null }[] = [];
+        docs.push({ name: readme?.name || 'README.md', content: readme?.content ?? null });
+        docs.push({ name: 'CONTRIBUTING.md', content: contributing?.content ?? null });
+        docs.push({ name: 'CHANGELOG.md', content: changelog?.content ?? null });
+        docs.push({ name: 'CODE_OF_CONDUCT.md', content: conduct?.content ?? null });
+        docs.push({ name: 'LICENSE', content: license?.name ?? null });
+
+        // adiciona arquivos da pasta docs/
+        if (Array.isArray(docsContent)) {
+            for (const d of docsContent) {
+                docs.push({ name: d.name, content: d.content ?? null });
+            }
+        }
+
+        const analysis = this.docsAnalyzer.analyzeMany(docs);
+        return analysis;
     @Get('tree/:owner/:repo')
     async getRepoTree(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getRepoTree(owner, repo);
