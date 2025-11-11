@@ -7,6 +7,47 @@ const ExplainDoc = ({ name, card }) => {
   const [openStructure, setOpenStructure] = useState(false);
   const [openPractices, setOpenPractices] = useState(false);
 
+  // Boas práticas específicas por tipo de documento
+  const getBestPractices = () => {
+    switch (name) {
+      case 'CONTRIBUTING.md':
+        return (
+          <p>
+            As boas práticas para o arquivo {name} envolvem garantir clareza nas instruções e manter o documento sempre atualizado conforme o fluxo de contribuição evolui. 
+            Use exemplos de commits e pull requests reais, explique o padrão de branches (como <code>feature/</code> e <code>fix/</code>), 
+            e inclua links diretos para o <code>CODE_OF_CONDUCT.md</code> e o <code>README.md</code> para reforçar o alinhamento do projeto.
+          </p>
+        );
+
+      case 'CHANGELOG.md':
+        return (
+          <p>
+            Mantenha o <code>CHANGELOG.md</code> estruturado de forma cronológica e categorizada. 
+            Utilize cabeçalhos como <strong>Adicionado</strong>, <strong>Corrigido</strong> e <strong>Alterado</strong> para cada versão. 
+            Evite descrições vagas e sempre inclua a data e o número da versão no topo, seguindo o padrão de versionamento semântico (ex: v1.2.0).
+          </p>
+        );
+
+      case 'CODE_OF_CONDUCT.md':
+        return (
+          <p>
+            As boas práticas para este documento incluem garantir linguagem inclusiva e acessível, além de detalhar 
+            o processo de denúncia e resolução de conflitos. Revise o conteúdo periodicamente para assegurar que ele 
+            continue representando os valores da comunidade e esteja de acordo com políticas atualizadas de diversidade e ética.
+          </p>
+        );
+
+      default:
+        return (
+          <p>
+            As boas práticas para o arquivo {name} incluem padronização de formatação, 
+            clareza nas informações, uso de exemplos atualizados e alinhamento com 
+            as diretrizes do GuiaDev. Sempre mantenha o conteúdo revisado e acessível.
+          </p>
+        );
+    }
+  };
+
   return (
     <>
       {/* Estrutura */}
@@ -50,11 +91,7 @@ const ExplainDoc = ({ name, card }) => {
         <div className="estructureDocs">
           {openPractices ? (
             <div className='contentLearning'>
-              <p>
-                As boas práticas para o arquivo {name} incluem padronização de formatação, 
-                clareza nas informações, uso de exemplos atualizados e alinhamento com 
-                as diretrizes do GuiaDev. Sempre mantenha o conteúdo revisado e acessível.
-              </p>
+              {getBestPractices()}
               {card?.expandedText && (
                 <p className='note'>Dica: {card.expandedText}</p>
               )}
