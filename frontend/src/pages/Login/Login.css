@@ -1,4 +1,3 @@
-
 .login-page {
     display: flex;
     padding: 0;
@@ -10,10 +9,11 @@
     font-family: Arial, sans-serif;
     align-items: center;
     justify-content: center;
-    justify-items: center;  
+    justify-items: center;
     padding: 0 5vw;
 }
-.content-right{
+
+.content-right {
     margin: none;
     align-self: center;
     margin-bottom: 20px;
@@ -71,6 +71,11 @@
     margin-bottom: 2rem;
     display: flex;
     max-width: 600px;
+    transition: 0.6s ease-in;
+}
+
+.content-left ul li:hover {
+    transform: scale(1.04);
 }
 
 /*lado direito agora */
@@ -85,20 +90,23 @@
 
 
 @media (max-width: 992px) {
-    .content{
+    .content {
         flex-direction: column;
         align-items: stretch;
         width: 100%;
     }
+
     .content-left {
         padding: 2rem;
         text-align: center;
         align-items: center;
     }
-    .content-right{
+
+    .content-right {
         max-width: 400px;
     }
 }
+
 /* 
 @media (max-width: 992px){
     .content{
@@ -121,13 +129,14 @@
 
 } */
 
-@media (max-width: 480px){
-    .content{
+@media (max-width: 480px) {
+    .content {
         width: 100%;
         margin: none;
         padding: none;
     }
-    .content-right{
+
+    .content-right {
         width: 100%;
     }
 }
