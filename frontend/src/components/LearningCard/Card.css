@@ -28,6 +28,7 @@
     border-color: #0f62fe;
     background-color: #fbfdff; 
     box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transform: scale(1.04);
 }
 
 .card-conteudo.expanded {
