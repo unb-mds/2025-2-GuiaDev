@@ -1,308 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GuiaDev</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>GuiaDev — Guias e tutoriais do curso</title>
+  <meta name="description" content="Guias, tutoriais e materiais práticos para o curso GuiaDev" />
+
+  <meta property="og:title" content="GuiaDev — Guias e tutoriais do curso" />
+  <meta property="og:description" content="Guias, tutoriais e materiais práticos para o curso GuiaDev" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="/" />
+  <meta property="og:image" content="/assets/images/og-image.png" />
+
+ 
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="logo">
-                <div class="logo-icon">&lt;/&gt;</div>
-                <h1>GuiaDev</h1>
-            </div>
-            
-            <nav>
-                <div class="nav-section">
-                    <h3>Documentação</h3>
-                    <a href="#" class="nav-item active" data-section="home">Início</a>
-                    <a href="#" class="nav-item" data-section="sprints">Documentos</a>
-                    <a href="#" class="nav-item" data-section="architecture">Arquitetura</a>
-                    <a href="#" class="nav-item" data-section="api">API Reference</a>
-                </div>
-                
-                <div class="nav-section">
-                    <h3>Recursos</h3>
-                    <a href="#" class="nav-item" data-section="guides">Guias</a>
-                    <a href="#" class="nav-item" data-section="examples">Exemplos</a>
-                    <a href="#" class="nav-item" data-section="faq">FAQ</a>
-                </div>
-            </nav>
-        </div>
-        
-        <main class="main-content">
-            <div class="content-header">
-                <h1>GuiaDev</h1>
-                <p>Plataforma completa para escrita técnica em projetos de software. Acompanhe o desenvolvimento através das sprints e documentação detalhada.</p>
-            </div>
-            
-            <div id="home-section" class="content-section">
-                <h2>🚀 Bem-vindo ao GuiaDev</h2>
-                <div class="markdown-content">
-                    <p>Esta plataforma foi desenvolvida para facilitar a criação, organização e manutenção de documentação técnica em projetos de software. Aqui você encontrará:</p>
-                    
-                    <h3>🎯 Objetivos do Projeto</h3>
-                    <p>O GuiaDev visa resolver os principais desafios na criação de documentação técnica:</p>
-                    <ul>
-                        <li>Reduzir o tempo necessário para criar documentação de qualidade</li>
-                        <li>Padronizar a estrutura e formato dos documentos técnicos</li>
-                        <li>Facilitar a colaboração entre desenvolvedores e technical writers</li>
-                        <li>Manter a documentação sempre atualizada e sincronizada</li>
-                    </ul>
-                    
-                    <h3>🛠️ Stack Tecnológica</h3>
-                    <ul>
-                        <li><strong>Frontend:</strong> React + JavaScript + Vite</li>
-                        <li><strong>Backend:</strong> NestJS com TypeScript</li>
-                        <li><strong>Database:</strong> PostgreSQL via Supabase</li>
-                        <li><strong>Deploy:</strong> Vercel (front) + Railway/Render (back)</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div id="sprints-section" class="content-section" style="display: none;">
-                <h2>📅 Documentação do Projeto</h2>
-                
-                <div class="sprint-selector">
-                    <h3>📋 Documentos Disponíveis</h3>
-                    <div class="sprint-buttons" id="sprint-buttons">
-                        <!-- Botões serão gerados automaticamente baseados nos arquivos configurados -->
-                    </div>
-                </div>
-                
-                <div id="sprint-content" class="markdown-content">
-                    <div class="loading">Carregando documentação...</div>
-                </div>
-            </div>
-            
-            <div id="architecture-section" class="content-section" style="display: none;">
-                <h2>🏗️ Arquitetura do Sistema</h2>
-                <div class="markdown-content">
-                    <h3>Visão Geral</h3>
-                    <p>O GuiaDev utiliza uma arquitetura simples, priorizando produtividade e facilidade de manutenção.</p>
-                    
-                    <h3>Stack Tecnológica</h3>
-                    <ul>
-                        <li><strong>Frontend:</strong> React + JavaScript + Vite</li>
-                        <li><strong>Backend API:</strong> NestJS (Node.js framework)</li>
-                        <li><strong>Banco de Dados:</strong> PostgreSQL via Supabase</li>
-                        <li><strong>ORM:</strong> Prisma para type-safe database access</li>
-                    </ul>
-                    
-                    <h3>Vantagens da Stack Escolhida</h3>
-                    <ul>
-                        <li><strong>NestJS:</strong> Arquitetura modular, decorators, injeção de dependência</li>
-                        <li><strong>Supabase:</strong> Backend-as-a-Service com PostgreSQL real-time</li>
-                        <li><strong>TypeScript:</strong> Type safety em todo o stack</li>
-                        <li><strong>Simplicidade:</strong> Sem complexidade desnecessária de websockets ou AWS</li>
-                    </ul>
-                    
-                    <h3>Comunicação API</h3>
-                    <p>A aplicação utiliza REST API com endpoints bem definidos. Para funcionalidades real-time futuras, podemos utilizar Supabase Realtime (baseado em PostgreSQL LISTEN/NOTIFY).</p>
-                    
-                    <h3>Deploy e Hosting</h3>
-                    <ul>
-                        <li><strong>Frontend:</strong> Vercel ou Netlify</li>
-                        <li><strong>Backend:</strong> Railway, Render ou Digital Ocean</li>
-                        <li><strong>Database:</strong> Supabase (hosting gerenciado)</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div id="api-section" class="content-section" style="display: none;">
-                <h2>🔌 API Reference</h2>
-                <div class="markdown-content">
-                    <h3>Autenticação</h3>
-                    <p>Utilizamos Supabase Auth com JWT tokens. Inclua o token no header:</p>
-                    <pre><code>Authorization: Bearer {your-jwt-token}</code></pre>
-                    
-                    <h4>Endpoints de Auth</h4>
-                    <pre><code>POST /auth/register    # Registro de usuário
-POST /auth/login       # Login
-POST /auth/logout      # Logout
-GET  /auth/profile     # Perfil do usuário</code></pre>
-                    
-                    <h3>Documentos</h3>
-                    <pre><code>GET    /documents           # Listar documentos
-POST   /documents           # Criar documento
-GET    /documents/:id       # Buscar documento
-PUT    /documents/:id       # Atualizar documento
-DELETE /documents/:id       # Deletar documento
-POST   /documents/:id/share # Compartilhar documento</code></pre>
-                    
-                    <h3>Projetos/Sprints</h3>
-                    <pre><code>GET    /projects           # Listar projetos
-POST   /projects           # Criar projeto
-GET    /projects/:id       # Buscar projeto
-PUT    /projects/:id       # Atualizar projeto
-GET    /projects/:id/sprints # Listar sprints do projeto
-POST   /projects/:id/sprints # Criar sprint</code></pre>
-                    
-                    <h3>Exemplo de Resposta</h3>
-                    <pre><code>{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "title": "Documento de Sprint",
-    "content": "# Sprint 1...",
-    "created_at": "2025-01-15T10:00:00Z",
-    "updated_at": "2025-01-15T10:00:00Z",
-    "author": {
-      "id": "uuid",
-      "name": "João Silva",
-      "email": "joao@email.com"
-    }
-  },
-  "meta": {
-    "total": 1,
-    "page": 1,
-    "limit": 10
-  }
-}</code></pre>
-                </div>
-            </div>
-        </main>
+
+  <header class="site-header" role="banner" aria-label="Cabeçalho do site">
+    <div class="container header-inner">
+      <a class="brand" href="#home">
+        <img src="assets/images/logo.svg" alt="GuiaDev" height="40" />
+        <span class="brand-text">GuiaDev</span>
+      </a>
+
+      <nav id="site-nav" class="site-nav" role="navigation" aria-label="Navegação principal">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="diagrama-c4.html" target="_blank" rel="noopener">Diagrama C4 (PDF)</a></li>
+          <li><a href="milestones.html">Milestones</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="como-contribuir.html">Como contribuir</a></li>
+          <li><a href="guias.html">Guias</a></li>
+          <li><a href="projetos.html">Projetos</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+      </nav>
+
+    
     </div>
+  </header>
 
-    <script>
-        // ====================================
-        // CONFIGURAÇÃO DOS ARQUIVOS MARKDOWN
-        // ====================================
-        // EDITE AQUI: Adicione os caminhos dos seus arquivos .md
-        const markdownFiles = [
-            {path: 'Docs/Milestones/Sprint-01/nestjs.md', name: 'Sprint 01 - Estudo Nest'},
-            {path: 'Docs/Milestones/Sprint-01/React.md', name: 'Sprint 01 - Estudo React'},
-            {path: 'Docs/Milestones/Sprint-02/documento-de-requisitos.md', name: 'Sprint 02 - Levantamento de Requisitos'},
-            {path: 'Docs/Milestones/Sprint-02/estudo_arquitetura.md', name: 'Sprint 02 - Decisões Arquiteturais'},
-            {path: 'Docs/Milestones/Sprint-03/sprint-03.md', name: 'Sprint 03'},
-            {path: 'Docs/Milestones/Sprint-04/Revisão Geral Sprint 04.md', name: 'Sprint 04'},
-            {path: 'Docs/Milestones/Sprint-04/padrão_commits.md', name: 'Sprint 04 - Padrão de Commits'},
-            {path: 'Docs/Milestones/Sprint-04/revisão_de_documento_da_R1.md', name: 'Sprint 04 - Revisão Release 1'},
-        ];
+  <main id="main" class="container" role="main" aria-live="polite">
+    <section id="home" class="hero" aria-label="Introdução">
+      <h1>GuiaDev — Materiais, guias e exemplos para o curso</h1>
+      <p class="lede">
+        Documentação e materiais práticos para estudantes e colaboradores. Veja como contribuir,
+        consulte o checklist de docs e o documento de requisitos, ou abra o diagrama C4 do projeto.
+      </p>
 
-        // Estado da aplicação
-        let sprintData = {};
+      
+    </section>
 
-        // Função para carregar arquivos markdown
-        async function loadMarkdownFiles() {
-            const sprintButtons = document.getElementById('sprint-buttons');
-            sprintButtons.innerHTML = '';
-            
-            if (markdownFiles.length === 0) {
-                document.getElementById('sprint-content').innerHTML = `
-                    <div class="error">
-                        <h3>Nenhum arquivo configurado</h3>
-                        <p>Para adicionar documentação:</p>
-                        <ol>
-                            <li>Coloque seus arquivos .md na pasta do projeto</li>
-                            <li>Adicione os caminhos no array <code>markdownFiles</code> no código</li>
-                            <li>Exemplo: <code>{ path: 'docs/sprint-1.md', name: 'Sprint 1' }</code></li>
-                        </ol>
-                        <p>Após configurar, os botões aparecerão automaticamente aqui.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            for (const file of markdownFiles) {
-                try {
-                    const response = await fetch(file.path);
-                    if (response.ok) {
-                        const content = await response.text();
-                        const fileKey = file.path.replace(/[^a-zA-Z0-9]/g, '-');
-                        
-                        sprintData[fileKey] = {
-                            title: file.name,
-                            content: content
-                        };
-                        
-                        const btn = document.createElement('button');
-                        btn.className = 'sprint-btn';
-                        btn.dataset.sprint = fileKey;
-                        btn.textContent = file.name;
-                        
-                        btn.addEventListener('click', (e) => {
-                            document.querySelectorAll('.sprint-btn').forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            loadSprintContent(fileKey);
-                        });
-                        
-                        sprintButtons.appendChild(btn);
-                        
-                    } else {
-                        console.warn(`Não foi possível carregar: ${file.path}`);
-                    }
-                } catch (error) {
-                    console.error(`Erro ao carregar ${file.path}:`, error);
-                }
-            }
-            
-            if (Object.keys(sprintData).length > 0) {
-                const firstKey = Object.keys(sprintData)[0];
-                document.querySelector(`[data-sprint="${firstKey}"]`)?.classList.add('active');
-                loadSprintContent(firstKey);
-            }
-        }
 
-        function loadSprintContent(sprintId) {
-            const sprintContent = document.getElementById('sprint-content');
-            const data = sprintData[sprintId];
-            
-            if (data) {
-                sprintContent.innerHTML = `
-                    <h3>${data.title}</h3>
-                    <div class="markdown-content">${marked.parse(data.content)}</div>
-                `;
-            } else {
-                sprintContent.innerHTML = `
-                    <div class="error">
-                        Documentação não encontrada para esta sprint. 
-                        Por favor, carregue o arquivo .md correspondente.
-                    </div>
-                `;
-            }
-            
-            sprintContent.querySelectorAll('pre code').forEach(block => {
-                hljs.highlightElement(block);
-            });
-        }
+    <section class="features" aria-label="Destaques">
+      <article>
+        <h2>Documentação presente</h2>
+        <p>Os principais arquivos de projeto estão na pasta Docs: check-list, documento de requisitos e diagrama C4.</p>
+        <p><a href="docs-checklist.html">Abrir Docs Check-list</a></p>
+      </article>
 
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-                
-                document.querySelectorAll('[id$="-section"]').forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                const sectionId = item.dataset.section + '-section';
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.style.display = 'block';
-                }
-            });
-        });
+      <article>
+        <h2>Fluxo de contribuição</h2>
+        <p>Consulte <a href="como-contribuir.html">Como Contribuir</a> e o arquivo <code>CONTRIBUTING.md</code>.</p>
+      </article>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMarkdownFiles();
-        });
+      <article>
+        <h2>Guias e exemplos</h2>
+        <p>Veja <a href="guias.html">Guias</a>, <a href="projetos.html">Projetos</a> e o <a href="roadmap.html">Roadmap</a>.</p>
+      </article>
+    </section>
 
-        marked.setOptions({
-            highlight: function(code, lang) {
-                if (lang && hljs.getLanguage(lang)) {
-                    return hljs.highlight(code, { language: lang }).value;
-                }
-                return hljs.highlightAuto(code).value;
-            }
-        });
-    </script>
+  </main>
+
+  <footer class="site-footer" role="contentinfo" aria-label="Rodapé">
+    <div class="footer">
+      <nav aria-label="Rodapé">
+        <ul id="footer-links">
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="security.html">Security</a></li>
+          <li><a href="privacy.html">Privacidade</a></li>
+        </ul>
+      </nav>
+
+      <p class="copyright">
+        © 2025 GuiaDev — Licença: MIT
+      </p>
+    </div>
+  </footer>
+
 </body>
 </html>
