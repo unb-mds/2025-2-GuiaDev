@@ -185,3 +185,70 @@ a:hover {
     margin-top: .75rem;
     color: var(--muted-2)
 }
+
+.markdown-body {
+    overflow-x: auto;
+}
+
+.markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    min-width: 520px;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.5rem 0.65rem;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.markdown-body table th {
+    background: rgba(255, 255, 255, 0.03);
+    font-weight: 600;
+}
+
+.markdown-body table tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.markdown-body table caption {
+    caption-side: bottom;
+    color: var(--muted-2);
+    font-size: .95rem;
+    padding-top: .25rem;
+}
+
+.guides-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.guides-table th,
+.guides-table td {
+    text-align: left;
+    padding: .5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+}
+
+.guides-table th {
+    font-weight: 600;
+    background: rgba(255,255,255,0.02);
+}
+
+.guides-table td a {
+    color: var(--accent);
+}
+
+.guides-table td.status.available {
+    color: var(--accent);
+}
+
+.guides-table td.status.error {
+    color: #e11d48;
+}
+
