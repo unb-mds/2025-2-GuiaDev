@@ -140,8 +140,11 @@ export class GithubController {
             }
         }
 
-        const analysis = this.docsAnalyzer.analyzeMany(docs);
-        return analysis;
+        // const analysis = this.docsAnalyzer.analyzeMany(docs); //verificar isso
+        // return analysis;
+        return null;
+    }
+
     @Get('tree/:owner/:repo')
     async getRepoTree(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getRepoTree(owner, repo);
