@@ -53,17 +53,18 @@ function Sign_in() {
       <p className="subtitle">Acesse sua jornada de desenvolvedor</p>
 
       <form onSubmit={handleSubmit}>
-        <label htmlFor="email">E-mail</label>
+        <label htmlFor="email-input">E-mail</label>
         <input
-          id="email"
+          id="email-input"
           type="email"
           placeholder="seu@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <label>Senha</label>
+        <label htmlFor="senha-input">Senha</label>
         <input
+          id="senha-input"
           type="password"
           placeholder="**********"
           value={senha}
