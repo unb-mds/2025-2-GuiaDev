@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import api from "../../../services/api";
+import api from "../../../services/api.js";
 
 import Register from "../Register/Register";
 import "./Sign-in.css";
@@ -12,10 +12,10 @@ function Sign_in() {
 
   const navigate = useNavigate();
 
-const handleGithubLogin = () => {
-  window.open('http://localhost:3000/auth/github', '_self'); // ou '_blank'
+  const handleGithubLogin = () => {
+    window.open('http://localhost:3000/auth/github', '_self'); // ou '_blank'
 
-};
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,10 +23,10 @@ const handleGithubLogin = () => {
     try {
       const response = await api.post("/auth/login", {
         email: email,
-        password: senha, 
+        password: senha,
       });
 
-      const { access_token } = response.data; 
+      const { access_token } = response.data;
 
       localStorage.setItem("authToken", access_token);
       console.log("Token salvo:", access_token);
@@ -53,8 +53,9 @@ const handleGithubLogin = () => {
       <p className="subtitle">Acesse sua jornada de desenvolvedor</p>
 
       <form onSubmit={handleSubmit}>
-        <label>E-mail</label>
+        <label htmlFor="email">E-mail</label>
         <input
+          id="email"
           type="email"
           placeholder="seu@email.com"
           value={email}
@@ -85,7 +86,7 @@ const handleGithubLogin = () => {
         </button> */}
         <button className="btn-social github" onClick={() => handleGithubLogin()}>
           <i className="fab fa-github social-icon"></i>
-           
+
           GitHub
         </button>
       </div>
