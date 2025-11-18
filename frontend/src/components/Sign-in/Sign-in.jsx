@@ -74,7 +74,7 @@ function Sign_in() {
         <div className="options">
           <a href="#" className="forgot-pass">Esqueci minha senha</a>
         </div>
-        <button type="submit" className="btn-entrar">
+        <button type="submit" className="btn-entrar" data-testid="login-submit-button">
           Entrar
         </button>
       </form>
