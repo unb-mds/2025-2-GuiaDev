@@ -3,6 +3,7 @@ import { GithubService } from './github.service';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { PrismaService } from 'src/database/prisma.service';  
 import { Request } from 'express';
+import { DocsAnalyzerService } from './docs-analyzer/docs-analyzer.service';
 
 interface RequestWithUser extends Request {
   user: {
@@ -14,7 +15,7 @@ interface RequestWithUser extends Request {
 export class GithubController {
 
     private readonly logger = new Logger(GithubController.name);
-    constructor(private readonly githubService: GithubService, private readonly prisma: PrismaService,) {}
+    constructor(private readonly githubService: GithubService, private readonly prisma: PrismaService, private readonly docsAnalyzeService: DocsAnalyzerService) {}
 
     
     
@@ -140,9 +141,8 @@ export class GithubController {
             }
         }
 
-        // const analysis = this.docsAnalyzer.analyzeMany(docs); //verificar isso
-        // return analysis;
-        return null;
+        const analysis = this.docsAnalyzeService.analyzeMany(docs); //verificar isso
+        return analysis;
     }
 
     @Get('tree/:owner/:repo')

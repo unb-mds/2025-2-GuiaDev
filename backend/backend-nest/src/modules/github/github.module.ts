@@ -8,7 +8,7 @@ import { authModule } from 'src/modules/auth/auth.module';
 
 @Module({
   imports: [HttpModule, authModule],
-  providers: [GithubService, PrismaService],
+  providers: [GithubService, PrismaService, DocsAnalyzerService],
   controllers: [GithubController],
   exports: [GithubService],
 })
