@@ -37,6 +37,13 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 
 window.open = jest.fn();
+jest.mock('../Register/Register', () => {
+    return ({ onSwitchToLogin }) => (
+        <div data-testid="register-mock">
+            <button onClick={onSwitchToLogin}>Voltar para Login</button>
+        </div>
+    );
+});
 
 
 
@@ -55,7 +62,7 @@ describe('Componente Sign_in', () => {
 
         expect(screen.getByLabelText(/E-mail/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/Senha/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Entrar/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Entrar/i, selector: 'button[type="submit"]' })).toBeInTheDocument();
     });
 
 
@@ -92,7 +99,7 @@ describe('Componente Sign_in', () => {
         });
 
 
-        fireEvent.click(screen.getByRole('button', { name: /Entrar/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Entrar/i, selector: 'button[type="submit"]' }));
 
 
         await waitFor(() => {
@@ -126,7 +133,7 @@ describe('Componente Sign_in', () => {
 
         fireEvent.change(screen.getByLabelText(/E-mail/i), { target: { value: 'user@fail.com' } });
         fireEvent.change(screen.getByLabelText(/Senha/i), { target: { value: 'wrongpass' } });
-        fireEvent.click(screen.getByRole('button', { name: /Entrar/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Entrar/i, selector: 'button[type="submit"]' }));
 
 
         await waitFor(() => {
@@ -143,13 +150,7 @@ describe('Componente Sign_in', () => {
 
     test('deve mudar para o componente Register ao clicar no botão "Cadastro"', () => {
 
-        jest.mock('../Register/Register', () => {
-            return ({ onSwitchToLogin }) => (
-                <div data-testid="register-mock">
-                    <button onClick={onSwitchToLogin}>Voltar para Login</button>
-                </div>
-            );
-        });
+
 
         render(<Sign_in />);
 
