@@ -62,7 +62,7 @@ describe('Componente Sign_in', () => {
 
         expect(screen.getByLabelText(/E-mail/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/Senha/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Entrar/i, selector: 'button[type="submit"]' })).toBeInTheDocument();
+        expect(screen.getByTestId('login-submit-button')).toBeInTheDocument();
     });
 
 
@@ -99,7 +99,7 @@ describe('Componente Sign_in', () => {
         });
 
 
-        fireEvent.click(screen.getByRole('button', { name: /Entrar/i, selector: 'button[type="submit"]' }));
+        fireEvent.click(screen.getByTestId('login-submit-button'));
 
 
         await waitFor(() => {
@@ -133,7 +133,7 @@ describe('Componente Sign_in', () => {
 
         fireEvent.change(screen.getByLabelText(/E-mail/i), { target: { value: 'user@fail.com' } });
         fireEvent.change(screen.getByLabelText(/Senha/i), { target: { value: 'wrongpass' } });
-        fireEvent.click(screen.getByRole('button', { name: /Entrar/i, selector: 'button[type="submit"]' }));
+        fireEvent.click(screen.getByTestId('login-submit-button'));
 
 
         await waitFor(() => {
