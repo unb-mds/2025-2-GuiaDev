@@ -7,6 +7,7 @@ module.exports = {
     moduleNameMapper: {
 
         '\\.(css|less|scss|sass)$': '<rootDir>/jest-mocks/style-mock.js',
+        '\\.(gif|ttf|eot|svg|png|jpg|jpeg)$': '<rootDir>/jest-mocks/file-mock.js',
 
 
     },
