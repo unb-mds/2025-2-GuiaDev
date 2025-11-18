@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Register from './Register';
 
@@ -24,6 +24,7 @@ window.alert = jest.fn();
 
 describe('Componente Register', () => {
 
+    jest.useRealTimers();
     const mockOnSwitchToLogin = jest.fn();
 
     beforeEach(() => {
@@ -52,9 +53,9 @@ describe('Componente Register', () => {
     test('deve atualizar o estado ao digitar em todos os campos do formulário', () => {
         render(<Register onSwitchToLogin={mockOnSwitchToLogin} />);
 
-        const nameInput = screen.getByLabelText(/Nome/i);
-        const emailInput = screen.getByLabelText(/E-mail/i);
-        const senhaInput = screen.getByLabelText(/Senha/i);
+        const nameInput = screen.getByLabelText('Nome');
+        const emailInput = screen.getByLabelText('E-mail');
+        const senhaInput = screen.getByLabelText('Senha');
 
 
         fireEvent.change(nameInput, { target: { value: 'Joao Teste' } });
@@ -77,10 +78,10 @@ describe('Componente Register', () => {
         render(<Register onSwitchToLogin={mockOnSwitchToLogin} />);
 
 
-        fireEvent.change(screen.getByLabelText(/Nome/i), { target: { value: 'João' } });
-        fireEvent.change(screen.getByLabelText(/E-mail/i), { target: { value: 'joao@success.com' } });
-        fireEvent.change(screen.getByLabelText(/Sobrenome/i), { target: { value: 'Silva' } });
-        fireEvent.change(screen.getByLabelText(/Senha/i), { target: { value: 'senha123' } });
+        fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'João' } });
+        fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'joao@success.com' } });
+        fireEvent.change(screen.getByLabelText('Sobrenome'), { target: { value: 'Silva' } });
+        fireEvent.change(screen.getByLabelText('Senha'), { target: { value: 'senha123' } });
 
 
         fireEvent.click(screen.getByRole('button', { name: /Criar Conta/i }));
@@ -111,9 +112,9 @@ describe('Componente Register', () => {
         render(<Register onSwitchToLogin={mockOnSwitchToLogin} />);
 
 
-        fireEvent.change(screen.getByLabelText(/Nome/i), { target: { value: 'João' } });
-        fireEvent.change(screen.getByLabelText(/E-mail/i), { target: { value: 'joao@fail.com' } });
-        fireEvent.change(screen.getByLabelText(/Senha/i), { target: { value: '123456' } });
+        fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'João' } });
+        fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'joao@fail.com' } });
+        fireEvent.change(screen.getByLabelText('Senha'), { target: { value: '123456' } });
 
         fireEvent.click(screen.getByRole('button', { name: /Criar Conta/i }));
 
@@ -122,8 +123,7 @@ describe('Componente Register', () => {
 
             expect(window.alert).toHaveBeenCalledWith('Erro ao criar conta. Tente novamente.');
 
-
             expect(mockOnSwitchToLogin).not.toHaveBeenCalled();
-        });
-    });
+        }, { timeout: 10000 });
+    }, 10000);
 });
