@@ -1,5 +1,5 @@
 // src/pages/Home/Home.jsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BoxRepo from "../../components/BoxRepo/Boxrepo";
 import "./Home.css";
@@ -16,17 +16,17 @@ const Home = () => {
   const urlToken = searchParams.get("token");
   // const [repo, setRepos] = useState("");
 
-  const handleToken = async (token)=>{
-    try{
-      const response = await api.post("/auth/checkToken",{
+  const handleToken = async (token) => {
+    try {
+      const response = await api.post("/auth/checkToken", {
         token,
       })
       console.log("Token válido", response)
-    } catch(error) {
+    } catch (error) {
       console.log("Erro ao validar token:", error);
     }
   }
-  
+
   useEffect(() => {
     let token = urlToken;
 
@@ -39,10 +39,10 @@ const Home = () => {
     // se ainda não houver token, redireciona pro login
     if (!token) {
       navigate("/login");
-    } else{
+    } else {
       handleToken(token);
     }
-  
+
   }, [urlToken, navigate]);
 
 
@@ -69,12 +69,12 @@ const Home = () => {
 
       <div className="center">
         {!owner && (
-          <div className="home-notice" style={{marginBottom:16, textAlign:'center'}}>
+          <div className="home-notice" style={{ marginBottom: 16, textAlign: 'center' }}>
             <strong>Digite o username do GitHub e clique em "Buscar" para carregar seus repositórios.</strong>
           </div>
         )}
 
-        <BoxRepo owner={owner}/>
+        <BoxRepo owner={owner} />
       </div>
     </div>
   );
