@@ -56,7 +56,7 @@
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    const mdURL = 'https://raw.githubusercontent.com/unb-mds/2025-2-GuiaDev/main/Docs/docsCheck-list.md';
+    const mdURL = 'https://raw.githubusercontent.com/unb-mds/2025-2-GuiaDev/main/docs/docsCheck-list.md';
     fetch(mdURL).then(r => r.text()).then(md => {
       document.getElementById('md-content').innerHTML = marked.parse(md);
     }).catch(err => {
