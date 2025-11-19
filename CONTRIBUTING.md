@@ -78,7 +78,7 @@ Se você tem perguntas ou precisa de ajuda, sinta-se à vontade para abrir um is
 
 ## Código de Conduta
 
-Por favor, leia nosso [Código de Conduta](./CODE_OF_CONDUCT.md) para entender as expectativas em relação ao comportamento ao contribuir para o GuiaDev.
+Por favor, leia nosso [Código de Conduta](./code-of-conduct.html) para entender as expectativas em relação ao comportamento ao contribuir para o GuiaDev.
 
 ## Agradecimentos
 

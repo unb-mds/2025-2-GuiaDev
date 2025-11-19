@@ -4,30 +4,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Guias — GuiaDev</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../styles.css" />
 </head>
 <body>
-    
   <header class="site-header">
     <div class="container header-inner">
-     
-        <img src="assets/images/logo.svg" alt="GuiaDev" height="40" />
-        <span class="brand-text">GuiaDev</span>
-      
+      <img src="../assets/images/logo.svg" alt="GuiaDev" height="40" />
+      <span class="brand-text">GuiaDev</span>
       <nav id="site-nav" class="site-nav">
         <ul>
           <li><a href="index.html">Home</a></li>
-          
           <li><a href="diagrama-c4.html">Diagrama C4 (PDF)</a></li>
           <li><a href="milestones.html">Milestones</a></li>
           <li><a href="sobre.html">Sobre</a></li>
           <li><a href="como-contribuir.html">Como contribuir</a></li>
-          <li><a href="guias.html">Guias</a></li>
-          <li><a href="projetos.html">Projetos</a></li>
+          <li><a href="guias.html">Docs</a></li>
           <li><a href="roadmap.html">Roadmap</a></li>
         </ul>
       </nav>
-
     </div>
   </header>
 
@@ -60,13 +54,15 @@
     // Lista de arquivos detectados no repositório
     const docsFiles = [
       'Docs/docsCheck-list.md',
-      'Docs/documento-de-requisitos.md'
+      'Docs/documento-de-requisitos.md',
+      'CODE_OF_CONDUCT.md',
+      'teste'
     ];
 
-    
     const mapToRendered = {
-      'Docs/docsCheck-list.md': '/docs-checklist.html',
-      'Docs/documento-de-requisitos.md': '/documento-de-requisitos.html'
+      'Docs/docsCheck-list.md': 'docs-checklist.html',
+      'Docs/documento-de-requisitos.md': 'documento-de-requisitos.html',
+      'CODE_OF_CONDUCT.md': 'code-of-conduct.html'
     };
 
     const tbody = document.getElementById('guides-list');
@@ -74,33 +70,41 @@
 
     docsFiles.forEach(path => {
       const fileName = path.split('/').pop();
+      const url = mapToRendered[path] || ('../' + path);
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="name">${fileName}</td>
-        <td class="link"><a href="${mapToRendered[path] || '#'}">Abrir renderizado</a></td>
+        <td class="link"><a href="${url}">Abrir renderizado</a></td>
         <td class="status" data-path="${path}">Verificando…</td>
       `;
       tbody.appendChild(tr);
 
-      const renderedUrl = mapToRendered[path] || ('/' + path);
-      fetch(renderedUrl).then(res => {
-        const cell = tr.querySelector('[data-path]');
-        if(res.ok) {
-          cell.textContent = 'Disponível';
-          cell.classList.add('available');
-        } else {
-          cell.textContent = res.status + ' ' + res.statusText;
-          cell.classList.add('error');
-        }
-      }).catch(err => {
-        const cell = tr.querySelector('[data-path]');
-        console.error('Erro ao verificar', renderedUrl, err);
-        cell.textContent = 'Erro';
+      const cell = tr.querySelector('[data-path]');
+
+      function markAvailable() {
+        cell.textContent = 'Disponível';
+        cell.classList.remove('error');
+        cell.classList.add('available');
+      }
+
+      function markError(msg) {
+        cell.textContent = 'Indisponível';
+        cell.classList.remove('available');
         cell.classList.add('error');
+      }
+
+      const checkUrl = mapToRendered[path] ? mapToRendered[path] : ('../' + path);
+      fetch(checkUrl, { method: 'HEAD' }).then(res => {
+        if (res.ok) return markAvailable();
+        if (res.status === 405 || res.status === 501) {
+          return fetch(checkUrl).then(r => r.ok ? markAvailable() : markError(r.status + ' ' + r.statusText));
+        }
+        return markError(res.status + ' ' + res.statusText);
+      }).catch(err => {
+        fetch(checkUrl).then(r => r.ok ? markAvailable() : markError(r.status + ' ' + r.statusText)).catch(() => markError('Erro'));
       });
     });
   </script>
-  </main>
 
   <footer class="site-footer">
     <div class="container">
@@ -115,6 +119,5 @@
     </div>
   </footer>
 
-  
 </body>
 </html>

@@ -4,30 +4,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Documento de Requisitos — GuiaDev</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../styles.css" />
 </head>
 <body>
-  
   <header class="site-header">
     <div class="container header-inner">
-      
-        <img src="assets/images/logo.svg" alt="GuiaDev" height="40" />
-        <span class="brand-text">GuiaDev</span>
-      
+      <img src="../assets/images/logo.svg" alt="GuiaDev" height="40" />
+      <span class="brand-text">GuiaDev</span>
       <nav id="site-nav" class="site-nav">
         <ul>
           <li><a href="index.html">Home</a></li>
-          
           <li><a href="diagrama-c4.html">Diagrama C4 (PDF)</a></li>
           <li><a href="milestones.html">Milestones</a></li>
           <li><a href="sobre.html">Sobre</a></li>
           <li><a href="como-contribuir.html">Como contribuir</a></li>
           <li><a href="guias.html">Guias</a></li>
-          <li><a href="projetos.html">Projetos</a></li>
           <li><a href="roadmap.html">Roadmap</a></li>
         </ul>
       </nav>
-    
     </div>
   </header>
 
@@ -35,22 +29,20 @@
     <section class="hero">
       <h1>Documento de Requisitos</h1>
       <p class="lede">Requisitos funcionais e não-funcionais do projeto. Consulte o documento completo ou baixe o Markdown abaixo.</p>
-      
     </section>
 
     <section class="container--narrow">
       <h2>Resumo</h2>
       <p>Este documento descreve o escopo, usuários, requisitos e critérios do sistema. A versão renderizada está disponível na própria página abaixo.</p>
-        <div id="md-content" class="markdown-body">
-          <p>Carregando conteúdo...</p>
-        </div>
+      <div id="md-content" class="markdown-body">
+        <p>Carregando conteúdo...</p>
+      </div>
     </section>
   </main>
 
-
-  <footer class="site-footer" role="contentinfo">
+  <footer class="site-footer">
     <div class="container">
-      <nav aria-label="Rodapé">
+      <nav>
         <ul>
           <li><a href="changelog.html">Changelog</a></li>
           <li><a href="security.html">Security</a></li>
@@ -60,11 +52,11 @@
       <p class="copyright">© 2025 GuiaDev — Licença: MIT</p>
     </div>
   </footer>
-  
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
     (function(){
-      const mdPath = 'Docs/documento-de-requisitos.md';
+      const mdPath = '../Docs/documento-de-requisitos.md';
       const container = document.getElementById('md-content');
       if(!container) return;
       fetch(mdPath).then(res => {

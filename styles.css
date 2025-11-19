@@ -112,7 +112,9 @@ a:hover {
 
 
 .hero {
-    padding: 3rem 0
+    padding: 3rem 0;
+    border-bottom: 6px solid white;
+    
 }
 
 .hero h1 {
@@ -251,4 +253,21 @@ a:hover {
 .guides-table td.status.error {
     color: #e11d48;
 }
+
+
+
+.markdown-body img {
+    max-width: 120px;
+    height: auto;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    margin-left:13%;
+    border-radius: 6px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset;
+}
+
+
+
+
 

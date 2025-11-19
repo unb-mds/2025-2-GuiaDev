@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Code Of Conduct — GuiaDev</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <img src="../assets/images/logo.svg" alt="GuiaDev" height="40" />
+      <span class="brand-text">GuiaDev</span>
+      <nav id="site-nav" class="site-nav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="diagrama-c4.html">Diagrama C4 (PDF)</a></li>
+          <li><a href="milestones.html">Milestones</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="como-contribuir.html">Como contribuir</a></li>
+          <li><a href="guias.html">Docs</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="hero">
+      <h1>Codigo de conduta</h1>
+      <p class="lede">Code of Conduct serve como uma referência clara para orientar as interações, garantindo que todos contribuam em um ambiente seguro, inclusivo e profissional.</p>
+    </section>
+
+    <section class="container--narrow">
+      <div id="md-content" class="markdown-body">
+        <p>Carregando conteúdo...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="security.html">Security</a></li>
+          <li><a href="privacy.html">Privacidade</a></li>
+        </ul>
+      </nav>
+      <p class="copyright">© 2025 GuiaDev — Licença: MIT</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    (function(){
+      const mdPath = '../CODE_OF_CONDUCT.md';
+      const container = document.getElementById('md-content');
+      if(!container) return;
+      fetch(mdPath).then(res => {
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      }).then(md => {
+        container.innerHTML = marked.parse(md);
+      }).catch(err => {
+        console.error('Erro ao carregar', mdPath, err);
+        container.innerHTML = '<p>Não foi possível carregar o conteúdo. Verifique se está servindo via HTTP (ex.: <code>python -m http.server 5500</code>).</p>';
+      });
+    })();
+  </script>
+</body>
+</html>
