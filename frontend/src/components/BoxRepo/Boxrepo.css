@@ -7,9 +7,10 @@
   /* margin-top: 10vh; */
   /* background-color: red; */
   width: 100%;
-
+  height: calc(100vh - 95px);
+  display: flex;
+  flex-direction: column;
   /* margin-top: 10000px; */
-
   /* background-color: rebeccapurple; */
 }
 .scroll {
@@ -65,6 +66,9 @@
   gap: 24px;
   padding-bottom: 16px;
   /* background-color: red; */
+  height: 100%;
+  min-height: 0; 
+  align-content: start;
 }
 
 
@@ -77,10 +81,10 @@
 
 
 .repo-scroll {
-  
-  max-height: 520px; 
+  flex: 1 1 auto;
+  min-height: 0; 
   overflow-y: auto;
-  padding-right: 8px; 
+  padding-right: 8px;
 }
 
 /* responsive: 3 cols */
@@ -126,6 +130,11 @@
 
 .repo-section {
   margin-top: 10px;
+  /* background-color: #0f53c2; */
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+
 }
 
 .info {

@@ -70,11 +70,8 @@ function SideBar() {
           <IconAprendizado />
           <a>Aprendizado</a>
         </div>
-{/* 
-        <div className="btn-nav">
-          <IconBuscar />
-          <a>Buscar</a>
-        </div>
+
+
         <div className="sidebar-header">Configuração</div>
           <div className="btn-nav" onClick={() => setConfigOpen(true)} role="button" tabIndex={0}>
         
@@ -90,4 +87,4 @@ function SideBar() {
   );
 }
 
-export default SideBar;
+export default SideBar; 

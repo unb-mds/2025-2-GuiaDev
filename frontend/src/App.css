@@ -13,7 +13,7 @@ body,
 }
 
 .AppContainer {
-  /* display: flex; */
+ 
   width: 100%;
   min-height: 100vh;
   /* reserve space for fixed header so it doesn't overlap content */
@@ -58,8 +58,10 @@ body,
 .content {
   display: flex;
   justify-content: center;
+  /* align-content: start; */
   overflow-y: auto; 
   flex: 1;
+  
   height: calc(100vh - var(--header-height));
   /* background-color: aqua; */
   min-width: calc(100% - 260px);

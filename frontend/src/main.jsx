@@ -11,6 +11,7 @@ import LearningPage from "./pages/LearningPage/LearningPage.jsx";
 
 import AnalysisPage from "./pages/Analysis/Analysis.jsx";
 import { ConfigModalProvider } from "./contexts/ConfigModalContext";
+import { ReposProvider } from "./contexts/ReposContext";
 
 const router = createBrowserRouter([
   
@@ -47,7 +48,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ConfigModalProvider>
-      <RouterProvider router={router} />
+      <ReposProvider>
+        <RouterProvider router={router} />
+      </ReposProvider>
     </ConfigModalProvider>
   </StrictMode>
 );
