@@ -8,18 +8,18 @@ import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
 import LearningPage from "./pages/LearningPage/LearningPage.jsx";
 
-//teste componente depois tirar e montar a page
 
 import AnalysisPage from "./pages/Analysis/Analysis.jsx";
+import { ConfigModalProvider } from "./contexts/ConfigModalContext";
 
 const router = createBrowserRouter([
-  // 🔹 Rota isolada do Login (sem Header nem Sidebar)
+  
   {
     path: "/login",
     element: <Login />,
   },
 
-  // 🔹 Layout principal (com Header e Sidebar)
+
   {
     path: "/",
     element: <App />,
@@ -46,6 +46,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ConfigModalProvider>
+      <RouterProvider router={router} />
+    </ConfigModalProvider>
   </StrictMode>
 );

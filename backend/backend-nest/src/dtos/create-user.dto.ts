@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, IsStrongPassword, Length} from 'class-validator'
+import {IsEmail, IsNotEmpty, IsOptional, IsStrongPassword, Length} from 'class-validator'
 
 export class CreateUserBody {
     @IsNotEmpty()
@@ -22,5 +22,8 @@ export class CreateUserBody {
     })
     // @IsStrongPassword()
     password: string;
+
+    @IsOptional()
+    usernameGit?:string;
 }
 

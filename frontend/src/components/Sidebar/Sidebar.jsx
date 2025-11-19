@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Sidebar.css";
 import { useNavigate } from "react-router-dom";
+import { useConfigModal } from "../../contexts/ConfigModalContext";
 import api from "../../../services/api";
 
 const IconRepositorios = () => (
@@ -42,8 +43,10 @@ const handleLogout = () => {
 
 
 function SideBar() {
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+    const { setOpen: setConfigOpen } = useConfigModal();
+ 
 
   return (
     <>
@@ -71,11 +74,10 @@ function SideBar() {
         <div className="btn-nav">
           <IconBuscar />
           <a>Buscar</a>
-        </div> */}
-
-
-        <div className="sidebar-header">Sistema</div>
-        <div className="btn-nav">
+        </div>
+        <div className="sidebar-header">Configuração</div>
+          <div className="btn-nav" onClick={() => setConfigOpen(true)} role="button" tabIndex={0}>
+        
           <IconConfiguracoes />
           <a>Configurações</a>
         </div>
