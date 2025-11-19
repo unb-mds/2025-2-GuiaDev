@@ -4,22 +4,23 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Sobre — GuiaDev</title>
-  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+    
   <header class="site-header">
     <div class="container header-inner">
-      <img src="../assets/images/logo.svg" alt="GuiaDev" height="40" />
+      <img  alt="GuiaDev" height="40" />
       <span class="brand-text">GuiaDev</span>
       <nav id="site-nav" class="site-nav">
         <ul>
           <li><a href="index.html">Home</a></li>
-          <li><a href="diagrama-c4.html">Diagrama C4 (PDF)</a></li>
-          <li><a href="milestones.html">Milestones</a></li>
+          <li><a href="diagrama-c4.html" rel="noopener">Diagrama C4 (PDF)</a></li>
+          <li><a href="" class="indisponivel">Milestones</a></li>
           <li><a href="sobre.html">Sobre</a></li>
           <li><a href="como-contribuir.html">Como contribuir</a></li>
           <li><a href="guias.html">Docs</a></li>
-          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="" class="indisponivel">Roadmap</a></li>
         </ul>
       </nav>
     </div>
@@ -50,23 +51,15 @@
       <p class="copyright">© 2025 GuiaDev — Licença: MIT</p>
     </div>
   </footer>
-
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    (function(){
-      const mdPath = '../README.md';
-      const container = document.getElementById('md-content');
-      if(!container) return;
-      fetch(mdPath).then(res => {
-        if(!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      }).then(md => {
-        container.innerHTML = marked.parse(md);
-      }).catch(err => {
-        console.error('Erro ao carregar', mdPath, err);
-        container.innerHTML = '<p>Não foi possível carregar o conteúdo. Verifique se está servindo via HTTP (ex.: <code>python -m http.server 5500</code>).</p>';
-      });
-    })();
+    const mdURL = 'https://raw.githubusercontent.com/unb-mds/2025-2-GuiaDev/main/README.md';
+    fetch(mdURL).then(r => r.text()).then(md => {
+      document.getElementById('md-content').innerHTML = marked.parse(md);
+    }).catch(err => {
+      document.getElementById('md-content').textContent = 'Erro ao carregar o README.';
+      console.error(err);
+    });
   </script>
 </body>
 </html>
