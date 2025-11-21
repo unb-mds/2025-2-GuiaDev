@@ -7,8 +7,8 @@ import { PrismaService } from '../../database/prisma.service';
 import { authModule } from 'src/modules/auth/auth.module';
 
 @Module({
-  imports: [HttpModule, authModule, DocsAnalyzerService],
-  providers: [GithubService, PrismaService],
+  imports: [HttpModule, authModule],
+  providers: [GithubService, PrismaService, DocsAnalyzerService],
   controllers: [GithubController],
   exports: [GithubService],
 })

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Projetos — GuiaDev</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Projetos</h1>
+    <div id="md-content" class="markdown-body">Carregando...</div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const mdURL = 'https://raw.githubusercontent.com/unb-mds/2025-2-GuiaDev/main/projetos.html';
+    fetch(mdURL).then(r => r.text()).then(md => {
+      document.getElementById('md-content').innerHTML = marked.parse(md);
+    }).catch(err => {
+      document.getElementById('md-content').textContent = 'Erro ao carregar projetos.';
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
