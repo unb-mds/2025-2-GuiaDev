@@ -1,7 +1,7 @@
 import { UseGuards, Req, Body, Controller, Get, Param, Post, Logger, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
-import { PrismaService } from 'src/database/prisma.service';  
+import { PrismaService } from 'src/database/prisma.service';
 import { Request } from 'express';
 import { DocsAnalyzerService } from './docs-analyzer/docs-analyzer.service';
 
@@ -18,10 +18,24 @@ export class GithubController {
     constructor(private readonly githubService: GithubService, private readonly prisma: PrismaService, private readonly docsAnalyzeService: DocsAnalyzerService) {}
 
     
-    
     @Get('commits/:owner/:repo')
     async getCommits(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getCommits(owner,repo);
+    }
+
+    @Get('branches/:owner/:repo')
+    async getBranches(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getBranches(owner, repo);
+    }
+
+    @Get('pulls/:owner/:repo')
+    async getPullRequests(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getPullRequests(owner, repo);
+    }
+
+    @Get('contributors/:owner/:repo')
+    async getContributors(@Param('owner') owner: string, @Param('repo') repo: string) {
+        return this.githubService.getContributors(owner, repo);
     }
 
     @Get('issues/:owner/:repo')
@@ -94,7 +108,7 @@ export class GithubController {
     async analyzeUserReposByUsername(@Param('username') username: string) {
         try {
             this.logger.log(`Iniciando análise para o usuário: ${username}`);
-            const analysisResults = await this.githubService.analyzeUserRepos(username);
+            const analysisResults = await this.githubService.analyzeUserRepos(username, false);
             this.logger.log(`Análise concluída para: ${username}`);
             return analysisResults;
         } catch (error: any) {
@@ -116,7 +130,6 @@ export class GithubController {
 
     @Get('analyze/:owner/:repo')
     async analyzeRepoDocs(@Param('owner') owner: string, @Param('repo') repo: string) {
-        // Gather docs que o serviço pode buscar
         const [readme, contributing, changelog, conduct, license, docsContent] = await Promise.all([
             this.githubService.getReadme(owner, repo).catch(() => ({ name: 'README.md', content: null })),
             this.githubService.getContributing(owner, repo).catch(() => ({ content: null })),
@@ -126,7 +139,6 @@ export class GithubController {
             this.githubService.getDocsContent(owner, repo).catch(() => []),
         ]);
 
-        // constrói o array de documentos
         const docs: { name: string; content: string | null }[] = [];
         docs.push({ name: readme?.name || 'README.md', content: readme?.content ?? null });
         docs.push({ name: 'CONTRIBUTING.md', content: contributing?.content ?? null });
@@ -134,7 +146,6 @@ export class GithubController {
         docs.push({ name: 'CODE_OF_CONDUCT.md', content: conduct?.content ?? null });
         docs.push({ name: 'LICENSE', content: license?.name ?? null });
 
-        // adiciona arquivos da pasta docs/
         if (Array.isArray(docsContent)) {
             for (const d of docsContent) {
                 docs.push({ name: d.name, content: d.content ?? null });
@@ -154,41 +165,42 @@ export class GithubController {
     @UseGuards(JwtAuthGuard) 
     async analyzeUserRepos(@Req() req: RequestWithUser) {
     
-    const userId = req.user.userId;
-    const user = await this.prisma.user.findUnique({
-      where: { id: Number(userId) },
-    });
-    if (!user || !(user.usernameGit)) {
-      throw new NotFoundException(
-        'Usuário não encontrado ou username do GitHub não configurado no perfil.',
-      );
-    }
-    const usernameToAnalyze = user.usernameGit;
+        const userId = req.user.userId;
+        const user = await this.prisma.user.findUnique({
+            where: { id: Number(userId) },
+        });
+        if (!user || !(user.usernameGit)) {
+            throw new NotFoundException(
+                'Usuário não encontrado ou username do GitHub não configurado no perfil.',
+            );
+        }
+        const usernameToAnalyze = user.usernameGit;
 
-    try {
-      const analysisResults = await this.githubService.analyzeUserRepos(
-        usernameToAnalyze,
-      );
-      
-      return {
-        message: `Análise de ${usernameToAnalyze} concluída.`,
-        count: analysisResults.length,
-        data: analysisResults,
-      };
+        try {
+            const analysisResults = await this.githubService.analyzeUserRepos(
+                usernameToAnalyze,
+                true 
+            );
+            
+            return {
+                message: `Análise de ${usernameToAnalyze} concluída.`,
+                count: analysisResults.length,
+                data: analysisResults,
+            };
 
-    } catch (error: any) {
+        } catch (error: any) {
 
-      if (error?.original?.response?.status === 404) {
-          throw new HttpException(
-          `Usuário do GitHub "${usernameToAnalyze}" não foi encontrado.`,
-          HttpStatus.NOT_FOUND,
-          );
-      }
-      
-      throw new HttpException(
-          'Falha ao buscar dados do GitHub.',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+            if (error?.original?.response?.status === 404) {
+                throw new HttpException(
+                `Usuário do GitHub "${usernameToAnalyze}" não foi encontrado.`,
+                HttpStatus.NOT_FOUND,
+                );
+            }
+            
+            throw new HttpException(
+                'Falha ao buscar dados do GitHub.',
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
     }
 }

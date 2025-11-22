@@ -7,7 +7,6 @@ import { PrismaService } from '../../database/prisma.service';
 import { GithubCache, GithubRepoData } from '@prisma/client'; 
 import { randomUUID } from 'crypto'; 
 
-
 @Injectable()
 export class GithubService {
   private readonly logger = new Logger(GithubService.name);
@@ -62,8 +61,10 @@ export class GithubService {
     });
 
     if (cachedEntry && cachedEntry.etag) {
-      finalHeaders['If-None-Match'] = cachedEntry.etag;
-      this.logger.debug(`[Cache DB] Usando ETag: ${cachedEntry.etag} para ${url}`);
+      if (!finalHeaders['If-None-Match']) {
+          finalHeaders['If-None-Match'] = cachedEntry.etag;
+          this.logger.debug(`[Cache DB] Usando ETag: ${cachedEntry.etag} para ${url}`);
+      }
     }
 
     try {
@@ -141,13 +142,42 @@ export class GithubService {
       try { const res = await this.httpGet(url); const data = res.data || []; all.push(...data); if (data.length < per_page) break; page += 1; }
       catch (err: any) { if (err.status === 404) return []; this.logger.warn(`getUserRepos error for ${username}: ${err.message}`); throw err.original || err; }
     }
-    return all.map(repo => ({ name: repo.name, owner: { login: repo.owner?.login }, url: repo.html_url, private: !!repo.private, default_branch: repo.default_branch || 'main' }));
+    // Aqui extraímos os TOTAIS que o GitHub já fornece
+    return all.map(repo => ({ 
+      name: repo.name, 
+      owner: { login: repo.owner?.login }, 
+      url: repo.html_url, 
+      private: !!repo.private, 
+      default_branch: repo.default_branch || 'main',
+      stargazers_count: repo.stargazers_count, // Total exato
+      watchers_count: repo.watchers_count,     // Total exato
+      open_issues_count: repo.open_issues_count, // Total exato (Inclui Issues + PRs abertos)
+      forks_count: repo.forks_count            // Total exato
+    }));
   }
 
   async getCommits(owner: string, repo: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=100`;
     try { const res = await this.httpGet(url); return (res.data || []).map((c: any) => c.commit?.message).filter(Boolean); }
     catch (err: any) { if (err.status !== 404) this.logger.warn(`getCommits ${owner}/${repo}: ${err.message}`); return []; }
+  }
+
+  async getBranches(owner: string, repo: string) {
+    const url = `https://api.github.com/repos/${owner}/${repo}/branches?per_page=100`;
+    try { const res = await this.httpGet(url); return (res.data || []).map((b: any) => b.name).filter(Boolean); }
+    catch (err: any) { if (err.status !== 404) this.logger.warn(`getBranches ${owner}/${repo}: ${err.message}`); return []; }
+  }
+
+  async getPullRequests(owner: string, repo: string) {
+    const url = `https://api.github.com/repos/${owner}/${repo}/pulls?state=all&per_page=100`;
+    try { const res = await this.httpGet(url); return (res.data || []).map((pr: any) => ({ number: pr.number, title: pr.title, state: pr.state, user: pr.user?.login })); }
+    catch (err: any) { if (err.status !== 404) this.logger.warn(`getPullRequests ${owner}/${repo}: ${err.message}`); return []; }
+  }
+
+  async getContributors(owner: string, repo: string) {
+    const url = `https://api.github.com/repos/${owner}/${repo}/contributors?per_page=100`;
+    try { const res = await this.httpGet(url); return (res.data || []).map((c: any) => ({ login: c.login, contributions: c.contributions })); }
+    catch (err: any) { if (err.status !== 404) this.logger.warn(`getContributors ${owner}/${repo}: ${err.message}`); return []; }
   }
 
   async getIssues(owner: string, repo: string) {
@@ -294,10 +324,6 @@ export class GithubService {
 
   formatRepoData(reposData: any[]) {
     return reposData.map((repo, index) => {
-      const folderChecks = repo.checkFolders || [];
-      const findCheck = (pathStr: string) =>
-        folderChecks.find((f: any) => f.path.toLowerCase() === pathStr.toLowerCase())?.exists || false;
-
       const allDocs = repo.docsContent || [];
       const findDocContent = (basename: string) => {
         const lowerBasename = basename.toLowerCase();
@@ -311,40 +337,26 @@ export class GithubService {
       };
 
       const apiLicenseValid = repo.license?.key && repo.license.key !== 'unlicensed';
-      const fileLicenseExists = findCheck('license_file_check');
-      const possuiLicense = apiLicenseValid || fileLicenseExists;
-
-      const possuiGitignore = !!repo.gitignore?.content || findCheck('.gitignore');
-      const possuiConductCode = !!findDocContent('code_of_conduct.md');
-      const possuiChangelog = !!findDocContent('changelog.md');
-      const possuiReadme = !!findDocContent('readme.md');
-      const possuiGovernance = !!findDocContent('governance.md');
-      const possuiArquitetura =
-        !!findDocContent('arquitetura.md') || !!findDocContent('architecture.md');
-      const possuiRoadmap = !!findDocContent('roadmap.md');
 
       return {
-        id: index + 1,
+        id: index + 1, 
         nomeRepositorio: repo.repo,
+        
         commits: Array.isArray(repo.commits) ? repo.commits.length : 0,
-        ultimosCommits: Array.isArray(repo.commits)
-          ? repo.commits.slice(0, 5)
-          : [],
-        possuiIssues: Array.isArray(repo.issues) && repo.issues.length > 0,
-        possuiReleases:
-          Array.isArray(repo.releases) && repo.releases.length > 0,
-        possuiReadme,
-        possuiLicense,
-        possuiGitignore,
-        possuiDocs: Array.isArray(allDocs) && allDocs.length > 0,
-        conduct: possuiConductCode,
-        changelog: possuiChangelog,
-        possuiSrc: findCheck('src'),
-        possuiPublic: findCheck('public'),
-        possuiGovernance,
-        possuiArquitetura,
-        possuiRoadmap,
-        possuiDocsFolder: findCheck('docs'),
+        branches_count: Array.isArray(repo.branches) ? repo.branches.length : 0,
+        prs_count: Array.isArray(repo.pullRequests) ? repo.pullRequests.length : 0,
+        contributors_count: Array.isArray(repo.contributors) ? repo.contributors.length : 0,
+        
+        stargazers_count: repo.stargazers_count || 0, 
+        watchers_count: repo.watchers_count || 0,     
+        open_issues_count: repo.open_issues_count || 0, 
+        forks_count: repo.forks_count || 0,           
+        
+        ultimosCommits: Array.isArray(repo.commits) ? repo.commits.slice(0, 5) : [],
+        branches: Array.isArray(repo.branches) ? repo.branches.slice(0, 5) : [],
+        pullRequests: Array.isArray(repo.pullRequests) ? repo.pullRequests.slice(0, 5) : [],
+        contributors: Array.isArray(repo.contributors) ? repo.contributors.slice(0, 5) : [],
+
         detalhes: {
           readme: findDocContent('readme.md'),
           changelog: findDocContent('changelog.md'),
@@ -362,7 +374,7 @@ export class GithubService {
     });
   }
 
-  async checkRepoChanged(owner: string, repo: string): Promise<{ changed: boolean, etag: string | null }> {
+  async checkRepoChanged(owner: string, repo: string, forceUpdate: boolean = false): Promise<{ changed: boolean, etag: string | null }> {
     const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
 
     const cached = await this.prisma.githubCache.findUnique({
@@ -370,7 +382,10 @@ export class GithubService {
     });
 
     const headers: Record<string, string> = this.defaultHeaders();
-    if (cached?.etag) headers['If-None-Match'] = cached.etag;
+    
+    if (!forceUpdate && cached?.etag) {
+        headers['If-None-Match'] = cached.etag;
+    }
 
     try {
       const res = await this.http.axiosRef.get(repoUrl, {
@@ -396,7 +411,7 @@ export class GithubService {
         create: { url: repoUrl, etag: newEtag, data: res.data },
       });
 
-      this.logger.debug(`[RepoCache] ${owner}/${repo} mudou. Novo ETag: ${newEtag}`);
+      this.logger.debug(`[RepoCache] ${owner}/${repo} mudou (ou forceUpdate). Novo ETag: ${newEtag}`);
       return { changed: true, etag: newEtag };
     } catch (err: any) {
       this.logger.warn(`[RepoCache] Falha ao verificar ${owner}/${repo}: ${err?.message || err}`);
@@ -410,12 +425,10 @@ export class GithubService {
     }
   }
   
-  private async _analyzeSingleRepo(repo: { owner: { login: string }, name: string, default_branch: string }): Promise<any> {
+  private async _analyzeSingleRepo(repo: { owner: { login: string }, name: string, default_branch: string, stargazers_count?: number, watchers_count?: number, open_issues_count?: number, forks_count?: number }, forceUpdate: boolean = false): Promise<any> {
     const owner = repo.owner.login;
     const name = repo.name; 
     const defaultBranch = repo.default_branch;
-
-    const { changed: repoChanged, etag: repoEtag } = await this.checkRepoChanged(owner, name);
 
     const cachedRepoData = await this.prisma.githubRepoData.findUnique({
       where: { 
@@ -426,12 +439,19 @@ export class GithubService {
       },
     });
 
+    if (cachedRepoData && !forceUpdate) {
+      this.logger.debug(`[Analyze] Cache HIT no DB (Lazy) para ${owner}/${name}. Retornando sem verificar GitHub.`);
+      return cachedRepoData.data;
+    }
+
+    const { changed: repoChanged, etag: repoEtag } = await this.checkRepoChanged(owner, name, forceUpdate);
+
     if (!repoChanged && cachedRepoData && cachedRepoData.etag === repoEtag) {
-      this.logger.debug(`[Analyze] Cache HIT para ${owner}/${name} na tabela 'GithubRepoData'.`);
+      this.logger.debug(`[Analyze] Cache HIT após verificação (304) para ${owner}/${name}.`);
       return cachedRepoData.data;
     }
     
-    this.logger.debug(`[Analyze] Cache MISS ou 'stale' para ${owner}/${name}. Re-analisando...`);
+    this.logger.debug(`[Analyze] Cache MISS, Stale ou ForceUpdate para ${owner}/${name}. Re-analisando...`);
 
     try {
       let patterns: string[] = ['/'];
@@ -454,8 +474,20 @@ export class GithubService {
         }
       } catch { }
 
-      const [commitsSettled, issuesSettled, releasesSettled, readmeSettled, changelogSettled, licenseSettled, contributingSettled, conductSettled, gitignoreSettled, docsListSettled] = await Promise.allSettled([
-        this.getCommits(owner, name), this.getIssues(owner, name), this.getReleases(owner, name), this.getReadme(owner, name), this.getChangelog(owner, name), this.getLicenses(owner, name), this.getContributing(owner, name), this.getConductCode(owner, name), this.getGitignore(owner, name), this.getDocs(owner, name)
+      const [commitsSettled, issuesSettled, releasesSettled, readmeSettled, changelogSettled, licenseSettled, contributingSettled, conductSettled, gitignoreSettled, docsListSettled, branchesSettled, prsSettled, contributorsSettled] = await Promise.allSettled([
+        this.getCommits(owner, name), 
+        this.getIssues(owner, name), 
+        this.getReleases(owner, name), 
+        this.getReadme(owner, name), 
+        this.getChangelog(owner, name), 
+        this.getLicenses(owner, name), 
+        this.getContributing(owner, name), 
+        this.getConductCode(owner, name), 
+        this.getGitignore(owner, name), 
+        this.getDocs(owner, name),
+        this.getBranches(owner, name),
+        this.getPullRequests(owner, name),
+        this.getContributors(owner, name)
       ]);
       
       const { patternResults, resultsByPath, summary } = await this.fetchChecklistMdFiles(owner, name, patterns, defaultBranch);
@@ -465,6 +497,14 @@ export class GithubService {
       const analysisResult = {
         owner: owner,
         repo: name, 
+        stargazers_count: repo.stargazers_count,
+        watchers_count: repo.watchers_count,
+        open_issues_count: repo.open_issues_count, 
+        forks_count: repo.forks_count, 
+        branches: branchesSettled.status === 'fulfilled' ? branchesSettled.value : [],
+        pullRequests: prsSettled.status === 'fulfilled' ? prsSettled.value : [],
+        contributors: contributorsSettled.status === 'fulfilled' ? contributorsSettled.value : [],
+        
         commits: commitsSettled.status === 'fulfilled' ? commitsSettled.value : [], 
         issues: issuesSettled.status === 'fulfilled' ? issuesSettled.value : [], 
         releases: releasesSettled.status === 'fulfilled' ? releasesSettled.value : [], 
@@ -517,21 +557,24 @@ export class GithubService {
     }
   }
 
-  async analyzeUserRepos(username: string) {
+  async analyzeUserRepos(username: string, forceUpdate: boolean = false) {
     let repos = await this.getUserRepos(username);
     repos = repos.slice(0, 45); 
 
-    this.logger.debug(`[Analyze] Iniciando análise paralela para ${repos.length} repositórios com concorrência ${this.CONCURRENCY}...`);
+    this.logger.debug(`[Analyze] Iniciando análise paralela para ${repos.length} repositórios (ForceUpdate: ${forceUpdate})...`);
 
     const allResults = await this.mapWithConcurrency(
       repos,
       this.CONCURRENCY,
-      (repo) => this._analyzeSingleRepo(repo)
+      (repo) => this._analyzeSingleRepo(repo, forceUpdate)
     );
 
     this.logger.debug(`[Analyze] Análise paralela concluída. ${allResults.length} resultados.`);
 
-    return allResults.filter(Boolean);
+    return allResults.filter(Boolean).map((repo: any, index: number) => ({
+        ...repo,
+        id: index + 1
+    }));
   }
 
   async getAllCache() {
