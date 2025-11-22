@@ -571,7 +571,6 @@ export class GithubService {
 
     this.logger.debug(`[Analyze] Análise paralela concluída. ${allResults.length} resultados.`);
 
-    // CORREÇÃO DOS IDs: Mapeia novamente para garantir sequência 1, 2, 3...
     return allResults.filter(Boolean).map((repo: any, index: number) => ({
         ...repo,
         id: index + 1
