@@ -163,18 +163,29 @@ export class GithubController {
 
     @Post('analyze') 
     @UseGuards(JwtAuthGuard) 
-    async analyzeUserRepos(@Req() req: RequestWithUser) {
+    async analyzeUserRepos(
+        @Req() req: RequestWithUser,
+        @Body() body: { username?: string } 
+    ) {
     
-        const userId = req.user.userId;
-        const user = await this.prisma.user.findUnique({
-            where: { id: Number(userId) },
-        });
-        if (!user || !(user.usernameGit)) {
+        let usernameToAnalyze = body.username;
+
+        if (!usernameToAnalyze) {
+            const userId = req.user.userId;
+            const user = await this.prisma.user.findUnique({
+                where: { id: Number(userId) },
+            });
+            
+            if (user?.usernameGit) {
+                usernameToAnalyze = user.usernameGit;
+            }
+        }
+
+        if (!usernameToAnalyze) {
             throw new NotFoundException(
-                'Usuário não encontrado ou username do GitHub não configurado no perfil.',
+                'Username do GitHub não fornecido e não configurado no perfil.',
             );
         }
-        const usernameToAnalyze = user.usernameGit;
 
         try {
             const analysisResults = await this.githubService.analyzeUserRepos(
