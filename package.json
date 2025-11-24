@@ -2,9 +2,11 @@
   "dependencies": {
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
+    "@nestjs/swagger": "^11.2.2",
     "axios": "^1.12.2",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "swagger-ui-express": "^5.0.1"
   }
 }

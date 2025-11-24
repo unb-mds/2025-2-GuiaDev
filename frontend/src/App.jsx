@@ -1,3 +1,4 @@
+import React from 'react';
 import { Outlet, useLocation } from "react-router-dom"; // 1. Importe o Outlet!
 import Header from "./components/Header/Header.jsx";
 import SideBar from "./components/Sidebar/Sidebar.jsx";
@@ -17,20 +18,20 @@ function App() {
 
         <div className="Main">
 
-        {showSideBar && (
-          <div className="sideBar">
-            <SideBar />
-          </div>
-        )}
+          {showSideBar && (
+            <div className="sideBar">
+              <SideBar />
+            </div>
+          )}
 
           {/* <div className="sideBar">{showSideBar && <SideBar />}</div> */}
 
 
           <div className="content">
 
-            
-              <Outlet />
-            
+
+            <Outlet />
+
           </div>
 
         </div>

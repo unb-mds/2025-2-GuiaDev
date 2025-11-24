@@ -1,5 +1,5 @@
 
-
+import React from 'react';
 import "./Login.css";
 import Footer from "../../components/Footer/Footer";
 
@@ -7,7 +7,7 @@ import Footer from "../../components/Footer/Footer";
 import Sign_in from "../../components/Sign-in/Sign-in";
 
 export default function Login() {
-  
+
 
   return (
     <div className="login-page">
@@ -34,11 +34,11 @@ export default function Login() {
           </ul>
         </div>
 
-        <div className="content-right">      
-          <Sign_in/>
+        <div className="content-right">
+          <Sign_in />
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }
