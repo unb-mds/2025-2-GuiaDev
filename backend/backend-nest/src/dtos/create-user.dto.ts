@@ -1,5 +1,6 @@
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {IsEmail, IsNotEmpty, IsOptional, IsStrongPassword, Length} from 'class-validator'
+
 
 export class CreateUserBody {
     @ApiProperty({
@@ -39,4 +40,7 @@ export class CreateUserBody {
     })
     // @IsStrongPassword()
     password: string;
+
+    @IsOptional()
+    usernameGit?:string;
 }

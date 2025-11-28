@@ -4,6 +4,7 @@ import { authService } from "./auth.service";
 import { LoginDto } from '../../dtos/login.dto';
 import { AuthGuard } from "@nestjs/passport";
 import type { Response } from 'express';
+import { PrismaService } from 'src/database/prisma.service';
 import { checkTokenDto } from "src/dtos/check-token.dto";
 
 import {
@@ -17,7 +18,7 @@ import {
 @ApiTags("Auth")
 @Controller("auth")
 export class authController {
-    constructor(private readonly authService: authService) { }
+    constructor(private readonly authService: authService, private readonly prisma: PrismaService) { }
 
     @Post('register')
     @ApiOperation({
@@ -112,8 +113,18 @@ export class authController {
         status: 401,
         description: 'Token ausente ou inválido.',
     })
-    getProfile(@Request() req) {
-        return { message: "Rota protegida acessada!", user: req.user };
+    async getProfile(@Request() req) {
+        
+        const userId = req.user?.sub ?? req.user?.id ?? req.user?.userId;
+        if (!userId) {
+            return { message: "Token válido, mas id do usuário não encontrado no payload", user: req.user };
+        }
+
+        const user = await this.prisma.user.findUnique({ where: { id: Number(userId) } });
+        if (!user) return { message: 'Usuário não encontrado' };
+
+        const { password, ...safe } = user;
+        return { message: "Rota protegida acessada!", user: safe };
     }
 
 

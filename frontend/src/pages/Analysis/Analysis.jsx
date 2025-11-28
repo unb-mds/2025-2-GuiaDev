@@ -1,5 +1,5 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
-
+import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
+import api from "../../../services/api";
 import "./Analysis.css";
 import Overview from "../../components/Overview/Overview";
 import MetricsRepo from "../../components/Overview/MetricsRepo";
@@ -9,11 +9,12 @@ import { useParams, useLocation } from 'react-router-dom';
 
 const AnalysisPage = () => {
 
-  const params = useParams();        // { owner, repo }
-  const location = useLocation();    // location.state?.repo (objeto passado)
+  const params = useParams();        
+  const location = useLocation();    
 
   const owner = params.owner;
-  const repoObj = location.state?.repo || null;
+  const repo = params.repo || location.state?.repo?.nomeRepositorio;
+  const [repoObjt, setRepoObjt] = useState(null);
 
   const [selected, setSelected] = useState("general");
   const containerRef = useRef(null);
@@ -46,6 +47,26 @@ const AnalysisPage = () => {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, [selected]);
+
+
+useEffect(() => {
+  let alive = true;
+  const fetchAnalysis = async () => {
+    if (!owner || !repo) return;
+    try {
+      const res = await api.get(`github/analyze/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
+      if (!alive) return;
+      setRepoObjt(res?.data ?? null);
+    } catch (err) {
+      console.error('Erro ao buscar análise do repositório:', err);
+      if (alive) setRepoObjt(null);
+    }
+  };
+
+  fetchAnalysis();
+
+  return () => { alive = false; };
+}, [owner, repo]);
 
   return (
     <div className="page">
@@ -86,18 +107,18 @@ const AnalysisPage = () => {
           <div className="firstSection">
             {/* <BoxComponent/> */}
             <span>
-              <Overview />
+              <Overview repoObj={repoObjt}/>
             </span>
           </div>
           <div className="secondSection">
-            <MetricsRepo />
+            <MetricsRepo repoObj={repoObjt}/>
           </div>
           <div className="thirdSection">
-            <Summary />
+            <Summary repoObj={repoObjt}/>
           </div>
         </div>
       ) : (
-        <Details owner={owner} repo={repoObj}/>
+        <Details repoObj={repoObjt}/>
       )}
     </div>
   );

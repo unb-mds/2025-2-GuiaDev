@@ -12,7 +12,7 @@ export class authService {
     ) { }
 
     async register(body: CreateUserBody) {
-        const { email, name, lastName, password } = body;
+        const { email, name, lastName, password, usernameGit } = body;
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -22,6 +22,7 @@ export class authService {
                 lastName,
                 email,
                 password: hashedPassword,
+                usernameGit,
             },
         });
 

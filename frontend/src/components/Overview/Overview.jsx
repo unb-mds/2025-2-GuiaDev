@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "./Overview.css";
-import branchIcon from "../../assets/branch.svg"
+import commitIcon from "../../assets/commit.svg"
 import userIcon from "../../assets/users.svg"
 import docs from "../../assets/docs.svg"
+import { useParams, useLocation } from 'react-router-dom';
+import ProgressBar from "../Shared/ProgressBar";
 
 const BoxRepoInfo = ({
   name,
-  progress,
-  branch,
-  contributors,
-  qtsArchive,
-  status,
-  languages,
+  progress = 0,
+  commits,
+  contributors = 0,
+  qtsArchive = 0,
+  status = "Desconectado",
+  languages = "-",
 }) => {
   // barra de progresso
   const pct =
@@ -41,74 +43,73 @@ const BoxRepoInfo = ({
         </div>
       </div>
 
-      <div className="progress">
-        <div className="progress-label">
-          <span>Progresso geral:</span> <span>{pctClamped}%</span>
-        </div>
-
-        <div
-          className="progress-bar"
-          role="progressbar"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow={pctClamped}
-        >
-          <div className="progress-fill" style={{ width: `${pctClamped}%` }} />
-        </div>
-      </div>
+          <ProgressBar value={progress} label="Progresso geral" />
 
       <div className="repoInfoBottom">
               <span>
-            <img src={branchIcon}/>{branch} Branches
+            <img src={commitIcon}/>{commits} Commits
 </span>
 <span>
             <img src={userIcon}/>{contributors} Contribuidores </span>
-<span>
 
-            <img src={docs}/>{qtsArchive} Arquivos totais
-</span>
        
       </div>
     </div>
   );
 };
 
-function Overview() {
-  // projectId pode vir de props/rota; mantive como 'demo' enquanto integra
-  const projectId = "demo";
-  const repos = [];
-  const loading = false;
-  const error = null;
+function Overview({repoObj}) {
 
-  const [repoInfo, setRepoInfo] = useState([]);
+  const params = useParams();
+  const location = useLocation();
 
-  useEffect(() => {
-    // dados de fallback (simulação) para desenvolvimento offline
-    const apiFake = [
-      {
-        id: "1",
-        name: "Repo-a",
-        progress: "85%",
-        branch: "3",
-        contributors: "5",
-        qtsArchive: "15",
-        status: "Ativo",
-        languages: " React e Type",
-      },
-    ];
-    // se o backend estiver carregando ou falhar, use o mock para manter a UI visível
-    if (loading || error || !repos || repos.length === 0) {
-      setRepoInfo(apiFake);
-    } else {
-      setRepoInfo(repos);
-    }
-  }, [loading, error, repos]);
+  const URLname = params.repo || location.state?.repo?.nomeRepositorio || 'Repositório';
+
+ 
+  const docs = Array.isArray(repoObj)
+    ? repoObj
+    : Array.isArray(repoObj?.detalhes?.docs)
+    ? repoObj.detalhes.docs
+    : Array.isArray(repoObj?.docs)
+    ? repoObj.docs   : [];
+
+  const totalDocs = docs.length;
+  const existsCount = docs.filter((d) => d.exists === true).length;
+  const sumScore = docs.reduce((s, d) => s + (Number(d.score) || 0), 0);
+  const avgScore = totalDocs > 0 ? Math.round(sumScore / totalDocs) : 0;
+
+  const tryFromRepoObj = typeof repoObj === 'object' && repoObj !== null
+    ? (Number(repoObj.commits ?? (Array.isArray(repoObj.ultimosCommits) ? repoObj.ultimosCommits.length : undefined)) || 0)
+    : 0;
+  const tryFromLocation = location.state?.repo && typeof location.state.repo === 'object'
+    ? (Number(location.state.repo.commits ?? (Array.isArray(location.state.repo.ultimosCommits) ? location.state.repo.ultimosCommits.length : undefined)) || 0)
+    : 0;
+
+  const commitCount = tryFromRepoObj || tryFromLocation || 0;
+
+  const aggregate = {
+    id: URLname,
+    name: URLname,
+    progress: avgScore, 
+    commits: commitCount, 
+    contributors: '-', 
+    qtsArchive: totalDocs,
+    status: existsCount > 0 ? 'Ativo' : 'Desconectado',
+    languages: '-',
+  };
 
   return (
     <div className="allComponent">
-      {repoInfo.map((repo) => (
-        <BoxRepoInfo key={repo.id} {...repo} />
-      ))}
+      <BoxRepoInfo
+        key={aggregate.id}
+        name={aggregate.name}
+        progress={aggregate.progress}
+        commits={aggregate.commits}
+        contributors={aggregate.contributors}
+        qtsArchive={aggregate.qtsArchive}
+        status={aggregate.status}
+        languages={aggregate.languages}
+      />
     </div>
   );
 }
