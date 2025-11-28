@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Docs Check-list — GuiaDev</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <img src="../assets/images/logo.svg" alt="GuiaDev" height="40" />
+      <span class="brand-text">GuiaDev</span>
+      <nav id="site-nav" class="site-nav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="diagrama-c4.html" rel="noopener">Diagrama C4 (PDF)</a></li>
+          <li><a href="" class="indisponivel">Milestones</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="como-contribuir.html">Como contribuir</a></li>
+          <li><a href="guias.html">Docs</a></li>
+          <li><a href="" class="indisponivel">Roadmap</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="hero">
+      <h1>Doc Check-list</h1>
+      <p class="lede">Checklist de documentação do projeto. Consulte o arquivo fonte ou renderize o Markdown nesta página para leitura mais agradável.</p>
+    </section>
+
+    <section class="container--narrow">
+      <h2>Visão rápida</h2>
+      <p>Este documento lista os arquivos e recomendações de documentação (README, LICENSE, CONTRIBUTING, etc.).</p>
+      <p>Versão renderizada do checklist disponível abaixo nesta página.</p>
+      <p>Conteúdo renderizado do Markdown:</p>
+      <div id="md-content" class="markdown-body">
+        <p>Carregando conteúdo...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav>
+        <ul>
+          <li><a href="changelog.html">Changelog</a></li>
+          <li><a href="security.html">Security</a></li>
+          <li><a href="privacy.html">Privacidade</a></li>
+        </ul>
+      </nav>
+      <p class="copyright">© 2025 GuiaDev — Licença: MIT</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const mdURL = 'https://raw.githubusercontent.com/unb-mds/2025-2-GuiaDev/main/docs/docsCheck-list.md';
+    fetch(mdURL).then(r => r.text()).then(md => {
+      document.getElementById('md-content').innerHTML = marked.parse(md);
+    }).catch(err => {
+      document.getElementById('md-content').textContent = 'Erro ao carregar o documento.';
+      console.error(err);
+    });
+  </script>
+</body>
+</html>

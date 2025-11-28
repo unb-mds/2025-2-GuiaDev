@@ -34,8 +34,6 @@ body {
     margin: 0 auto;
     padding: 0.5rem;
     width: 100%;
-    /* background-color: red; */
-    
 }
 
 a {
@@ -110,11 +108,20 @@ a:hover {
 }
 
 
+.site-nav a.indisponivel {
+    color: #e11d48;
+}
+
+.site-nav a.indisponivel:hover,
+.site-nav a.indisponivel:focus {
+    color: #e11d48;
+    background: transparent;
+}
+
 
 .hero {
     padding: 3rem 0;
     border-bottom: 6px solid white;
-    
 }
 
 .hero h1 {
@@ -136,7 +143,6 @@ a:hover {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
     padding: 1.5rem 0;
-    
 }
 
 .features article {
@@ -160,7 +166,6 @@ a:hover {
 }
 
 .footer{
-    
     width: 100%;
     display: grid;
     justify-items: center;
@@ -175,6 +180,10 @@ a:hover {
     display: flex;
     gap: .75rem;
     flex-wrap: wrap
+}
+
+.indisponivel{
+    color: #e11d48;
 }
 
 .site-footer nav a {
@@ -242,18 +251,13 @@ a:hover {
     background: rgba(255,255,255,0.02);
 }
 
-.guides-table td a {
+/* Status cells for the guides table */
+.guides-table td.available {
     color: var(--accent);
 }
-
-.guides-table td.status.available {
-    color: var(--accent);
-}
-
-.guides-table td.status.error {
+.guides-table td.error {
     color: #e11d48;
 }
-
 
 
 .markdown-body img {
@@ -266,8 +270,4 @@ a:hover {
     border-radius: 6px;
     box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset;
 }
-
-
-
-
 

@@ -25,7 +25,7 @@ function Register({ onSwitchToLogin }) {
 
       console.log("Usuário criado:", response.data);
       alert("Cadastro realizado com sucesso! Agora você pode fazer login.");
-      
+
       // Volta para o login após cadastro bem-sucedido
       onSwitchToLogin();
     } catch (err) {
@@ -43,32 +43,36 @@ function Register({ onSwitchToLogin }) {
       <p className="subtitle">Junte-se à comunidade de desenvolvedores</p>
 
       <form onSubmit={handleSubmit}>
-        <label>Nome</label>
+        <label htmlFor="name-input">Nome</label>
         <input
+          id="name-input"
           type="text"
           placeholder="Seu nome"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <label>Sobrenome</label>
+        <label htmlFor="sobrenome-input">Sobrenome</label>
         <input
+          id="sobrenome-input"
           type="text"
           placeholder="Seu sobrenome"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           required
         />
-        <label>E-mail</label>
+        <label htmlFor="email-input">E-mail</label>
         <input
+          id="email-input"
           type="email"
           placeholder="seu@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <label>Senha</label>
+        <label htmlFor="senha-input">Senha</label>
         <input
+          id="senha-input"
           type="password"
           placeholder="**********"
           value={senha}
@@ -76,12 +80,12 @@ function Register({ onSwitchToLogin }) {
           required
         />
         <hr className="register-divider"></hr>
-        
+
         <button type="submit" className="btn-cadastrar">
           Criar Conta
         </button>
       </form>
-      </div>
+    </div>
   );
 }
 
