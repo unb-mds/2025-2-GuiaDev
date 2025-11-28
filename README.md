@@ -271,7 +271,7 @@ Após a inicialização:
     <td align="center">
       <a href="https://github.com/filipeBG-07">
         <img src="https://avatars.githubusercontent.com/u/174053010?s=150" width="100px;" alt="Filipe"/><br>
-        <sub><b>Filipe Gonzaga</b></sub>
+        <sub><b>Filipe Brito</b></sub>
       </a><br>
       <sub>Desenvolvedor</sub>
     </td>
