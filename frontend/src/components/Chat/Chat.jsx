@@ -18,7 +18,7 @@ export default function Chat() {
 
         const userText = input.trim();
 
-        setMessagens((prev) => [...prev, { text: input, sender: 'bot' }]);
+        // setMessagens((prev) => [...prev, { text: input, sender: 'bot' }]);
         setInput('');
         setMessagens((prev) => [...prev, { text: userText, sender: 'user' }]);
 

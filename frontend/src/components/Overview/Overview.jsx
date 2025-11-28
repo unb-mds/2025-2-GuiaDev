@@ -4,6 +4,7 @@ import commitIcon from "../../assets/commit.svg"
 import userIcon from "../../assets/users.svg"
 import docs from "../../assets/docs.svg"
 import { useParams, useLocation } from 'react-router-dom';
+import ProgressBar from "../Shared/ProgressBar";
 
 const BoxRepoInfo = ({
   name,
@@ -42,21 +43,7 @@ const BoxRepoInfo = ({
         </div>
       </div>
 
-      <div className="progress">
-        <div className="progress-label">
-          <span>Progresso geral:</span> <span>{pctClamped}%</span>
-        </div>
-
-        <div
-          className="progress-bar"
-          role="progressbar"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow={pctClamped}
-        >
-          <div className="progress-fill" style={{ width: `${pctClamped}%` }} />
-        </div>
-      </div>
+          <ProgressBar value={progress} label="Progresso geral" />
 
       <div className="repoInfoBottom">
               <span>

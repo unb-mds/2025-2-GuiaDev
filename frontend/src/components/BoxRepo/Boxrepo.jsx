@@ -4,12 +4,18 @@ import api from "../../../services/api";
 import ReposContext from "../../contexts/ReposContext";
 import { useNavigate } from "react-router-dom";
 
+import { IconRepositorios } from "../Sidebar/Sidebar";
+import commitIcon from "../../assets/commit.svg";
+import ProgressBar from "../Shared/ProgressBar";
 
-const BoxStat = ({ nome, num, comment }) => {
+const BoxStat = ({ icon, nome, num, comment }) => {
   return (
     <div className="box-item">
       <div className="name">
-        {nome} 
+        <div className="stat-icon">
+          {icon}
+        </div>
+        {nome}
       </div>
 
       <h2>{num}</h2>
@@ -20,17 +26,43 @@ const BoxStat = ({ nome, num, comment }) => {
 
 const BoxRepositorio = ({ repo, owner }) => {
   const navigate = useNavigate();
+ 
+  const docs = Array.isArray(repo)
+    ? repo
+    : Array.isArray(repo?.detalhes?.docs)
+      ? repo.detalhes.docs
+      : Array.isArray(repo?.docs)
+        ? repo.docs
+        : [];
+
+ 
+  const totalDocs = docs.length;
+  const sumScore = docs.reduce((s, d) => s + (Number(d.score) || 0), 0);
+  const avgScore = totalDocs > 0 ? Math.round(sumScore / totalDocs) : 0;
+ 
+  const progressValue = (repo && repo.score !== undefined && repo.score !== null)
+    ? Number(repo.score)
+    : -1;
   return (
     <div className="box-item-repo">
+
       <div>
         <h2>{repo.nomeRepositorio}</h2>
       </div>
+<div className="Boxrepo-bottomBox">
+      <div className="Boxrepo-barProgress">
+        <span>
+        <ProgressBar value={progressValue} />
+        </span>
+      </div>
+      
       <button
         className="btn-details"
         onClick={() => navigate(`/analysis/${encodeURIComponent(owner)}/${encodeURIComponent(repo.nomeRepositorio)}`, { state: { repo } })}
       >
         Ver detalhes
       </button>
+      </div>
     </div>
   );
 };
@@ -38,7 +70,7 @@ const BoxRepositorio = ({ repo, owner }) => {
 
 
 function BoxRepo({ owner }) {
-  // 1. DOIS ESTADOS SEPARADOS: um para cada tipo de dado
+ 
   const [stats, setStats] = useState([]);
   const [repos, setRepos] = useState([]);
 
@@ -55,62 +87,62 @@ function BoxRepo({ owner }) {
     }
 
     const repoCount = repos.length;
- 
+
     const totalCommits = repos.reduce((sum, r) => {
       const n = Number(r?.commits ?? 0);
       return sum + (Number.isFinite(n) ? n : 0);
     }, 0);
 
     const statsArr = [
-      { id: 'repos', nome: 'Repositórios', num: repoCount, comment: 'Total de repositórios analisados' },
-      { id: 'commits', nome: 'Commits Total', num: totalCommits, comment: 'Total de commits em todos os repositórios' },
+      { id: 'repos', icon: <IconRepositorios className="repo-icon" />, nome: 'Repositórios', num: repoCount, comment: 'Total de repositórios analisados' },
+      { id: 'commits', icon: <img src={commitIcon} className="commit-icon" alt="Commits" />, nome: 'Commits Total', num: totalCommits, comment: 'Total de commits em todos os repositórios' },
       { id: 'placeholder', nome: 'Outro', num: 0, comment: 'Estatística adicional (a definir)' },
     ];
 
     setStats(statsArr);
   }, [repos]);
 
-useEffect(() => {
-  let alive = true;
-  if (!owner) return;
-  const cached = getReposForOwner ? getReposForOwner(owner) : null;
+  useEffect(() => {
+    let alive = true;
+    if (!owner) return;
+    const cached = getReposForOwner ? getReposForOwner(owner) : null;
 
-  setError(null);
-  setLoading(true);
+    setError(null);
+    setLoading(true);
 
-  if (cached) {
-    setRepos(Array.isArray(cached) ? cached : []);
-    setLoading(false);
-    return () => { alive = false; };
-  }
-
-  (async () => {
-    try {
-      const res = await api.get(`github/analyze/user/${encodeURIComponent(owner)}`);
-      if (!alive) return;
-      const data = res?.data ?? [];
-      setRepos(Array.isArray(data) ? data : []);
-      // store in context cache
-      if (setReposForOwner) setReposForOwner(owner, Array.isArray(data) ? data : []);
-    } catch (err) {
-      if (!alive) return;
-      setError("Erro ao pegar os repositórios");
-      console.error(err);
-    } finally {
-      if (alive) setLoading(false);
+    if (cached) {
+      setRepos(Array.isArray(cached) ? cached : []);
+      setLoading(false);
+      return () => { alive = false; };
     }
-  })();
 
-  return () => { alive = false; };
-}, [owner]);
-   
+    (async () => {
+      try {
+        const res = await api.get(`github/analyze/user/${encodeURIComponent(owner)}`);
+        if (!alive) return;
+        const data = res?.data ?? [];
+        setRepos(Array.isArray(data) ? data : []);
+        // store in context cache
+        if (setReposForOwner) setReposForOwner(owner, Array.isArray(data) ? data : []);
+      } catch (err) {
+        if (!alive) return;
+        setError("Erro ao pegar os repositórios");
+        console.error(err);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
 
-useEffect(() => {
-  console.log('repoObj (debug):', repos);
-}, [repos]);
+    return () => { alive = false; };
+  }, [owner]);
+
+
+  useEffect(() => {
+    console.log('repoObj (debug):', repos);
+  }, [repos]);
 
   return (
-    
+
     <div className="box-repo-container">
       {/* --- PRIMEIRA SEÇÃO: DASHBOARD/ESTATÍSTICAS --- */}
       <div>
@@ -162,7 +194,7 @@ useEffect(() => {
             ) : (
               // 4. RENDERIZAR USANDO O ESTADO 'repos'
               repos.map((repo) => (
-               <BoxRepositorio key={repo.id} repo={repo} owner={owner} />
+                <BoxRepositorio key={repo.id} repo={repo} owner={owner} />
               ))
             )}
           </div>

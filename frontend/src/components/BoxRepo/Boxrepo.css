@@ -48,6 +48,7 @@
 }
 
 .name {
+  display: flex;
   font-size: 18px;
 }
 
@@ -181,4 +182,28 @@
 .boxes-list-repo::-webkit-scrollbar-thumb {
   background: #0f53c2;
   border-radius: 10px;
+}
+
+.stat-icon{
+  display: flex;
+  align-items: center;
+  /* background-color: #0f53c2; */
+  width: 30px;
+}
+
+.repo-icon{
+  /* background-color: #777777; */
+  fill: #0d6efd;
+  width: 20px;
+}
+
+.Boxrepo-barProgress{
+
+}
+.Boxrepo-bottomBox{
+  
+}
+.btn-details{
+  margin-top: 10px;
+width: 100%;
 }
