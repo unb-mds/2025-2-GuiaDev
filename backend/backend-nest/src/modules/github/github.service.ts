@@ -6,6 +6,7 @@ import { AxiosResponse } from 'axios';
 import { PrismaService } from '../../database/prisma.service';
 import { GithubCache, GithubRepoData } from '@prisma/client'; 
 import { randomUUID } from 'crypto'; 
+import { DocsAnalyzerService, DocAnalysis } from './docs-analyzer/docs-analyzer.service';
 
 @Injectable()
 export class GithubService {
@@ -14,11 +15,30 @@ export class GithubService {
   constructor(
     private readonly http: HttpService,
     private readonly prisma: PrismaService,
+    private readonly docsAnalyzer: DocsAnalyzerService, 
   ) {}
 
   private token = process.env.GITHUB_TOKEN;
   private readonly MAX_BYTES = Number(process.env.GH_MAX_BYTES || 200 * 1024);
   private readonly CONCURRENCY = Number(process.env.GH_CONCURRENCY || 10);
+
+  private async saveAnalysisToDb(owner: string, repo: string, analysis: DocAnalysis) {
+    try {
+      await this.prisma.docAnalysisResult.create({
+        data: {
+          repoOwner: owner,
+          repoName: repo,
+          docName: analysis.name,
+          exists: analysis.exists,
+          score: analysis.score,
+          summary: analysis.summary || '',
+          suggestions: analysis.suggestions || [],
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Erro ao salvar análise de ${repo}/${analysis.name}: ${error.message}`);
+    }
+  }
 
   private defaultHeaders() {
     const headers: Record<string, string> = { Accept: 'application/vnd.github+json' };
@@ -522,6 +542,22 @@ export class GithubService {
 
       const formattedData = this.formatRepoData([analysisResult])[0];
       
+      const docsToAnalyze = [
+        { key: 'readme', name: 'README.md', content: formattedData.detalhes.readme },
+        { key: 'changelog', name: 'CHANGELOG.md', content: formattedData.detalhes.changelog },
+        { key: 'conduct', name: 'CODE_OF_CONDUCT.md', content: formattedData.detalhes.conduct },
+        { key: 'governance', name: 'GOVERNANCE.md', content: formattedData.detalhes.governance },
+        { key: 'roadmap', name: 'ROADMAP.md', content: formattedData.detalhes.roadmap },
+        { key: 'arquitetura', name: 'ARCHITECTURE.md', content: formattedData.detalhes.arquitetura },
+      ];
+
+      await Promise.allSettled(docsToAnalyze.map(async (doc) => {
+        if (doc.content) {
+          const analysis = await this.docsAnalyzer.analyzeText(doc.name, doc.content);
+          await this.saveAnalysisToDb(owner, name, analysis);
+        }
+      }));
+
       await this.prisma.githubRepoData.upsert({
         where: {
           owner_repo: {

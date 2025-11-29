@@ -6,6 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 import { PrismaService } from '../../database/prisma.service';
 import { authModule } from 'src/modules/auth/auth.module';
 
+
 @Module({
   imports: [HttpModule, authModule],
   providers: [GithubService, PrismaService, DocsAnalyzerService],
