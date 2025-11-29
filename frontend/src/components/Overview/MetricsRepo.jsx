@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import "./MetricsRepo.css";
 import accept from "./../../assets/accept.svg";
 import docs from "./../../assets/docs.svg";
@@ -18,14 +19,35 @@ const MetricBoxRender = ({ name, num, icon }) => {
   );
 };
 
-function MetricsRepo() {
-  // projectId pode vir de props/rota; deixei 'demo' enquanto backend não existir
-  const projectId = "demo";
+function MetricsRepo({repoObj}) {
+
   const metrics = [];
   const loading = false;
   const error = null;
 
-  // fallback (dados de simulação) para desenvolvimento offline
+  const qtsDocs = Array.isArray(repoObj) ? repoObj : [];
+
+
+
+
+  const totalDocs = qtsDocs.length;
+  const existsCount = qtsDocs.filter((d) => d.exists === false).length;
+  const location = useLocation();
+   
+  
+  const commitsArr = (() => {
+    if (repoObj && !Array.isArray(repoObj) && Array.isArray(repoObj.ultimosCommits) && repoObj.ultimosCommits.length) return repoObj.ultimosCommits;
+    if (Array.isArray(repoObj) && repoObj.length && Array.isArray(repoObj[0]?.ultimosCommits) && repoObj[0].ultimosCommits.length) return repoObj[0].ultimosCommits;
+    const st = location.state?.repo;
+    if (st && Array.isArray(st.ultimosCommits) && st.ultimosCommits.length) return st.ultimosCommits;
+    return null;
+  })();
+
+
+  const nameCommit = commitsArr && commitsArr.length ? commitsArr[0] : 'Sem commits';
+  
+
+  
   const [dataMetric, setData] = useState([]);
 
   useEffect(() => {
@@ -33,33 +55,36 @@ function MetricsRepo() {
       {
         id: "Metric-1",
         name: "Taxa de conclusão",
-        num: "85%",
+        num: "-",
         icon: <img src={accept} className="accept" />,
       },
       {
         id: "Metric-2",
         name: "Documentos",
-        num: "38",
+        num: totalDocs,
         icon: <img src={docs} />,
       },
       {
         id: "Metric-3",
         name: "Arquivos Pendentes",
-        num: "7",
+        num: existsCount,
         icon: <img src={warning} />,
       },
       {
         id: "Metric-4",
-        name: "Última Atualização",
-        num: "2 dias atrás",
+        name: "Último Commit",
+        num: nameCommit,
         icon: <img src={clock} />,
       },
     ];
 
-    // Uso os dados do backend quando disponíveis; caso contrário, mantenho o mock
     if (loading || error || !metrics || metrics.length === 0) setData(infos);
     else setData(metrics);
-  }, [loading, error, metrics]);
+  }, [loading, error, metrics, totalDocs, existsCount, nameCommit]);
+
+  useEffect(() => {
+  console.log('repoObj (debug):', repoObj);
+}, [repoObj]);
 
   return (
     <div className="allComponentMetrics">

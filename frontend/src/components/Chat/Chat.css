@@ -58,13 +58,13 @@
 
 .chat-bubble.bot .botIcon{
     display: flex;
-    justify-items: start;
+    justify-items: center;
     align-items: center;
     border: 1px solid #e2e8f0;
     border-radius: 90%;
     height: 40px;
     /* background-color: red; */
-    width: 10%;
+    width: 37px;
 }
 
 .chat-bubble.user .botIcon{

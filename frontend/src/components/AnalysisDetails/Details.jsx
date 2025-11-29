@@ -2,14 +2,30 @@ import React, { useState, useEffect, useMemo } from "react";
 import "./Details.css";
 import FileTree from "../FileTree/FileTree";
 import warning from "../../assets/warning.svg";
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { buildTreeWithDocs } from "../../utils/tree";
-import GitHubAPI from "../../../services/github";
+import api from "../../../services/api";
 
+const IssuesDocs = ({ suggestion, fileName }) => {
+  const items = Array.isArray(suggestion) ? suggestion : suggestion ? [suggestion] : [];
+  return (
+    <div className="issueBody">
+      <div className="issuePath">{fileName || "(arquivo)"}</div>
+      <ul className="issuePoints">
+        {items.length > 0 ? (
+          items.map((s, i) => <li key={i}>{s}</li>)
+        ) : (
+          <li>Sem sugestões</li>
+        )}
+      </ul>
+    </div>
+  );
+};
 
-const Details = ({ owner, repo }) => {
+const Details = ({ repoObj, repo }) => {
 
-  const params = useParams();
+    const params = useParams();        // { owner, repo }
+    const location = useLocation(); 
 
   const [treeEntries, setTreeEntries] = useState(null);
   const [error, setError] = useState(null);
@@ -21,14 +37,15 @@ const Details = ({ owner, repo }) => {
     let alive = true;
 
     async function gitAPITree() {
-      if (!repo && !params?.repo) {
+      const currentRepoName = repo?.nomeRepositorio || repo?.repo || repo || params?.repo || location.state?.repo?.nomeRepositorio;
+      if (!currentRepoName && !params?.repo) {
         setTreeEntries([]);
         return;
       }
 
-      
-      const effectiveOwner = owner || params?.owner || repo?.owner?.login || repo?.owner || null;
-      const repoName = repo?.nomeRepositorio || repo?.repo || repo?.name || params?.repo || null;
+
+      const effectiveOwner = params.owner;
+      const repoName = params.repo || currentRepoName || location.state?.repo?.nomeRepositorio;
 
       if (!effectiveOwner || !repoName) {
         setTreeEntries([]);
@@ -39,9 +56,10 @@ const Details = ({ owner, repo }) => {
       setError(null);
 
       try {
-        const path = await GitHubAPI.getRepoTree(effectiveOwner, repoName);
+        const res = await api.get(`github/tree/${encodeURIComponent(effectiveOwner)}/${encodeURIComponent(repoName)}`);
         if (!alive) return;
-        setTreeEntries(Array.isArray(path) ? path : []);
+        const pathData = res && res.data ? res.data : [];
+        setTreeEntries(Array.isArray(pathData) ? pathData : []);
       } catch (err) {
         console.error("Erro ao buscar o tree", err);
         if (!alive) return;
@@ -53,11 +71,11 @@ const Details = ({ owner, repo }) => {
     }
     gitAPITree();
     return () => {alive = false; };
-  }, [repo]);
+  }, [repo, params?.owner, params?.repo, location?.state?.repo]);
 
 
 
-  const docs = repo?.detalhes?.docs || repo?.docsContent || repo?.docs || [];
+  const docs = repoObj || repo || null;
 
   const tree = useMemo(() => {
     if (treeEntries === null) return [];
@@ -73,9 +91,12 @@ const Details = ({ owner, repo }) => {
       });
       return;
     }
-    // arquivo sem doc: comportamento opcional (poderia buscar blob via endpoint)
+    
     console.log('Arquivo sem doc clicado:', node.path);
   }
+
+  const suggestionsFix = Array.isArray(repoObj) ? repoObj : Array.isArray(repo) ? repo : [];
+
   return (
     <div className="analysisDetails">
       <div className="structerProject">
@@ -85,30 +106,15 @@ const Details = ({ owner, repo }) => {
 
       <div className="issuesList">
         <h4>Arquivos com Problemas</h4>
-        <div className="issueCard">
-          <div className="issueIcon">
-            <img src={warning} alt="aviso" />
-          </div>
-          <div className="issueBody">
-            <div className="issuePath">src/components/Modal.tsx</div>
-            <ul className="issuePoints">
-              <li>Faltam comentários JSDoc</li>
-              <li>Sem descrição de props</li>
-            </ul>
-          </div>
-        </div>
+        {suggestionsFix.map((d) => ( d.score === 100? '':(
+          <div className="issueCard" key={d.id ?? d.name}>
+            <div className="issueIcon">
+              <img src={warning} alt="aviso" />
+            </div>
+            <IssuesDocs suggestion={d.suggestions} fileName={d.name} />
+          </div>) 
+        ))}
 
-        <div className="issueCard">
-          <div className="issueIcon">
-            <img src={warning} alt="aviso" />
-          </div>
-          <div className="issueBody">
-            <div className="issuePath">src/hooks/useApi.ts</div>
-            <ul className="issuePoints">
-              <li>Documentação incompleta de retorno</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
   );
