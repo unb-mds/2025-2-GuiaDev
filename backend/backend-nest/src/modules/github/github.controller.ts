@@ -1,4 +1,4 @@
-import { UseGuards, Req, Body, Controller, Get, Param, Post, Logger, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { UseGuards, Req, Body, Controller, Get, Param, Post, Logger, HttpException, HttpStatus, NotFoundException, Put } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { PrismaService } from 'src/database/prisma.service';
@@ -160,6 +160,13 @@ export class GithubController {
     async getRepoTree(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getRepoTree(owner, repo);
     }
+
+    @Put('analyze/:owner/:repo/refresh-score')
+    @UseGuards(JwtAuthGuard)
+    async refreshScore(@Param('owner') owner: string, @Param('repo') repo: string) {
+    return this.githubService.forceUpdateAnalysis(owner, repo);
+  }
+
 
     @Post('analyze') 
     @UseGuards(JwtAuthGuard) 

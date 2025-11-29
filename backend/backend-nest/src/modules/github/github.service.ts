@@ -40,6 +40,31 @@ export class GithubService {
     }
   }
 
+  private async getStoredAnalysis(owner: string, repo: string) {
+    const allAnalyses = await this.prisma.docAnalysisResult.findMany({
+      where: { repoOwner: owner, repoName: repo },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const uniqueMap = new Map();
+    for (const analysis of allAnalyses) {
+      if (!uniqueMap.has(analysis.docName)) {
+        uniqueMap.set(analysis.docName, analysis);
+      }
+    }
+    return Array.from(uniqueMap.values());
+  }
+
+  async forceUpdateAnalysis(owner: string, repo: string) {
+    this.logger.log(`Forçando atualização de análise para ${owner}/${repo}...`);
+    const repoInfo = {
+      owner: { login: owner },
+      name: repo,
+      default_branch: await this._fetchDefaultBranch(owner, repo) 
+    };
+    return this._analyzeSingleRepo(repoInfo as any, true);
+  }
+
   private defaultHeaders() {
     const headers: Record<string, string> = { Accept: 'application/vnd.github+json' };
     if (this.token) headers.Authorization = `Bearer ${this.token}`;
@@ -162,17 +187,16 @@ export class GithubService {
       try { const res = await this.httpGet(url); const data = res.data || []; all.push(...data); if (data.length < per_page) break; page += 1; }
       catch (err: any) { if (err.status === 404) return []; this.logger.warn(`getUserRepos error for ${username}: ${err.message}`); throw err.original || err; }
     }
-    // Aqui extraímos os TOTAIS que o GitHub já fornece
     return all.map(repo => ({ 
       name: repo.name, 
       owner: { login: repo.owner?.login }, 
       url: repo.html_url, 
       private: !!repo.private, 
       default_branch: repo.default_branch || 'main',
-      stargazers_count: repo.stargazers_count, // Total exato
-      watchers_count: repo.watchers_count,     // Total exato
-      open_issues_count: repo.open_issues_count, // Total exato (Inclui Issues + PRs abertos)
-      forks_count: repo.forks_count            // Total exato
+      stargazers_count: repo.stargazers_count, 
+      watchers_count: repo.watchers_count,     
+      open_issues_count: repo.open_issues_count, 
+      forks_count: repo.forks_count            
     }));
   }
 
@@ -461,14 +485,22 @@ export class GithubService {
 
     if (cachedRepoData && !forceUpdate) {
       this.logger.debug(`[Analyze] Cache HIT no DB (Lazy) para ${owner}/${name}. Retornando sem verificar GitHub.`);
-      return cachedRepoData.data;
+      const existingData = cachedRepoData.data as any;
+      if (!existingData.ai_analysis) {
+        existingData.ai_analysis = await this.getStoredAnalysis(owner, name);
+      }
+      return existingData;
     }
 
     const { changed: repoChanged, etag: repoEtag } = await this.checkRepoChanged(owner, name, forceUpdate);
 
     if (!repoChanged && cachedRepoData && cachedRepoData.etag === repoEtag) {
       this.logger.debug(`[Analyze] Cache HIT após verificação (304) para ${owner}/${name}.`);
-      return cachedRepoData.data;
+      const existingData = cachedRepoData.data as any;
+      if (!existingData.ai_analysis) {
+        existingData.ai_analysis = await this.getStoredAnalysis(owner, name);
+      }
+      return existingData;
     }
     
     this.logger.debug(`[Analyze] Cache MISS, Stale ou ForceUpdate para ${owner}/${name}. Re-analisando...`);
@@ -551,12 +583,31 @@ export class GithubService {
         { key: 'arquitetura', name: 'ARCHITECTURE.md', content: formattedData.detalhes.arquitetura },
       ];
 
-      await Promise.allSettled(docsToAnalyze.map(async (doc) => {
+      for (const doc of docsToAnalyze) {
         if (doc.content) {
-          const analysis = await this.docsAnalyzer.analyzeText(doc.name, doc.content);
-          await this.saveAnalysisToDb(owner, name, analysis);
+          try {
+            let skip = false;
+            if (!forceUpdate) {
+               const existing = await this.prisma.docAnalysisResult.findFirst({
+                  where: { repoOwner: owner, repoName: name, docName: doc.name },
+                  select: { id: true }
+               });
+               if (existing) skip = true;
+            }
+
+            if (!skip) {
+              const analysis = await this.docsAnalyzer.analyzeText(doc.name, doc.content);
+              await this.saveAnalysisToDb(owner, name, analysis);
+            }
+          } catch (err) {
+            this.logger.warn(`Erro ao analisar ${doc.name} de ${owner}/${name}: ${err.message}`);
+          }
         }
-      }));
+      }
+
+      const storedAnalyses = await this.getStoredAnalysis(owner, name);
+
+      (formattedData as any).ai_analysis = storedAnalyses;
 
       await this.prisma.githubRepoData.upsert({
         where: {
@@ -582,7 +633,6 @@ export class GithubService {
       try {
         await this.prisma.githubCache.delete({ where: { url: `analysis_v1/${owner}/${name}` }});
       } catch (e) {
-        // Ignora
       }
 
       return formattedData;
