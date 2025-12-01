@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import Modal from "../components/Modal/Modal";
-import ConfigComponent from "../components/config/Config";
+import ConfigComponent from "../components/Config/Config";
 
 const ConfigModalContext = createContext(null);
 
