@@ -208,3 +208,35 @@
 width: 100%;
 }
 
+.erro-container{
+ 
+  background-color: antiquewhite;
+}
+
+.erro-component{
+  border: 1px solid;
+  border-radius: 12px;
+  min-width: 100%; 
+  display: flex;
+  /* justify-content: center; */
+}
+
+.erro-box{
+  display:flex;
+  /* background-color: #fafafa; */
+  width: 100%;
+  /* justify-content: space-between; */
+}
+.erro-box img{
+  height: 80px;
+}
+
+.erroMsg{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  font-size: large;
+  /* background-color: #0f53c2; */
+  width: 100%;
+}

@@ -7,8 +7,26 @@ import { IconRepositorios } from "../Sidebar/Sidebar";
 import commitIcon from "../../assets/commit.svg";
 import ProgressBar from "../Shared/ProgressBar";
 import LoadingWave from "../WaveLoad/WaveLoad";
+import warning from "../../assets/warning.svg"
 
+const ErroOwner = ({owner}) =>{
+  return (
+  <div className="erro-box">
+    <span className="erroIcon">
+    <img src={warning}></img>
+    </span>
 
+    <div className="erroMsg">
+    <span>
+      <p>Ops! Não conseguimos localizar este perfil.</p>
+      <p>Parece que o nome de usuário: <u>{owner}</u> está incorreto ou o perfil não existe.</p>
+    </span>
+     
+    </div>
+    
+  </div>
+);
+}
 
 const BoxStat = ({ icon, nome, num, comment }) => {
   return (
@@ -80,7 +98,7 @@ function BoxRepo({ owner }) {
   const navigate = useNavigate();
   const { getReposForOwner, setReposForOwner } = useContext(ReposContext);
 
-
+const [test, setTESTE] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -155,10 +173,14 @@ return (
         
         <>
        
-          {!owner ? (
-            <div className="error-message">
-              <p>Username do GitHub não identificado!</p>
+          {!test ? (
+            <div className="erro-container">
+              <div className="erro-component">
+                <ErroOwner owner={owner}/>
+              </div>
+              
             </div>
+            
           ) : (
          
             <div>
