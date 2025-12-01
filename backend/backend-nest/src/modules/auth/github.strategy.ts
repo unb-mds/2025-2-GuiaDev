@@ -9,8 +9,8 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     super({
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      // callbackURL: 'http://localhost:3000/auth/github/callback',//[back] é pra onde redireciona depois de autenticar 
-      callbackURL: 'https://two025-2-guiadev.onrender.com/auth/github/callback',//é pra onde redireciona depois de autenticar 
+      callbackURL: 'http://localhost:3000/auth/github/callback',//[back] é pra onde redireciona depois de autenticar 
+      // callbackURL: 'https://two025-2-guiadev.onrender.com/auth/github/callback',//é pra onde redireciona depois de autenticar 
       scope: ['user:email'],
     });
   }
