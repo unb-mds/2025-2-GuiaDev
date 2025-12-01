@@ -1,7 +1,9 @@
-
 import React from 'react';
 import "./Login.css";
 import Footer from "../../components/Footer/Footer";
+import iconeFoguete from "../../assets/icone-foguete.png"
+import iconeLivro from "../../assets/icone-livro.png"
+import iconeAnalise from "../../assets/icone-analise.png"
 
 
 import Sign_in from "../../components/Sign-in/Sign-in";
@@ -23,13 +25,13 @@ export default function Login() {
           </p>
           <ul>
             <li>
-              <strong>🚀 Acelere seu aprendizado</strong>
+              <img src={iconeFoguete} alt="icone foguete" /><strong> Área exclusiva de aprendizado</strong>
             </li>
             <li>
-              <strong>👥 Conecte-se com devs</strong>
+              <img src={iconeAnalise} alt="icone analise" /><strong>Análise de projetos reais com IA</strong>
             </li>
             <li>
-              <strong>📖 Recursos exclusivos</strong>
+              <img src={iconeLivro} alt="icone livro" /><strong>Recursos exclusivos</strong>
             </li>
           </ul>
         </div>
