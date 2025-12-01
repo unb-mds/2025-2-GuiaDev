@@ -207,3 +207,65 @@
   margin-top: 10px;
 width: 100%;
 }
+
+.loading-component{
+  display: grid;
+  justify-items: center;
+  align-items: end;
+  /* background-color: red; */
+  height: 50vh;
+  border: 1px solid;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.search-msg{
+
+  font-size: large;
+
+  /* background-color: red; */
+}
+
+.empty-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; 
+  height: 50px; 
+  /* background-color: #0f53c2; */
+}
+
+
+.wave-container {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  align-items: end;
+  gap: 5.5px;
+  width: 100%;
+  height: 60px;
+}
+
+.wave-bar {
+  width: 6px;
+  height: 20px;
+  background-color: #4f46e5;
+  border-radius: 4px;
+  
+  transform: scaleY(1);
+}
+
+.wave-container.running .wave-bar {
+  animation-name: wave;
+  
+
+  animation-duration: var(--anim-duration, 1s); 
+  
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-iteration-count: var(--wave-count, 10); 
+}
+
+@keyframes wave {
+  0%, 100% { height: 20px; }
+  50% { height: 50px; }
+}

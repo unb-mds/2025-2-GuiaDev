@@ -51,6 +51,7 @@ const Home = () => {
         if (!token) return; // sem token não há profile
 
         const res = await api.get('/auth/profile');
+        
         if (!mounted) return;
         const payload = res.data?.user ?? res.data ?? {};
         const username = payload.usernameGit || payload.username || '';
@@ -61,11 +62,23 @@ const Home = () => {
     };
 
     fetchProfile();
+    // listen for profile updates from the Config modal and update owner live
+    const onProfileUpdated = (ev) => {
+      try {
+        const payload = ev?.detail ?? {};
+        const username = payload.usernameGit || payload.username || '';
+        if (username && mounted) setOwner(username);
+      } catch (e) {
+        // ignore
+      }
+    };
+    window.addEventListener('profileUpdated', onProfileUpdated);
     return () => { mounted = false; };
   }, []);
 
   return (
     <div className="Boxrepo">
+      
       <div className="center">
         {!owner && (
           <div className="home-notice" style={{ marginBottom: 16, textAlign: 'center' }}>
