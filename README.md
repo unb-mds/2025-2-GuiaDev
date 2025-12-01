@@ -11,7 +11,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-[Documentação](https://unb-mds.github.io/2025-2-GuiaDev/) • [Arquitetura](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/Docs/Diagrama%20modelo%20C4.pdf) • [Protótipo](https://www.figma.com/design/NSQw0YsJVA1PZDF9cclfxQ/Alta-Fidelidade) • [Visão do Produto](https://docs.google.com/document/d/13E_innekoi4V3e2igaeZ5Xg_1glMoNRd8j2--BJWiFk)
+[Documentação](https://unb-mds.github.io/2025-2-GuiaDev/) • [Arquitetura](https://www.figma.com/design/Ses2U0uY5fJ4i1vn8cAF8w/MDS---GRUPO-03?node-id=0-1&p=f&t=6haQKuj3TeX644EO-0) • [Protótipo](https://www.figma.com/design/NSQw0YsJVA1PZDF9cclfxQ/Alta-Fidelidad) • [Visão do Produto](https://docs.google.com/document/d/13E_innekoi4V3e2igaeZ5Xg_1glMoNRd8j2--BJWiFk)
 
 ---
 
