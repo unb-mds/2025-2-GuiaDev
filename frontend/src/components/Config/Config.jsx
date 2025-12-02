@@ -47,7 +47,17 @@ export default function ConfigComponent({ onClose }) {
             setEmail(updated.email ?? email);
             setUsernameGit(updated.usernameGit ?? updated.username ?? usernameGit);
             setError(null);
+            if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("profileUpdated", {
+                    detail: {
+                        usernameGit: updated.usernameGit ?? usernameGit,
+                        username: updated.username ?? undefined,
+                        email: updated.email ?? email,
+                    }
+                }));
+            }
             onClose && onClose();
+            
         } catch (e) {
             setError(e?.response?.data?.message || e?.message || "Falha ao salvar");
         } finally {

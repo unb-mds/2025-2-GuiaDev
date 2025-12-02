@@ -6,6 +6,8 @@ import { useParams, useLocation } from 'react-router-dom';
 import { buildTreeWithDocs } from "../../utils/tree";
 import api from "../../../services/api";
 
+const treeCache = new Map();
+
 const IssuesDocs = ({ suggestion, fileName }) => {
   const items = Array.isArray(suggestion) ? suggestion : suggestion ? [suggestion] : [];
   return (
@@ -52,6 +54,14 @@ const Details = ({ repoObj, repo }) => {
         return;
       }
 
+      const cacheKey = `${effectiveOwner}/${repoName}`;
+      const cachedTree = treeCache.get(cacheKey);
+      if (cachedTree) {
+        setTreeEntries(cachedTree);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
@@ -59,7 +69,9 @@ const Details = ({ repoObj, repo }) => {
         const res = await api.get(`github/tree/${encodeURIComponent(effectiveOwner)}/${encodeURIComponent(repoName)}`);
         if (!alive) return;
         const pathData = res && res.data ? res.data : [];
-        setTreeEntries(Array.isArray(pathData) ? pathData : []);
+        const normalized = Array.isArray(pathData) ? pathData : [];
+        treeCache.set(cacheKey, normalized);
+        setTreeEntries(normalized);
       } catch (err) {
         console.error("Erro ao buscar o tree", err);
         if (!alive) return;

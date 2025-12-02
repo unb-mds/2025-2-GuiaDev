@@ -8,8 +8,10 @@ import api from "../../../services/api";
 const Home = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+  
   const [owner, setOwner] = useState("");
+  const [ownerLoading, setOwnerLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const urlToken = searchParams.get("token");
  
 
@@ -48,32 +50,55 @@ const Home = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        if (!token) return; // sem token não há profile
+        if (!token) {
+          if (mounted) setOwnerLoading(false);
+          return; // sem token não há profile
+        }
 
+        if (mounted) setOwnerLoading(true);
         const res = await api.get('/auth/profile');
+        
         if (!mounted) return;
         const payload = res.data?.user ?? res.data ?? {};
         const username = payload.usernameGit || payload.username || '';
         if (username) setOwner(username);
+        setOwnerLoading(false);
       } catch (err) {
         console.error('Falha ao obter perfil:', err);
+        if (mounted) setOwnerLoading(false);
       }
     };
 
     fetchProfile();
-    return () => { mounted = false; };
+    // listen for profile updates from the Config modal and update owner live
+    const onProfileUpdated = (ev) => {
+      try {
+        const payload = ev?.detail ?? {};
+        const username = payload.usernameGit || payload.username || '';
+        if (mounted) {
+          if (typeof username === 'string') {
+            setOwner(username);
+          }
+          setOwnerLoading(false);
+          setRefreshKey((prev) => prev + 1);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    window.addEventListener('profileUpdated', onProfileUpdated);
+    return () => {
+      mounted = false;
+      window.removeEventListener('profileUpdated', onProfileUpdated);
+    };
   }, []);
 
   return (
     <div className="Boxrepo">
+      
       <div className="center">
-        {!owner && (
-          <div className="home-notice" style={{ marginBottom: 16, textAlign: 'center' }}>
-            <strong>Digite o username do GitHub no campo Username GitHub nas configurações para puxar os repositórios.</strong>
-          </div>
-        )}
 
-        <BoxRepo owner={owner} />
+        <BoxRepo owner={owner} refreshKey={refreshKey} ownerLoading={ownerLoading} />
       </div>
     </div>
   );

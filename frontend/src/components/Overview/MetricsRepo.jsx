@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { useLocation } from 'react-router-dom';
 import "./MetricsRepo.css";
 import accept from "./../../assets/accept.svg";
@@ -20,11 +20,6 @@ const MetricBoxRender = ({ name, num, icon }) => {
 };
 
 function MetricsRepo({repoObj}) {
-
-  const metrics = [];
-  const loading = false;
-  const error = null;
-
   const qtsDocs = Array.isArray(repoObj) ? repoObj : [];
 
 
@@ -48,43 +43,32 @@ function MetricsRepo({repoObj}) {
   
 
   
-  const [dataMetric, setData] = useState([]);
-
-  useEffect(() => {
-    const infos = [
-      {
-        id: "Metric-1",
-        name: "Taxa de conclusão",
-        num: "-",
-        icon: <img src={accept} className="accept" />,
-      },
-      {
-        id: "Metric-2",
-        name: "Documentos",
-        num: totalDocs,
-        icon: <img src={docs} />,
-      },
-      {
-        id: "Metric-3",
-        name: "Arquivos Pendentes",
-        num: existsCount,
-        icon: <img src={warning} />,
-      },
-      {
-        id: "Metric-4",
-        name: "Último Commit",
-        num: nameCommit,
-        icon: <img src={clock} />,
-      },
-    ];
-
-    if (loading || error || !metrics || metrics.length === 0) setData(infos);
-    else setData(metrics);
-  }, [loading, error, metrics, totalDocs, existsCount, nameCommit]);
-
-  useEffect(() => {
-  console.log('repoObj (debug):', repoObj);
-}, [repoObj]);
+  const dataMetric = useMemo(() => ([
+    {
+      id: "Metric-1",
+      name: "Taxa de conclusão",
+      num: "-",
+      icon: <img src={accept} className="accept" />,
+    },
+    {
+      id: "Metric-2",
+      name: "Documentos",
+      num: totalDocs,
+      icon: <img src={docs} />,
+    },
+    {
+      id: "Metric-3",
+      name: "Arquivos Pendentes",
+      num: existsCount,
+      icon: <img src={warning} />,
+    },
+    {
+      id: "Metric-4",
+      name: "Último Commit",
+      num: nameCommit,
+      icon: <img src={clock} />,
+    },
+  ]), [totalDocs, existsCount, nameCommit]);
 
   return (
     <div className="allComponentMetrics">
