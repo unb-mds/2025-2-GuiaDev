@@ -1,7 +1,7 @@
 import axios from "axios";
 const api = axios.create({
-  baseURL: "http://localhost:3000/",
-  // baseURL: "https://two025-2-guiadev-1-frontend.onrender.com/",
+  //baseURL: "http://localhost:3000/",
+   baseURL: "https://two025-2-guiadev.onrender.com/",
 });
 
 api.interceptors.request.use(
