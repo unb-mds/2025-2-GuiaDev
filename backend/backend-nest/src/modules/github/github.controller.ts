@@ -1,4 +1,4 @@
-import { UseGuards, Req, Body, Controller, Get, Param, Post, Logger, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { UseGuards, Req, Controller, Get, Param, Post, Logger, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { PrismaService } from 'src/database/prisma.service';
@@ -17,7 +17,6 @@ export class GithubController {
     private readonly logger = new Logger(GithubController.name);
     constructor(private readonly githubService: GithubService, private readonly prisma: PrismaService, private readonly docsAnalyzeService: DocsAnalyzerService) {}
 
-    
     @Get('commits/:owner/:repo')
     async getCommits(@Param('owner') owner: string, @Param('repo') repo: string) {
         return this.githubService.getCommits(owner,repo);
@@ -75,33 +74,32 @@ export class GithubController {
     
     @Get('gitignore/templates/:owner/:repo')
     async getGitignore(@Param('owner') owner: string, @Param('repo') repo: string) {
-    return this.githubService.getGitignore(owner, repo);
+        return this.githubService.getGitignore(owner, repo);
     }
 
     @Get('changelog/:owner/:repo')
     async getChangelog(@Param('owner') owner: string, @Param('repo') repo: string) {
-    return this.githubService.getChangelog(owner, repo);
+        return this.githubService.getChangelog(owner, repo);
     }
 
     @Get('contributing/:owner/:repo')
     async getContributing(@Param('owner') owner: string, @Param('repo') repo: string) {
-    return this.githubService.getContributing(owner, repo);
+        return this.githubService.getContributing(owner, repo);
     }
 
     @Get('conductcode/:owner/:repo')
     async getConductCode(@Param('owner') owner: string, @Param('repo') repo: string) {
-    return this.githubService.getConductCode(owner, repo);
+        return this.githubService.getConductCode(owner, repo);
     }
 
     @Get('docs/:owner/:repo')
     async getDocs(@Param('owner') owner: string, @Param('repo') repo: string) {
-    return this.githubService.getDocs(owner, repo);
+        return this.githubService.getDocs(owner, repo);
     }
-
 
     @Get('content/docs/:owner/:repo')
     async getDocsContent(@Param('owner') owner: string, @Param('repo') repo: string) {
-    return this.githubService.getDocsContent(owner, repo);
+        return this.githubService.getDocsContent(owner, repo);
     }
 
     @Get('analyze/user/:username')
@@ -152,7 +150,7 @@ export class GithubController {
             }
         }
 
-        const analysis = this.docsAnalyzeService.analyzeMany(docs); //verificar isso
+        const analysis = this.docsAnalyzeService.analyzeMany(docs);
         return analysis;
     }
 
@@ -169,17 +167,22 @@ export class GithubController {
         const user = await this.prisma.user.findUnique({
             where: { id: Number(userId) },
         });
+
         if (!user || !(user.usernameGit)) {
             throw new NotFoundException(
                 'Usuário não encontrado ou username do GitHub não configurado no perfil.',
             );
         }
+        
         const usernameToAnalyze = user.usernameGit;
+        
+        const userToken = (user as any).githubAccessToken || (user as any).token || (user as any).githubToken || undefined;
 
         try {
             const analysisResults = await this.githubService.analyzeUserRepos(
                 usernameToAnalyze,
-                true 
+                true,
+                userToken
             );
             
             return {
@@ -189,7 +192,6 @@ export class GithubController {
             };
 
         } catch (error: any) {
-
             if (error?.original?.response?.status === 404) {
                 throw new HttpException(
                 `Usuário do GitHub "${usernameToAnalyze}" não foi encontrado.`,
