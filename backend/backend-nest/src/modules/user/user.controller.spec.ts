@@ -64,6 +64,10 @@ describe('UserController', () => {
       .send({ usernameGit: 'newuser' })
       .expect(200);
 
-    expect(res.body).toEqual({ id: 1, email: 'test@test.com', usernameGit: 'newuser' });
+    expect(res.body).toEqual({
+      id: 1,
+      email: 'test@test.com',
+      usernameGit: 'newuser',
+    });
   });
 });

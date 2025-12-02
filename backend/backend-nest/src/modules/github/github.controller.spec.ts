@@ -9,8 +9,17 @@ import { CanActivate } from '@nestjs/common';
 
 const mockPrisma = {
   user: { findUnique: jest.fn() },
-  githubCache: { findUnique: jest.fn(), upsert: jest.fn(), delete: jest.fn(), findMany: jest.fn() },
-  githubRepoData: { findUnique: jest.fn(), upsert: jest.fn(), findMany: jest.fn() },
+  githubCache: {
+    findUnique: jest.fn(),
+    upsert: jest.fn(),
+    delete: jest.fn(),
+    findMany: jest.fn(),
+  },
+  githubRepoData: {
+    findUnique: jest.fn(),
+    upsert: jest.fn(),
+    findMany: jest.fn(),
+  },
 };
 
 const mockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
@@ -59,9 +68,14 @@ describe('GithubController', () => {
   });
 
   it('analyzeUserReposByUsername - throws 404 HttpException when upstream 404', async () => {
-    const err: any = { original: { response: { status: 404 } }, message: 'not found' };
+    const err: any = {
+      original: { response: { status: 404 } },
+      message: 'not found',
+    };
     mockGithub.analyzeUserRepos.mockRejectedValueOnce(err);
-    await expect(controller.analyzeUserReposByUsername('nouser')).rejects.toMatchObject({ status: 404 });
+    await expect(
+      controller.analyzeUserReposByUsername('nouser'),
+    ).rejects.toMatchObject({ status: 404 });
   });
 
   it('analyzeRepoDocs - aggregates docs and calls docs analyzer', async () => {
@@ -70,7 +84,9 @@ describe('GithubController', () => {
     mockGithub.getChangelog.mockResolvedValue({ content: 'ch' });
     mockGithub.getConductCode.mockResolvedValue({ content: 'cd' });
     mockGithub.getLicenses.mockResolvedValue({ name: 'MIT' });
-    mockGithub.getDocsContent.mockResolvedValue([{ name: 'DOC.md', content: 'doc' }]);
+    mockGithub.getDocsContent.mockResolvedValue([
+      { name: 'DOC.md', content: 'doc' },
+    ]);
 
     const result = await controller.analyzeRepoDocs('o', 'r');
     expect(mockDocs.analyzeMany).toHaveBeenCalled();
@@ -85,7 +101,10 @@ describe('GithubController', () => {
 
   it('analyzeUserRepos (POST) - returns summary on success', async () => {
     mockPrisma.user.findUnique.mockResolvedValue({ id: 1, usernameGit: 'u' });
-    mockGithub.analyzeUserRepos.mockResolvedValue([{ repo: 'r1' }, { repo: 'r2' }]);
+    mockGithub.analyzeUserRepos.mockResolvedValue([
+      { repo: 'r1' },
+      { repo: 'r2' },
+    ]);
     const req: any = { user: { userId: 1 } };
     const res = await controller.analyzeUserRepos(req);
     expect(res).toHaveProperty('message');

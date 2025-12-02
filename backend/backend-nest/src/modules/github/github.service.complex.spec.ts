@@ -4,8 +4,17 @@ import { GithubService } from './github.service';
 describe('GithubService Complex Flows', () => {
   let service: GithubService;
   const mockPrisma: any = {
-    githubCache: { findUnique: jest.fn(), upsert: jest.fn(), delete: jest.fn(), findMany: jest.fn() },
-    githubRepoData: { findUnique: jest.fn(), upsert: jest.fn(), findMany: jest.fn() },
+    githubCache: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+      delete: jest.fn(),
+      findMany: jest.fn(),
+    },
+    githubRepoData: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+      findMany: jest.fn(),
+    },
   };
 
   const axiosGet = jest.fn();
@@ -23,7 +32,11 @@ describe('GithubService Complex Flows', () => {
     const repo = 'repo';
     const branch = 'main';
     const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-    mockPrisma.githubCache.findUnique.mockResolvedValue({ url: treeUrl, etag: 'W/\"1\"', data: { tree: [{ path: 'file.md', type: 'blob' }] } });
+    mockPrisma.githubCache.findUnique.mockResolvedValue({
+      url: treeUrl,
+      etag: 'W/\"1\"',
+      data: { tree: [{ path: 'file.md', type: 'blob' }] },
+    });
     axiosGet.mockResolvedValue({ status: 304, data: null, headers: {} });
 
     const res = await service.getRepoTree(owner, repo);
@@ -39,35 +52,70 @@ describe('GithubService Complex Flows', () => {
 
     axiosGet.mockImplementation((url: string) => {
       if (url.includes('/git/trees/') && url.includes('?recursive=1')) {
-        return Promise.resolve({ status: 200, data: { tree: [{ path: 'docs/binary.md', type: 'blob', sha: blobSha, size: 10 }] }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: {
+            tree: [
+              { path: 'docs/binary.md', type: 'blob', sha: blobSha, size: 10 },
+            ],
+          },
+          headers: {},
+        });
       }
       if (url.includes(`/git/blobs/${blobSha}`)) {
         const content = Buffer.from('\0binary', 'utf8').toString('base64');
         return Promise.resolve({ status: 200, data: { content }, headers: {} });
       }
       if (url.includes('/git/refs/heads/')) {
-        return Promise.resolve({ status: 200, data: { object: { sha: 'commitSha' } }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: { object: { sha: 'commitSha' } },
+          headers: {},
+        });
       }
       if (url.includes('/git/commits/commitSha')) {
-        return Promise.resolve({ status: 200, data: { tree: { sha: 'treeSha' } }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: { tree: { sha: 'treeSha' } },
+          headers: {},
+        });
       }
       if (url.includes('/git/trees/treeSha')) {
-        return Promise.resolve({ status: 200, data: { tree: [{ path: 'docs/binary.md', type: 'blob', sha: blobSha, size: 10 }] }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: {
+            tree: [
+              { path: 'docs/binary.md', type: 'blob', sha: blobSha, size: 10 },
+            ],
+          },
+          headers: {},
+        });
       }
       return Promise.reject(new Error('unexpected ' + url));
     });
 
-    const { resultsByPath } = await service.fetchChecklistMdFiles(owner, repo, ['binary.md'], branch);
+    const { resultsByPath } = await service.fetchChecklistMdFiles(
+      owner,
+      repo,
+      ['binary.md'],
+      branch,
+    );
     const res = resultsByPath['docs/binary.md'];
     expect(res).toBeDefined();
     expect(res.skipped).toBe('binary');
   });
 
   it('analyzeUserRepos uses mapWithConcurrency and _analyzeSingleRepo', async () => {
-    const repoObj = { owner: { login: 'o' }, name: 'n', default_branch: 'main' };
+    const repoObj = {
+      owner: { login: 'o' },
+      name: 'n',
+      default_branch: 'main',
+    };
     // spy on internal methods
     jest.spyOn(service as any, 'getUserRepos').mockResolvedValue([repoObj]);
-    (service as any)._analyzeSingleRepo = jest.fn().mockResolvedValue({ owner: 'o', repo: 'n' });
+    (service as any)._analyzeSingleRepo = jest
+      .fn()
+      .mockResolvedValue({ owner: 'o', repo: 'n' });
 
     const results = await service.analyzeUserRepos('username', false);
     expect(results).toHaveLength(1);
@@ -76,12 +124,19 @@ describe('GithubService Complex Flows', () => {
 
   it('getAllCache and getCacheByUrl extract owner/repo correctly', async () => {
     const url = 'https://api.github.com/repos/ownerX/repoY';
-    mockPrisma.githubCache.findMany.mockResolvedValue([{ url, etag: 'e', updatedAt: new Date(), data: { hello: 1 } }]);
+    mockPrisma.githubCache.findMany.mockResolvedValue([
+      { url, etag: 'e', updatedAt: new Date(), data: { hello: 1 } },
+    ]);
     const all = await service.getAllCache();
     expect(all[0].owner).toBe('ownerX');
     expect(all[0].repo).toBe('repoY');
 
-    mockPrisma.githubCache.findUnique.mockResolvedValue({ url, etag: 'e', updatedAt: new Date(), data: { hello: 1 } });
+    mockPrisma.githubCache.findUnique.mockResolvedValue({
+      url,
+      etag: 'e',
+      updatedAt: new Date(),
+      data: { hello: 1 },
+    });
     const byUrl = await service.getCacheByUrl(url);
     expect(byUrl.owner).toBe('ownerX');
     expect(byUrl.repo).toBe('repoY');
@@ -91,8 +146,15 @@ describe('GithubService Complex Flows', () => {
     const owner = 'o';
     const repo = 'r';
     const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
-    mockPrisma.githubCache.findUnique.mockResolvedValue({ url: repoUrl, etag: 'etag1' });
-    axiosGet.mockResolvedValue({ status: 304, headers: { etag: 'etag1' }, data: null });
+    mockPrisma.githubCache.findUnique.mockResolvedValue({
+      url: repoUrl,
+      etag: 'etag1',
+    });
+    axiosGet.mockResolvedValue({
+      status: 304,
+      headers: { etag: 'etag1' },
+      data: null,
+    });
 
     const res = await service.checkRepoChanged(owner, repo, false);
     expect(res.changed).toBe(false);
@@ -103,23 +165,26 @@ describe('GithubService Complex Flows', () => {
     const owner = 'o';
     const repo = 'r';
     const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
-    mockPrisma.githubCache.findUnique.mockResolvedValue({ url: repoUrl, etag: 'etag1' });
+    mockPrisma.githubCache.findUnique.mockResolvedValue({
+      url: repoUrl,
+      etag: 'etag1',
+    });
     axiosGet.mockRejectedValue(new Error('network failure'));
 
     const res = await service.checkRepoChanged(owner, repo, false);
     expect(res.changed).toBe(false);
     expect(res.etag).toBe('etag1');
   });
-  
+
   it('mapWithConcurrency returns results and respects limit', async () => {
-    const items = [1,2,3,4,5];
+    const items = [1, 2, 3, 4, 5];
     const fn = async (n: number) => n * 2;
     const res = await (service as any).mapWithConcurrency(items, 2, fn);
-    expect(res).toEqual([2,4,6,8,10]);
+    expect(res).toEqual([2, 4, 6, 8, 10]);
   });
 
   it('bufferIsProbablyBinary detects binary and text buffers', () => {
-    const binary = Buffer.from([0,1,2,3,4,5]);
+    const binary = Buffer.from([0, 1, 2, 3, 4, 5]);
     const text = Buffer.from('hello world', 'utf8');
     expect((service as any).bufferIsProbablyBinary(binary)).toBe(true);
     expect((service as any).bufferIsProbablyBinary(text)).toBe(false);
@@ -131,13 +196,25 @@ describe('GithubService Complex Flows', () => {
     // contents/.gitignore -> 404
     axiosGet.mockImplementation((url: string) => {
       if (url.includes('/contents/.gitignore')) {
-        const err: any = new Error('not found'); err.response = { status: 404 }; return Promise.reject(err);
+        const err: any = new Error('not found');
+        err.response = { status: 404 };
+        return Promise.reject(err);
       }
       if (url.includes('/git/trees/') && url.includes('?recursive=1')) {
-        return Promise.resolve({ status: 200, data: { tree: [{ path: '.gitignore', sha: 'gsha', type: 'blob', size: 5 }] }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: {
+            tree: [{ path: '.gitignore', sha: 'gsha', type: 'blob', size: 5 }],
+          },
+          headers: {},
+        });
       }
       if (url.includes('/git/blobs/gsha')) {
-        return Promise.resolve({ status: 200, data: { content: Buffer.from('node_modules').toString('base64') }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: { content: Buffer.from('node_modules').toString('base64') },
+          headers: {},
+        });
       }
       return Promise.reject(new Error('unexpected ' + url));
     });
@@ -152,13 +229,29 @@ describe('GithubService Complex Flows', () => {
     const repo = 'r';
     axiosGet.mockImplementation((url: string) => {
       if (url.toLowerCase().includes('/contents/changelog')) {
-        const err: any = new Error('not found'); err.response = { status: 404 }; return Promise.reject(err);
+        const err: any = new Error('not found');
+        err.response = { status: 404 };
+        return Promise.reject(err);
       }
       if (url.includes('/git/trees/') && url.includes('?recursive=1')) {
-        return Promise.resolve({ status: 200, data: { tree: [{ path: 'docs/CHANGELOG.md', sha: 'csha', type: 'blob', size: 5 }] }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: {
+            tree: [
+              { path: 'docs/CHANGELOG.md', sha: 'csha', type: 'blob', size: 5 },
+            ],
+          },
+          headers: {},
+        });
       }
       if (url.includes('/git/blobs/csha')) {
-        return Promise.resolve({ status: 200, data: { content: Buffer.from('changelog content').toString('base64') }, headers: {} });
+        return Promise.resolve({
+          status: 200,
+          data: {
+            content: Buffer.from('changelog content').toString('base64'),
+          },
+          headers: {},
+        });
       }
       return Promise.reject(new Error('unexpected ' + url));
     });
@@ -180,7 +273,11 @@ describe('GithubService Complex Flows', () => {
     const repo = 'b';
     const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
     mockPrisma.githubCache.findUnique.mockResolvedValue(null);
-    axiosGet.mockResolvedValue({ status: 200, data: { some: 1 }, headers: { etag: 'newE' } });
+    axiosGet.mockResolvedValue({
+      status: 200,
+      data: { some: 1 },
+      headers: { etag: 'newE' },
+    });
 
     const res = await service.checkRepoChanged(owner, repo, false);
     expect(res.changed).toBe(true);

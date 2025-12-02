@@ -4,8 +4,17 @@ import { HttpService } from '@nestjs/axios';
 describe('GithubService (partial)', () => {
   let svc: GithubService;
   const mockPrisma: any = {
-    githubCache: { findUnique: jest.fn(), upsert: jest.fn(), delete: jest.fn(), findMany: jest.fn() },
-    githubRepoData: { findMany: jest.fn(), findUnique: jest.fn(), upsert: jest.fn() },
+    githubCache: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+      delete: jest.fn(),
+      findMany: jest.fn(),
+    },
+    githubRepoData: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+    },
   };
 
   beforeEach(() => {
@@ -24,7 +33,8 @@ describe('GithubService (partial)', () => {
     const headersWith = (svc as any).defaultHeaders();
     expect(headersWith.Authorization).toContain('Bearer');
     // restore
-    if (typeof prev === 'undefined') delete process.env.GITHUB_TOKEN; else process.env.GITHUB_TOKEN = prev;
+    if (typeof prev === 'undefined') delete process.env.GITHUB_TOKEN;
+    else process.env.GITHUB_TOKEN = prev;
   });
 
   it('decodeBase64 returns decoded string or null', () => {
@@ -34,13 +44,17 @@ describe('GithubService (partial)', () => {
   });
 
   it('bufferIsProbablyBinary works for text and binary', () => {
-    expect((svc as any).bufferIsProbablyBinary(Buffer.from('plain text'))).toBe(false);
+    expect((svc as any).bufferIsProbablyBinary(Buffer.from('plain text'))).toBe(
+      false,
+    );
     const buf = Buffer.from([0, 1, 2, 3, 4]);
     expect((svc as any).bufferIsProbablyBinary(buf)).toBe(true);
   });
 
   it('getCommits maps commit messages and filters falsy', async () => {
-    (svc as any).httpGet = jest.fn().mockResolvedValue({ data: [{ commit: { message: 'm1' } }, { commit: { message: null } }] });
+    (svc as any).httpGet = jest.fn().mockResolvedValue({
+      data: [{ commit: { message: 'm1' } }, { commit: { message: null } }],
+    });
     const res = await svc.getCommits('o', 'r');
     expect(res).toEqual(['m1']);
   });
@@ -53,11 +67,23 @@ describe('GithubService (partial)', () => {
   });
 
   it('getAllCache and getCacheByUrl extract owner/repo', async () => {
-    mockPrisma.githubCache.findMany.mockResolvedValue([{ url: 'analysis_v1/own/repo', etag: null, updatedAt: new Date(), data: { foo: 'bar' } }]);
+    mockPrisma.githubCache.findMany.mockResolvedValue([
+      {
+        url: 'analysis_v1/own/repo',
+        etag: null,
+        updatedAt: new Date(),
+        data: { foo: 'bar' },
+      },
+    ]);
     const all = await svc.getAllCache();
     expect(all[0].owner).toBe('own');
 
-    mockPrisma.githubCache.findUnique.mockResolvedValue({ url: 'analysis_v1/own2/repo2', etag: null, updatedAt: new Date(), data: { x: 1 } });
+    mockPrisma.githubCache.findUnique.mockResolvedValue({
+      url: 'analysis_v1/own2/repo2',
+      etag: null,
+      updatedAt: new Date(),
+      data: { x: 1 },
+    });
     const single = await svc.getCacheByUrl('any');
     expect(single.owner).toBe('own2');
     mockPrisma.githubCache.findUnique.mockResolvedValueOnce(null);
@@ -65,7 +91,24 @@ describe('GithubService (partial)', () => {
   });
 
   it('formatRepoData picks doc content and license logic', () => {
-    const input = [{ repo: 'r', commits: [1,2,3], branches: [], pullRequests: [], contributors: [], stargazers_count: 5, watchers_count: 1, open_issues_count: 0, forks_count: 0, docsContent: [{ name: 'README.md', path: 'README.md', content: 'c' }, { name: 'README.md', path: 'sub/README.md', content: 'c2' }], license: { key: 'mit', name: 'MIT' } }];
+    const input = [
+      {
+        repo: 'r',
+        commits: [1, 2, 3],
+        branches: [],
+        pullRequests: [],
+        contributors: [],
+        stargazers_count: 5,
+        watchers_count: 1,
+        open_issues_count: 0,
+        forks_count: 0,
+        docsContent: [
+          { name: 'README.md', path: 'README.md', content: 'c' },
+          { name: 'README.md', path: 'sub/README.md', content: 'c2' },
+        ],
+        license: { key: 'mit', name: 'MIT' },
+      },
+    ];
     const out = svc.formatRepoData(input as any);
     expect(out[0].detalhes.readme).toBeDefined();
     expect(out[0].detalhes.license).toBe('MIT');
@@ -80,7 +123,11 @@ import { AxiosResponse } from 'axios';
 import { Buffer } from 'buffer';
 import path from 'path';
 
-const mockAxiosResponse = (data: any, status: number, headers: any = {}): AxiosResponse<any> => ({
+const mockAxiosResponse = (
+  data: any,
+  status: number,
+  headers: any = {},
+): AxiosResponse<any> => ({
   data,
   status,
   statusText: status.toString(),
@@ -145,9 +192,14 @@ describe('GithubService', () => {
 
     jest.clearAllMocks();
 
-    mockFetchBranch = jest.spyOn(service as any, '_fetchDefaultBranch').mockResolvedValue('main');
+    mockFetchBranch = jest
+      .spyOn(service as any, '_fetchDefaultBranch')
+      .mockResolvedValue('main');
     mockFetchChecklist = jest.spyOn(service as any, 'fetchChecklistMdFiles');
-    bufferIsProbablyBinarySpy = jest.spyOn(service as any, 'bufferIsProbablyBinary');
+    bufferIsProbablyBinarySpy = jest.spyOn(
+      service as any,
+      'bufferIsProbablyBinary',
+    );
     extractOwnerSpy = jest.spyOn(service as any, 'extractOwner');
     extractRepoSpy = jest.spyOn(service as any, 'extractRepo');
   });
@@ -185,7 +237,9 @@ describe('GithubService', () => {
 
   describe('bufferIsProbablyBinary (Private)', () => {
     it('deve retornar true se contiver o byte nulo (0)', () => {
-      const binaryBuffer = Buffer.from([0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x00, 0x77, 0x6f, 0x72, 0x6c, 0x64]);
+      const binaryBuffer = Buffer.from([
+        0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x00, 0x77, 0x6f, 0x72, 0x6c, 0x64,
+      ]);
       expect((service as any).bufferIsProbablyBinary(binaryBuffer)).toBe(true);
     });
     it('deve retornar false para texto ASCII', () => {
@@ -199,10 +253,14 @@ describe('GithubService', () => {
       const items = [1, 2, 3, 4];
       const limit = 2;
       const mockFn = jest.fn(async (item) => {
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
         return item * 2;
       });
-      const results = await (service as any).mapWithConcurrency(items, limit, mockFn);
+      const results = await (service as any).mapWithConcurrency(
+        items,
+        limit,
+        mockFn,
+      );
       expect(results.sort()).toEqual([2, 4, 6, 8]);
       expect(mockFn).toHaveBeenCalledTimes(4);
     });
@@ -213,7 +271,9 @@ describe('GithubService', () => {
 
     it('deve buscar sem cache e salvar se o status for 200', async () => {
       mockPrismaService.githubCache.findUnique.mockResolvedValue(null);
-      mockHttpService.axiosRef.get.mockResolvedValue(mockAxiosResponse({ data: 'new' }, 200, { etag: 'new-etag' }));
+      mockHttpService.axiosRef.get.mockResolvedValue(
+        mockAxiosResponse({ data: 'new' }, 200, { etag: 'new-etag' }),
+      );
       const response = await (service as any).httpGet(url);
       expect(mockPrismaService.githubCache.upsert).toHaveBeenCalled();
       expect(response.status).toBe(200);
@@ -222,7 +282,9 @@ describe('GithubService', () => {
     it('deve usar o cache se o status for 304', async () => {
       const cachedData = { url, etag: 'old-etag', data: { data: 'cached' } };
       mockPrismaService.githubCache.findUnique.mockResolvedValue(cachedData);
-      mockHttpService.axiosRef.get.mockResolvedValue(mockAxiosResponse(null, 304, { etag: 'old-etag' }));
+      mockHttpService.axiosRef.get.mockResolvedValue(
+        mockAxiosResponse(null, 304, { etag: 'old-etag' }),
+      );
       const response = await (service as any).httpGet(url);
       expect(response.data.data).toBe('cached');
       expect(response.status).toBe(200);
@@ -230,9 +292,16 @@ describe('GithubService', () => {
     });
 
     it('deve retornar cache "stale" em caso de falha de API, se houver cache', async () => {
-      const cachedData = { url, etag: 'old-etag', data: { data: 'stale-cache' } };
+      const cachedData = {
+        url,
+        etag: 'old-etag',
+        data: { data: 'stale-cache' },
+      };
       mockPrismaService.githubCache.findUnique.mockResolvedValue(cachedData);
-      mockHttpService.axiosRef.get.mockRejectedValue({ message: 'Network Error', response: { status: 500 } });
+      mockHttpService.axiosRef.get.mockRejectedValue({
+        message: 'Network Error',
+        response: { status: 500 },
+      });
       const response = await (service as any).httpGet(url);
       expect(response.data.data).toBe('stale-cache');
       expect(response.headers['x-cache-status']).toBe('stale');
@@ -245,7 +314,7 @@ describe('GithubService', () => {
       await expect((service as any).httpGet(url)).rejects.toEqual({
         status: 404,
         message: 'Not Found',
-        original: error
+        original: error,
       });
     });
   });
@@ -257,21 +326,23 @@ describe('GithubService', () => {
     it('deve retornar repositórios com contadores', async () => {
       // Mock da resposta da API do GitHub com campos novos
       const reposPage1 = [
-        { 
-            name: `repo1`, 
-            owner: { login: 'testuser' }, 
-            html_url: `url1`, 
-            private: false, 
-            default_branch: 'main',
-            stargazers_count: 10,
-            watchers_count: 5,
-            open_issues_count: 2,
-            forks_count: 1
-        }
+        {
+          name: `repo1`,
+          owner: { login: 'testuser' },
+          html_url: `url1`,
+          private: false,
+          default_branch: 'main',
+          stargazers_count: 10,
+          watchers_count: 5,
+          open_issues_count: 2,
+          forks_count: 1,
+        },
       ];
-      
-      jest.spyOn(service as any, 'httpGet').mockResolvedValueOnce(mockAxiosResponse(reposPage1, 200));
-      
+
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValueOnce(mockAxiosResponse(reposPage1, 200));
+
       const result = await service.getUserRepos(username);
       expect(result.length).toBe(1);
       expect((result[0] as any).stargazers_count).toBe(10);
@@ -284,7 +355,9 @@ describe('GithubService', () => {
   describe('getBranches', () => {
     it('deve retornar lista de nomes de branches', async () => {
       const branches = [{ name: 'main' }, { name: 'dev' }];
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(branches, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse(branches, 200));
       const result = await service.getBranches('o', 'r');
       expect(result).toEqual(['main', 'dev']);
     });
@@ -292,8 +365,12 @@ describe('GithubService', () => {
 
   describe('getPullRequests', () => {
     it('deve retornar lista simplificada de PRs', async () => {
-      const prs = [{ number: 1, title: 'Fix', state: 'open', user: { login: 'u' } }];
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(prs, 200));
+      const prs = [
+        { number: 1, title: 'Fix', state: 'open', user: { login: 'u' } },
+      ];
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse(prs, 200));
       const result = await service.getPullRequests('o', 'r');
       expect(result[0].title).toBe('Fix');
     });
@@ -302,7 +379,9 @@ describe('GithubService', () => {
   describe('getContributors', () => {
     it('deve retornar lista de contribuidores', async () => {
       const contribs = [{ login: 'dev', contributions: 10 }];
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(contribs, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse(contribs, 200));
       const result = await service.getContributors('o', 'r');
       expect(result[0].login).toBe('dev');
     });
@@ -313,7 +392,9 @@ describe('GithubService', () => {
   describe('getCommits', () => {
     it('deve retornar mensagens de commit', async () => {
       const commits = [{ commit: { message: 'feat: new' } }];
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(commits, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse(commits, 200));
       const result = await service.getCommits('o', 'r');
       expect(result).toEqual(['feat: new']);
     });
@@ -321,8 +402,13 @@ describe('GithubService', () => {
 
   describe('getIssues', () => {
     it('deve retornar apenas issues (filtrando PRs)', async () => {
-      const data = [{ number: 1, pull_request: {} }, { number: 2, pull_request: undefined, title: 'Issue' }];
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(data, 200));
+      const data = [
+        { number: 1, pull_request: {} },
+        { number: 2, pull_request: undefined, title: 'Issue' },
+      ];
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse(data, 200));
       const result = await service.getIssues('o', 'r');
       expect(result.length).toBe(1);
       expect(result[0].title).toBe('Issue');
@@ -332,7 +418,9 @@ describe('GithubService', () => {
   describe('getReleases', () => {
     it('deve retornar releases formatadas', async () => {
       const data = [{ name: 'v1.0', tag_name: 'v1.0.0' }];
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(data, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse(data, 200));
       const result = await service.getReleases('o', 'r');
       expect(result.length).toBe(1);
       expect(result[0].name).toBe('v1.0');
@@ -343,7 +431,11 @@ describe('GithubService', () => {
     it('deve retornar conteúdo decodificado', async () => {
       const content = 'README content';
       const encoded = Buffer.from(content).toString('base64');
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse({ content: encoded, path: 'README.md' }, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(
+          mockAxiosResponse({ content: encoded, path: 'README.md' }, 200),
+        );
       const result = await service.getReadme('o', 'r');
       expect(result.content).toBe(content);
     });
@@ -351,14 +443,23 @@ describe('GithubService', () => {
     it('deve retornar conteúdo nulo em caso de erro 404', async () => {
       jest.spyOn(service as any, 'httpGet').mockRejectedValue({ status: 404 });
       const result = await service.getReadme('o', 'r');
-      expect(result).toEqual({ name: 'README.md', path: 'README.md', content: null });
+      expect(result).toEqual({
+        name: 'README.md',
+        path: 'README.md',
+        content: null,
+      });
     });
   });
 
   describe('getLicenses', () => {
     it('deve retornar detalhes da licença API', async () => {
-      const data = { license: { name: 'MIT License', spdx_id: 'MIT', key: 'mit' }, name: 'LICENSE' };
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(data, 200));
+      const data = {
+        license: { name: 'MIT License', spdx_id: 'MIT', key: 'mit' },
+        name: 'LICENSE',
+      };
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse(data, 200));
       const result = await service.getLicenses('o', 'r');
       expect(result.name).toBe('MIT License');
     });
@@ -368,7 +469,11 @@ describe('GithubService', () => {
     it('deve retornar conteúdo via caminho direto', async () => {
       const content = 'ignore';
       const encoded = Buffer.from(content).toString('base64');
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse({ content: encoded, path: '.gitignore' }, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(
+          mockAxiosResponse({ content: encoded, path: '.gitignore' }, 200),
+        );
       const result = await service.getGitignore('o', 'r');
       expect(result.content).toBe(content);
     });
@@ -376,9 +481,15 @@ describe('GithubService', () => {
     it('deve usar fallback via tree/blobs em caso de 404', async () => {
       const content = 'fallback';
       const encoded = Buffer.from(content).toString('base64');
-      jest.spyOn(service as any, 'httpGet')
+      jest
+        .spyOn(service as any, 'httpGet')
         .mockRejectedValueOnce({ status: 404 })
-        .mockResolvedValueOnce(mockAxiosResponse({ tree: [{ path: '.gitignore', type: 'blob', sha: 'sha1' }] }, 200))
+        .mockResolvedValueOnce(
+          mockAxiosResponse(
+            { tree: [{ path: '.gitignore', type: 'blob', sha: 'sha1' }] },
+            200,
+          ),
+        )
         .mockResolvedValueOnce(mockAxiosResponse({ content: encoded }, 200));
       const result = await service.getGitignore('o', 'r');
       expect(result.content).toBe(content);
@@ -389,9 +500,12 @@ describe('GithubService', () => {
     it('deve retornar conteúdo do primeiro candidato encontrado', async () => {
       const content = 'Changelog';
       const encoded = Buffer.from(content).toString('base64');
-      jest.spyOn(service as any, 'httpGet')
+      jest
+        .spyOn(service as any, 'httpGet')
         .mockRejectedValueOnce({ status: 404 })
-        .mockResolvedValueOnce(mockAxiosResponse({ content: encoded, path: 'changelog.md' }, 200));
+        .mockResolvedValueOnce(
+          mockAxiosResponse({ content: encoded, path: 'changelog.md' }, 200),
+        );
       const result = await service.getChangelog('o', 'r');
       expect(result.content).toBe(content);
     });
@@ -401,7 +515,11 @@ describe('GithubService', () => {
     it('deve retornar conteúdo do CONTRIBUTING.md', async () => {
       const content = 'Contribute';
       const encoded = Buffer.from(content).toString('base64');
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse({ content: encoded, path: 'CONTRIBUTING.md' }, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(
+          mockAxiosResponse({ content: encoded, path: 'CONTRIBUTING.md' }, 200),
+        );
       const result = await service.getContributing('o', 'r');
       expect(result.content).toBe(content);
     });
@@ -411,9 +529,15 @@ describe('GithubService', () => {
     it('deve usar fallback para .github/CODE_OF_CONDUCT.md se o root falhar (404)', async () => {
       const content = 'Code Fallback';
       const encoded = Buffer.from(content).toString('base64');
-      jest.spyOn(service as any, 'httpGet')
+      jest
+        .spyOn(service as any, 'httpGet')
         .mockRejectedValueOnce({ status: 404 })
-        .mockResolvedValueOnce(mockAxiosResponse({ content: encoded, path: '.github/CODE_OF_CONDUCT.md' }, 200));
+        .mockResolvedValueOnce(
+          mockAxiosResponse(
+            { content: encoded, path: '.github/CODE_OF_CONDUCT.md' },
+            200,
+          ),
+        );
       const result = await service.getConductCode('o', 'r');
       expect(result.content).toBe(content);
     });
@@ -421,8 +545,16 @@ describe('GithubService', () => {
 
   describe('getDocs', () => {
     it('deve usar fallback para /docs/ se /Docs/ falhar (404)', async () => {
-      const fallbackData = [{ type: 'file', name: 'file.md', path: 'docs/file.md', download_url: 'url' }];
-      jest.spyOn(service as any, 'httpGet')
+      const fallbackData = [
+        {
+          type: 'file',
+          name: 'file.md',
+          path: 'docs/file.md',
+          download_url: 'url',
+        },
+      ];
+      jest
+        .spyOn(service as any, 'httpGet')
         .mockRejectedValueOnce({ status: 404 })
         .mockResolvedValueOnce(mockAxiosResponse(fallbackData, 200));
       const result = await service.getDocs('o', 'r');
@@ -433,8 +565,12 @@ describe('GithubService', () => {
 
   describe('getDocsContent', () => {
     it('deve retornar conteúdo de todos os documentos', async () => {
-      jest.spyOn(service as any, 'getDocs').mockResolvedValue([{ name: 'd1', download_url: 'u1' }, { name: 'd2', download_url: 'u2' }]);
-      jest.spyOn(service as any, 'httpGet')
+      jest.spyOn(service as any, 'getDocs').mockResolvedValue([
+        { name: 'd1', download_url: 'u1' },
+        { name: 'd2', download_url: 'u2' },
+      ]);
+      jest
+        .spyOn(service as any, 'httpGet')
         .mockResolvedValueOnce(mockAxiosResponse('Content 1', 200))
         .mockResolvedValueOnce(mockAxiosResponse('Content 2', 200));
       const result = await service.getDocsContent('o', 'r');
@@ -442,8 +578,12 @@ describe('GithubService', () => {
     });
 
     it('deve lidar com falhas de download', async () => {
-      jest.spyOn(service as any, 'getDocs').mockResolvedValue([{ name: 'd1', download_url: 'u1' }]);
-      jest.spyOn(service as any, 'httpGet').mockRejectedValueOnce({ message: 'Error' });
+      jest
+        .spyOn(service as any, 'getDocs')
+        .mockResolvedValue([{ name: 'd1', download_url: 'u1' }]);
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockRejectedValueOnce({ message: 'Error' });
       const result = await service.getDocsContent('o', 'r');
       expect(result[0].content).toBeNull();
     });
@@ -452,7 +592,9 @@ describe('GithubService', () => {
   describe('getRepoTree', () => {
     it('deve retornar a estrutura da árvore do repositório', async () => {
       const treeData = [{ path: 'src/file.ts', type: 'blob' }];
-      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse({ tree: treeData }, 200));
+      jest
+        .spyOn(service as any, 'httpGet')
+        .mockResolvedValue(mockAxiosResponse({ tree: treeData }, 200));
       const result = await service.getRepoTree('o', 'r');
       expect(result.length).toBe(1);
     });
@@ -461,12 +603,19 @@ describe('GithubService', () => {
   describe('getGovernance, getArchitecture, getRoadmap', () => {
     it('getGovernance deve usar fetchChecklistMdFiles com o padrão correto', async () => {
       mockFetchChecklist.mockResolvedValue({
-        resultsByPath: { 'governance.md': { path: 'governance.md', content: 'Gov' } },
+        resultsByPath: {
+          'governance.md': { path: 'governance.md', content: 'Gov' },
+        },
         summary: {},
-        patternResults: {}
+        patternResults: {},
       });
       const result = await service.getGovernance('o', 'r');
-      expect(mockFetchChecklist).toHaveBeenCalledWith('o', 'r', ['governance.md'], 'main');
+      expect(mockFetchChecklist).toHaveBeenCalledWith(
+        'o',
+        'r',
+        ['governance.md'],
+        'main',
+      );
       expect(result.content).toBe('Gov');
     });
   });
@@ -477,11 +626,22 @@ describe('GithubService', () => {
         { path: 'README.md', type: 'blob', sha: 'sha1', size: 100 },
         { path: 'TOO_LARGE.md', type: 'blob', sha: 'sha5', size: 600 },
       ];
-      jest.spyOn(service as any, 'httpGet')
+      jest
+        .spyOn(service as any, 'httpGet')
         .mockResolvedValueOnce(mockAxiosResponse({ tree }, 200))
-        .mockResolvedValueOnce(mockAxiosResponse({ content: Buffer.from('Content 1').toString('base64') }, 200));
+        .mockResolvedValueOnce(
+          mockAxiosResponse(
+            { content: Buffer.from('Content 1').toString('base64') },
+            200,
+          ),
+        );
 
-      const result = await (service as any).fetchChecklistMdFiles('o', 'r', ['README.md', 'TOO_LARGE.md'], 'main');
+      const result = await (service as any).fetchChecklistMdFiles(
+        'o',
+        'r',
+        ['README.md', 'TOO_LARGE.md'],
+        'main',
+      );
 
       expect(result.summary.fetched).toBe(1);
       expect(result.resultsByPath['README.md'].content).toBe('Content 1');
@@ -500,35 +660,39 @@ describe('GithubService', () => {
 
   describe('formatRepoData', () => {
     it('deve formatar corretamente dados com métricas e sem booleanos', () => {
-      const inputData = [{
-        repo: 'test-repo',
-        commits: ['c1', 'c2'], 
-        branches: ['b1', 'b2'], // Novo
-        pullRequests: [{}],     // Novo
-        contributors: [{}],     // Novo
-        stargazers_count: 10,
-        watchers_count: 5,
-        open_issues_count: 2,
-        forks_count: 1,
-        
-        issues: [{}], releases: [{}],
-        license: { name: 'MIT', key: 'mit' }, gitignore: { content: 'ignore' },
-        docsContent: [{ name: 'README.md', content: 'R' }],
-        checkFolders: []
-      }];
-      
+      const inputData = [
+        {
+          repo: 'test-repo',
+          commits: ['c1', 'c2'],
+          branches: ['b1', 'b2'], // Novo
+          pullRequests: [{}], // Novo
+          contributors: [{}], // Novo
+          stargazers_count: 10,
+          watchers_count: 5,
+          open_issues_count: 2,
+          forks_count: 1,
+
+          issues: [{}],
+          releases: [{}],
+          license: { name: 'MIT', key: 'mit' },
+          gitignore: { content: 'ignore' },
+          docsContent: [{ name: 'README.md', content: 'R' }],
+          checkFolders: [],
+        },
+      ];
+
       const result = service.formatRepoData(inputData)[0];
-      
+
       // Verifica se as métricas foram populadas
       expect((result as any).commits).toBe(2);
       expect((result as any).branches_count).toBe(2);
       expect((result as any).prs_count).toBe(1);
       expect((result as any).stargazers_count).toBe(10);
       expect((result as any).watchers_count).toBe(5);
-      
+
       // Verifica se os booleanos antigos foram removidos (agora são undefined)
       expect((result as any).possuiLicense).toBeUndefined();
-      
+
       // Verifica se detalhes foram populados
       expect((result as any).detalhes.license).toBe('MIT');
     });
@@ -538,7 +702,9 @@ describe('GithubService', () => {
     it('deve retornar changed: false se status for 304', async () => {
       const cached = { url: 'u', etag: 'e', data: {} };
       mockPrismaService.githubCache.findUnique.mockResolvedValue(cached);
-      mockHttpService.axiosRef.get.mockResolvedValue(mockAxiosResponse(null, 304, { etag: 'e' }));
+      mockHttpService.axiosRef.get.mockResolvedValue(
+        mockAxiosResponse(null, 304, { etag: 'e' }),
+      );
       const result = await service.checkRepoChanged('o', 'r');
       expect(result).toEqual({ changed: false, etag: 'e' });
     });
@@ -547,21 +713,26 @@ describe('GithubService', () => {
   describe('_analyzeSingleRepo (Private)', () => {
     it('deve retornar cache HIT se não houver mudança e etag coincidir', async () => {
       // Objeto completo mockado
-      const repo = { 
-          owner: { login: 'o' }, 
-          name: 'r', 
-          default_branch: 'main', 
-          url: 'u', 
-          private: false,
-          stargazers_count: 0,
-          watchers_count: 0,
-          open_issues_count: 0,
-          forks_count: 0
+      const repo = {
+        owner: { login: 'o' },
+        name: 'r',
+        default_branch: 'main',
+        url: 'u',
+        private: false,
+        stargazers_count: 0,
+        watchers_count: 0,
+        open_issues_count: 0,
+        forks_count: 0,
       };
-      
-      jest.spyOn(service, 'checkRepoChanged').mockResolvedValue({ changed: false, etag: 'e1' });
-      mockPrismaService.githubRepoData.findUnique.mockResolvedValue({ etag: 'e1', data: { hit: true } });
-      
+
+      jest
+        .spyOn(service, 'checkRepoChanged')
+        .mockResolvedValue({ changed: false, etag: 'e1' });
+      mockPrismaService.githubRepoData.findUnique.mockResolvedValue({
+        etag: 'e1',
+        data: { hit: true },
+      });
+
       // Testando com forceUpdate = false
       const result = await (service as any)._analyzeSingleRepo(repo, false);
       expect(result).toEqual({ hit: true });
@@ -572,13 +743,36 @@ describe('GithubService', () => {
     it('deve analisar repos e corrigir IDs', async () => {
       // Array completo mockado
       const repos = [
-          { owner: { login: 'o' }, name: 'r1', default_branch: 'main', url: 'u1', private: false, stargazers_count: 0, watchers_count: 0, open_issues_count: 0, forks_count: 0 }, 
-          { owner: { login: 'o' }, name: 'r2', default_branch: 'main', url: 'u2', private: false, stargazers_count: 0, watchers_count: 0, open_issues_count: 0, forks_count: 0 }
+        {
+          owner: { login: 'o' },
+          name: 'r1',
+          default_branch: 'main',
+          url: 'u1',
+          private: false,
+          stargazers_count: 0,
+          watchers_count: 0,
+          open_issues_count: 0,
+          forks_count: 0,
+        },
+        {
+          owner: { login: 'o' },
+          name: 'r2',
+          default_branch: 'main',
+          url: 'u2',
+          private: false,
+          stargazers_count: 0,
+          watchers_count: 0,
+          open_issues_count: 0,
+          forks_count: 0,
+        },
       ];
-      
+
       jest.spyOn(service, 'getUserRepos').mockResolvedValue(repos);
-      jest.spyOn(service as any, '_analyzeSingleRepo').mockResolvedValueOnce({ repo: 'r1' }).mockResolvedValueOnce({ repo: 'r2' });
-      
+      jest
+        .spyOn(service as any, '_analyzeSingleRepo')
+        .mockResolvedValueOnce({ repo: 'r1' })
+        .mockResolvedValueOnce({ repo: 'r2' });
+
       const result = await service.analyzeUserRepos('user', false);
       expect(result.length).toBe(2);
       expect(result[0].id).toBe(1); // ID corrigido
@@ -588,7 +782,13 @@ describe('GithubService', () => {
 
   describe('getAllCache', () => {
     it('deve retornar todos os itens de cache formatados', async () => {
-      const mockResults = [{ url: 'https://api.github.com/repos/o1/r1', updatedAt: new Date(), data: { d: 1 } }];
+      const mockResults = [
+        {
+          url: 'https://api.github.com/repos/o1/r1',
+          updatedAt: new Date(),
+          data: { d: 1 },
+        },
+      ];
       mockPrismaService.githubCache.findMany.mockResolvedValue(mockResults);
       extractOwnerSpy.mockReturnValue('o1');
       extractRepoSpy.mockReturnValue('r1');
@@ -600,13 +800,16 @@ describe('GithubService', () => {
   describe('getCacheByUrl', () => {
     it('deve lançar NotFoundException se o cache não for encontrado', async () => {
       mockPrismaService.githubCache.findUnique.mockResolvedValue(null);
-      await expect(service.getCacheByUrl('url')).rejects.toThrow(NotFoundException);
+      await expect(service.getCacheByUrl('url')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('extractOwner / extractRepo (Private)', () => {
     it('deve extrair de URLs de API de repositório', () => {
-      const repoUrl = 'https://api.github.com/repos/owner-test/repo-test/contents/file.md';
+      const repoUrl =
+        'https://api.github.com/repos/owner-test/repo-test/contents/file.md';
       expect((service as any).extractOwner(repoUrl)).toBe('owner-test');
       expect((service as any).extractRepo(repoUrl)).toBe('repo-test');
     });

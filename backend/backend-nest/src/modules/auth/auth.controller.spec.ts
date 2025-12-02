@@ -75,7 +75,10 @@ describe('AuthController', () => {
   // ----------------------------
 
   it('POST /auth/register - deve registrar usuário', async () => {
-    mockAuthService.register.mockResolvedValue({ id: 1, email: 'test@test.com' });
+    mockAuthService.register.mockResolvedValue({
+      id: 1,
+      email: 'test@test.com',
+    });
 
     const res = await request(app.getHttpServer())
       .post('/auth/register')
@@ -105,7 +108,10 @@ describe('AuthController', () => {
   // ----------------------------
 
   it('POST /auth/checkToken - token válido', async () => {
-    mockAuthService.verifyToken.mockReturnValue({ id: 1, email: 'test@test.com' });
+    mockAuthService.verifyToken.mockReturnValue({
+      id: 1,
+      email: 'test@test.com',
+    });
 
     const res = await request(app.getHttpServer())
       .post('/auth/checkToken')
@@ -158,9 +164,7 @@ describe('AuthController', () => {
   // ----------------------------
 
   it('GET /auth/github - apenas garante que rota existe', async () => {
-    await request(app.getHttpServer())
-      .get('/auth/github')
-      .expect(200);
+    await request(app.getHttpServer()).get('/auth/github').expect(200);
   });
 
   it('GET /auth/github/callback - deve redirecionar com token', async () => {

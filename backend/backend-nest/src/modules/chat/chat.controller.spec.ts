@@ -19,7 +19,9 @@ describe('ChatController (e2e)', () => {
           of({
             data: {
               candidates: [
-                { content: { parts: [{ text: 'Resposta simulada do Gemini' }] } },
+                {
+                  content: { parts: [{ text: 'Resposta simulada do Gemini' }] },
+                },
               ],
             },
           }),

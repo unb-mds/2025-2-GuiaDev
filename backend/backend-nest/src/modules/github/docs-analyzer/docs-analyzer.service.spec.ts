@@ -4,11 +4,25 @@ jest.mock('@google/generative-ai', () => {
   return {
     GoogleGenerativeAI: jest.fn().mockImplementation(() => ({
       getGenerativeModel: jest.fn(() => ({
-        generateContent: jest.fn(async (req: any) => ({ response: { text: () => '{"score":85,"summary":"OK","suggestions":["A","B"]}' } })),
+        generateContent: jest.fn(async (req: any) => ({
+          response: {
+            text: () => '{"score":85,"summary":"OK","suggestions":["A","B"]}',
+          },
+        })),
       })),
     })),
-    SchemaType: { OBJECT: 'object', NUMBER: 'number', STRING: 'string', ARRAY: 'array' },
-    HarmCategory: { HARM_CATEGORY_HATE_SPEECH: 0, HARM_CATEGORY_HARASSMENT: 1, HARM_CATEGORY_SEXUALLY_EXPLICIT: 2, HARM_CATEGORY_DANGEROUS_CONTENT: 3 },
+    SchemaType: {
+      OBJECT: 'object',
+      NUMBER: 'number',
+      STRING: 'string',
+      ARRAY: 'array',
+    },
+    HarmCategory: {
+      HARM_CATEGORY_HATE_SPEECH: 0,
+      HARM_CATEGORY_HARASSMENT: 1,
+      HARM_CATEGORY_SEXUALLY_EXPLICIT: 2,
+      HARM_CATEGORY_DANGEROUS_CONTENT: 3,
+    },
     HarmBlockThreshold: { BLOCK_NONE: 0 },
   };
 });
@@ -50,7 +64,10 @@ describe('DocsAnalyzerService', () => {
 
   it('should call Gemini and parse result', async () => {
     const svc = new DocsAnalyzerService();
-    const res = await svc.analyzeText('README.md', 'This is some content for testing.');
+    const res = await svc.analyzeText(
+      'README.md',
+      'This is some content for testing.',
+    );
     expect(res.exists).toBe(true);
     expect(res.score).toBe(85);
     expect(res.suggestions.length).toBeGreaterThan(0);
@@ -61,7 +78,9 @@ describe('DocsAnalyzerService', () => {
     const mod = require('@google/generative-ai');
     mod.GoogleGenerativeAI = jest.fn().mockImplementation(() => ({
       getGenerativeModel: jest.fn(() => ({
-        generateContent: jest.fn(async () => { throw new Error('LLM fail'); }),
+        generateContent: jest.fn(async () => {
+          throw new Error('LLM fail');
+        }),
       })),
     }));
 
@@ -91,7 +110,7 @@ describe('DocsAnalyzerService', () => {
   });
 
   it('analyzes missing doc', () => {
-    return service.analyzeText('README.md', null).then(result => {
+    return service.analyzeText('README.md', null).then((result) => {
       expect(result.exists).toBe(false);
       expect(result.score).toBe(0);
       expect(result.suggestions.length).toBeGreaterThan(0);
@@ -100,7 +119,7 @@ describe('DocsAnalyzerService', () => {
 
   it('analyzes short README', () => {
     const content = '# Meu Projeto\n\nREADME curto.';
-    return service.analyzeText('README.md', content).then(result => {
+    return service.analyzeText('README.md', content).then((result) => {
       expect(result.exists).toBe(true);
       expect(result.score).toBeGreaterThanOrEqual(0);
       expect(result.suggestions.length).toBeGreaterThanOrEqual(1);

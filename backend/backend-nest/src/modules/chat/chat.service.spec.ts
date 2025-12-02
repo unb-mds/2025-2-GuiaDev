@@ -28,7 +28,11 @@ describe('ChatService', () => {
     const mockResponse = {
       data: {
         candidates: [
-          { content: { parts: [{ text: 'Olá! Sou o assistente técnico do portal.' }] } },
+          {
+            content: {
+              parts: [{ text: 'Olá! Sou o assistente técnico do portal.' }],
+            },
+          },
         ],
       },
     };
