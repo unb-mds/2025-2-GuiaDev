@@ -87,12 +87,35 @@ function Overview({repoObj}) {
 
   const commitCount = tryFromRepoObj || tryFromLocation || 0;
 
+  const contributorsCount = (() => {
+    if (repoObj && !Array.isArray(repoObj)) {
+      if (typeof repoObj.contributors_count === 'number') {
+        return repoObj.contributors_count;
+      }
+      if (Array.isArray(repoObj.contributors)) {
+        return repoObj.contributors.length;
+      }
+    }
+
+    const stateRepo = location.state?.repo;
+    if (stateRepo) {
+      if (typeof stateRepo.contributors_count === 'number') {
+        return stateRepo.contributors_count;
+      }
+      if (Array.isArray(stateRepo.contributors)) {
+        return stateRepo.contributors.length;
+      }
+    }
+
+    return 0;
+  })();
+
   const aggregate = {
     id: URLname,
     name: URLname,
     progress: avgScore, 
     commits: commitCount, 
-    contributors: '-', 
+    contributors: contributorsCount, 
     qtsArchive: totalDocs,
     status: existsCount > 0 ? 'Ativo' : 'Desconectado',
     languages: '-',

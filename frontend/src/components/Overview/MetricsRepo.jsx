@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useLocation } from 'react-router-dom';
 import "./MetricsRepo.css";
-import accept from "./../../assets/accept.svg";
+import branch from "./../../assets/branch.svg";
 import docs from "./../../assets/docs.svg";
 import warning from "./../../assets/warning.svg";
 import clock from "./../../assets/clock.svg";
@@ -40,15 +40,38 @@ function MetricsRepo({repoObj}) {
 
 
   const nameCommit = commitsArr && commitsArr.length ? commitsArr[0] : 'Sem commits';
+
+  const branchCount = useMemo(() => {
+    if (repoObj && !Array.isArray(repoObj)) {
+      if (typeof repoObj.branches_count === 'number') {
+        return repoObj.branches_count;
+      }
+      if (Array.isArray(repoObj.branches)) {
+        return repoObj.branches.length;
+      }
+    }
+
+    const stateRepo = location.state?.repo;
+    if (stateRepo) {
+      if (typeof stateRepo.branches_count === 'number') {
+        return stateRepo.branches_count;
+      }
+      if (Array.isArray(stateRepo.branches)) {
+        return stateRepo.branches.length;
+      }
+    }
+
+    return 0;
+  }, [repoObj, location.state]);
   
 
   
   const dataMetric = useMemo(() => ([
     {
       id: "Metric-1",
-      name: "Taxa de conclusão",
-      num: "-",
-      icon: <img src={accept} className="accept" />,
+      name: "Branches",
+      num: branchCount,
+      icon: <img src={branch} className="accept" />,
     },
     {
       id: "Metric-2",
@@ -68,7 +91,7 @@ function MetricsRepo({repoObj}) {
       num: nameCommit,
       icon: <img src={clock} />,
     },
-  ]), [totalDocs, existsCount, nameCommit]);
+  ]), [branchCount, totalDocs, existsCount, nameCommit]);
 
   return (
     <div className="allComponentMetrics">

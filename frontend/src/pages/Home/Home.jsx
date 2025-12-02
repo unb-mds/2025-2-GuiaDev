@@ -12,6 +12,7 @@ const Home = () => {
   const [owner, setOwner] = useState("");
   const [ownerLoading, setOwnerLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('authToken') || "");
   const urlToken = searchParams.get("token");
  
 
@@ -35,6 +36,8 @@ const Home = () => {
       token = localStorage.getItem("authToken");
     }
 
+    setAuthToken(token || "");
+
     // se ainda não houver token, redireciona pro login
     if (!token) {
       navigate("/login");
@@ -49,8 +52,7 @@ const Home = () => {
 
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
+        if (!authToken) {
           if (mounted) setOwnerLoading(false);
           return; // sem token não há profile
         }
@@ -61,7 +63,10 @@ const Home = () => {
         if (!mounted) return;
         const payload = res.data?.user ?? res.data ?? {};
         const username = payload.usernameGit || payload.username || '';
-        if (username) setOwner(username);
+        if (username) {
+          setOwner(username);
+          setRefreshKey((prev) => prev + 1);
+        }
         setOwnerLoading(false);
       } catch (err) {
         console.error('Falha ao obter perfil:', err);
@@ -91,7 +96,7 @@ const Home = () => {
       mounted = false;
       window.removeEventListener('profileUpdated', onProfileUpdated);
     };
-  }, []);
+  }, [authToken]);
 
   return (
     <div className="Boxrepo">
