@@ -13,8 +13,8 @@ function Sign_in() {
   const navigate = useNavigate();
 
   const handleGithubLogin = () => {
-    window.open('http://localhost:3000/auth/github', '_self'); // ou '_blank'
-    // window.open('https://two025-2-guiadev.onrender.com/auth/github', '_self'); // ou '_blank'
+    // window.open('http://localhost:3000/auth/github', '_self'); // ou '_blank'
+    window.open('https://two025-2-guiadev.onrender.com/auth/github', '_self'); // ou '_blank'
   };
 
   const handleSubmit = async (e) => {

@@ -154,7 +154,7 @@ export class authController {
         const token = await this.authService.loginGithub(req.user);
 
         // Redireciona o navegador para o front com o token
-        return res.redirect(`http://localhost:3001/home?token=${token.access_token}`);//front
-        // return res.redirect(`https://two025-2-guiadev-1-frontend.onrender.com/home?token=${token.access_token}`);
+        // return res.redirect(`http://localhost:3001/home?token=${token.access_token}`);//front
+        return res.redirect(`https://two025-2-guiadev-1-frontend.onrender.com/home?token=${token.access_token}`);
     }
 }
