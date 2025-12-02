@@ -1,4 +1,3 @@
-// file: docs-analyzer.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { GoogleGenerativeAI, SchemaType, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
