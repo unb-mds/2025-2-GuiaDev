@@ -98,8 +98,7 @@
       "!**/module.ts",
       "!**/*.module.ts",
       "!**/*.strategy.ts",
-      "!**/*.spec.ts",
-      "!modules/github/**"
+      "!**/*.spec.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
