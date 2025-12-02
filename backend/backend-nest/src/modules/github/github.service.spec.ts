@@ -1,3 +1,76 @@
+import { GithubService } from './github.service';
+import { HttpService } from '@nestjs/axios';
+
+describe('GithubService (partial)', () => {
+  let svc: GithubService;
+  const mockPrisma: any = {
+    githubCache: { findUnique: jest.fn(), upsert: jest.fn(), delete: jest.fn(), findMany: jest.fn() },
+    githubRepoData: { findMany: jest.fn(), findUnique: jest.fn(), upsert: jest.fn() },
+  };
+
+  beforeEach(() => {
+    const mockHttp: any = { axiosRef: { get: jest.fn() } };
+    svc = new GithubService(mockHttp as unknown as HttpService, mockPrisma);
+    jest.clearAllMocks();
+  });
+
+  it('defaultHeaders respects token env', () => {
+    const prev = process.env.GITHUB_TOKEN;
+    delete process.env.GITHUB_TOKEN;
+    const headersNoToken = (svc as any).defaultHeaders();
+    expect(headersNoToken.Accept).toBeDefined();
+
+    process.env.GITHUB_TOKEN = 'abc';
+    const headersWith = (svc as any).defaultHeaders();
+    expect(headersWith.Authorization).toContain('Bearer');
+    // restore
+    if (typeof prev === 'undefined') delete process.env.GITHUB_TOKEN; else process.env.GITHUB_TOKEN = prev;
+  });
+
+  it('decodeBase64 returns decoded string or null', () => {
+    const enc = Buffer.from('hello', 'utf8').toString('base64');
+    expect((svc as any).decodeBase64(enc)).toBe('hello');
+    expect((svc as any).decodeBase64(undefined)).toBeNull();
+  });
+
+  it('bufferIsProbablyBinary works for text and binary', () => {
+    expect((svc as any).bufferIsProbablyBinary(Buffer.from('plain text'))).toBe(false);
+    const buf = Buffer.from([0, 1, 2, 3, 4]);
+    expect((svc as any).bufferIsProbablyBinary(buf)).toBe(true);
+  });
+
+  it('getCommits maps commit messages and filters falsy', async () => {
+    (svc as any).httpGet = jest.fn().mockResolvedValue({ data: [{ commit: { message: 'm1' } }, { commit: { message: null } }] });
+    const res = await svc.getCommits('o', 'r');
+    expect(res).toEqual(['m1']);
+  });
+
+  it('getReadme returns default when httpGet throws', async () => {
+    (svc as any).httpGet = jest.fn().mockRejectedValue({ status: 500 });
+    const res = await svc.getReadme('o', 'r');
+    expect(res.name).toBe('README.md');
+    expect(res.content).toBeNull();
+  });
+
+  it('getAllCache and getCacheByUrl extract owner/repo', async () => {
+    mockPrisma.githubCache.findMany.mockResolvedValue([{ url: 'analysis_v1/own/repo', etag: null, updatedAt: new Date(), data: { foo: 'bar' } }]);
+    const all = await svc.getAllCache();
+    expect(all[0].owner).toBe('own');
+
+    mockPrisma.githubCache.findUnique.mockResolvedValue({ url: 'analysis_v1/own2/repo2', etag: null, updatedAt: new Date(), data: { x: 1 } });
+    const single = await svc.getCacheByUrl('any');
+    expect(single.owner).toBe('own2');
+    mockPrisma.githubCache.findUnique.mockResolvedValueOnce(null);
+    await expect(svc.getCacheByUrl('no-url')).rejects.toThrow();
+  });
+
+  it('formatRepoData picks doc content and license logic', () => {
+    const input = [{ repo: 'r', commits: [1,2,3], branches: [], pullRequests: [], contributors: [], stargazers_count: 5, watchers_count: 1, open_issues_count: 0, forks_count: 0, docsContent: [{ name: 'README.md', path: 'README.md', content: 'c' }, { name: 'README.md', path: 'sub/README.md', content: 'c2' }], license: { key: 'mit', name: 'MIT' } }];
+    const out = svc.formatRepoData(input as any);
+    expect(out[0].detalhes.readme).toBeDefined();
+    expect(out[0].detalhes.license).toBe('MIT');
+  });
+});
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { Logger, NotFoundException } from '@nestjs/common';

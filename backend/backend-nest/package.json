@@ -91,7 +91,15 @@
       "<rootDir>/../test/jest.setup.ts"
     ],
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!main.ts",
+      "!app/**",
+      "!app.module.ts",
+      "!**/module.ts",
+      "!**/*.module.ts",
+      "!**/*.strategy.ts",
+      "!**/*.spec.ts",
+      "!modules/github/**"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
