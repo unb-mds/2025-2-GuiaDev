@@ -57,7 +57,7 @@ jobs:
 
       # 6️⃣ Aplica o linter no backend (ajuste o caminho se necessário)
       - name: 🧹 Run Linter (NestJS)
-        run: docker compose exec -T backend npm run lint
+        run: docker compose exec -T nest-app npm run lint
 
       # 7️⃣ Executa testes unitários no backend
       - name: 🧪 Run Tests (NestJS)
