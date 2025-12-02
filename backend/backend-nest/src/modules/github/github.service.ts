@@ -189,8 +189,20 @@ export class GithubService {
 
   async getLicenses(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/license`;
-    try { const res = await this.httpGet(url, undefined, undefined, userToken); const data = res.data; if (!data || !data.license) return { name: 'Unlicensed', key: 'unlicensed', fileName: data?.name || null }; return { name: data.license.name, key: data.license.spdx_id || data.license.key || null, fileName: data.name || null }; }
-    catch (err: any) { return { name: 'Unlicensed', key: 'unlicensed', fileName: null }; }
+    try {
+      const res = await this.httpGet(url, undefined, undefined, userToken);
+      const data = res.data;
+      if (!data || !data.license) {
+        return { name: 'Unlicensed', key: 'unlicensed', fileName: data?.name || null, content: null };
+      }
+      return {
+        name: data.license.name,
+        key: data.license.spdx_id || data.license.key || null,
+        fileName: data.name || null,
+        content: this.decodeBase64(data?.content) ?? null,
+      };
+    }
+    catch (err: any) { return { name: 'Unlicensed', key: 'unlicensed', fileName: null, content: null }; }
   }
 
   async getGitignore(owner: string, repo: string, userToken?: string) {
@@ -237,15 +249,59 @@ export class GithubService {
   async getDocsContent(owner: string, repo: string, userToken?: string) {
     const files = await this.getDocs(owner, repo, userToken);
     if (!Array.isArray(files) || files.length === 0) return [];
-    const docs: { name: string; content: string | null }[] = [];
-    for (const file of files) {
+    const limit = Math.max(1, Math.min(this.CONCURRENCY, 5));
+    const docs = await this.mapWithConcurrency(files, limit, async (file) => {
       try {
         const response = await this.httpGet(file.download_url, { Accept: 'application/vnd.github.raw' }, undefined, userToken);
-        docs.push({ name: file.name, content: response.data });
-      } catch (err: any) {
-        docs.push({ name: file.name, content: null });
+        return { name: file.name, content: response.data };
+      } catch {
+        return { name: file.name, content: null };
       }
-    } return docs;
+    });
+    return docs.filter(Boolean);
+  }
+
+  async getIssueAndPrTemplates(owner: string, repo: string, userToken?: string) {
+    const files: { name: string; content: string | null }[] = [];
+    const fetchFile = async (path: string) => {
+      try {
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+        const res = await this.httpGet(url, undefined, undefined, userToken);
+        return { name: path.split('/').pop() || path, content: this.decodeBase64(res.data?.content) };
+      } catch {
+        return null;
+      }
+    };
+
+    const singleFiles = [
+      '.github/ISSUE_TEMPLATE.md',
+      '.github/PULL_REQUEST_TEMPLATE.md',
+      'ISSUE_TEMPLATE.md',
+      'PULL_REQUEST_TEMPLATE.md',
+    ];
+
+    for (const path of singleFiles) {
+      const result = await fetchFile(path);
+      if (result) files.push(result);
+    }
+
+    const directories = ['.github/ISSUE_TEMPLATE', '.github/PULL_REQUEST_TEMPLATE'];
+    for (const dir of directories) {
+      try {
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(dir)}`;
+        const res = await this.httpGet(url, undefined, undefined, userToken);
+        const entries = Array.isArray(res.data) ? res.data : [];
+        for (const entry of entries) {
+          if (entry.type !== 'file') continue;
+          const fetched = await fetchFile(entry.path || entry.name);
+          if (fetched) files.push(fetched);
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return files;
   }
 
   async getRepoTree(owner: string, repo: string, userToken?: string) {
@@ -324,6 +380,8 @@ export class GithubService {
 
       const apiLicenseValid = repo.license?.key && repo.license.key !== 'unlicensed';
 
+      const normalizedScore = typeof repo.score === 'number' ? repo.score : -1;
+
       return {
         id: index + 1, 
         nomeRepositorio: repo.repo,
@@ -331,7 +389,7 @@ export class GithubService {
         branches_count: Array.isArray(repo.branches) ? repo.branches.length : 0,
         prs_count: Array.isArray(repo.pullRequests) ? repo.pullRequests.length : 0,
         contributors_count: Array.isArray(repo.contributors) ? repo.contributors.length : 0,
-        score: repo.score || 0, // <--- ADICIONADO AQUI
+        score: normalizedScore,
         stargazers_count: repo.stargazers_count || 0, 
         watchers_count: repo.watchers_count || 0,     
         open_issues_count: repo.open_issues_count || 0, 
@@ -469,6 +527,7 @@ export class GithubService {
       const analysisResult = {
         owner: owner,
         repo: name, 
+        score: (cachedRepoData?.data as any)?.score ?? -1,
         stargazers_count: repo.stargazers_count,
         watchers_count: repo.watchers_count,
         open_issues_count: repo.open_issues_count, 
@@ -513,11 +572,6 @@ export class GithubService {
           etag: repoEtag ?? null
         }
       });
-
-      try {
-        await this.prisma.githubCache.delete({ where: { url: `analysis_v1/${owner}/${name}` }});
-      } catch (e) {
-      }
 
       return formattedData;
 
@@ -586,5 +640,19 @@ export class GithubService {
   private extractRepo(url: string): string {
     const match = url.match(/repos\/[^/]+\/([^/?]+)/) || url.match(/analysis_v1\/[^/]+\/([^/?]+)/);
     return match ? match[1] : '';
+  }
+
+  async getCachedRepoAnalysis(owner: string, repo: string) {
+    return this.prisma.githubCache.findUnique({
+      where: { url: `analysis_v1/${owner}/${repo}` },
+    });
+  }
+
+  async saveCachedRepoAnalysis(owner: string, repo: string, etag: string | null, data: any) {
+    await this.prisma.githubCache.upsert({
+      where: { url: `analysis_v1/${owner}/${repo}` },
+      update: { data, etag },
+      create: { url: `analysis_v1/${owner}/${repo}`, data, etag },
+    });
   }
 }

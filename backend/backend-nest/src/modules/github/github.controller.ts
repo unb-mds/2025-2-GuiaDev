@@ -1,21 +1,23 @@
-import { UseGuards, Req, Controller, Get, Param, Post, Logger, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { GithubService } from './github.service';
-import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { PrismaService } from 'src/database/prisma.service';
-import { Request } from 'express';
 import { DocsAnalyzerService } from './docs-analyzer/docs-analyzer.service';
-
-interface RequestWithUser extends Request {
-  user: {
-      userId: number;
-  };
-}
 
 @Controller('github')
 export class GithubController {
 
     private readonly logger = new Logger(GithubController.name);
     constructor(private readonly githubService: GithubService, private readonly prisma: PrismaService, private readonly docsAnalyzeService: DocsAnalyzerService) {}
+
+    private calculateRepoScore(analysis: Array<{ score?: number }>): number {
+        if (!Array.isArray(analysis) || analysis.length === 0) return -1;
+        const scores = analysis
+            .map((doc) => (typeof doc.score === 'number' ? doc.score : null))
+            .filter((value): value is number => value !== null && Number.isFinite(value));
+        if (scores.length === 0) return -1;
+        const avg = scores.reduce((sum, value) => sum + value, 0) / scores.length;
+        return Math.round(avg);
+    }
 
     @Get('commits/:owner/:repo')
     async getCommits(@Param('owner') owner: string, @Param('repo') repo: string) {
@@ -128,29 +130,69 @@ export class GithubController {
 
     @Get('analyze/:owner/:repo')
     async analyzeRepoDocs(@Param('owner') owner: string, @Param('repo') repo: string) {
-        const [readme, contributing, changelog, conduct, license, docsContent] = await Promise.all([
+        const cached = await this.githubService.getCachedRepoAnalysis(owner, repo);
+        let repoEtag: string | null = null;
+
+        try {
+            const { changed, etag } = await this.githubService.checkRepoChanged(owner, repo);
+            repoEtag = etag ?? null;
+            if (!changed && cached?.data && cached?.etag && cached.etag === repoEtag) {
+                return cached.data;
+            }
+        } catch (err) {
+            if (cached?.data) {
+                return cached.data;
+            }
+        }
+
+        const [readme, contributing, conduct, license, gitignore, templates] = await Promise.all([
             this.githubService.getReadme(owner, repo).catch(() => ({ name: 'README.md', content: null })),
             this.githubService.getContributing(owner, repo).catch(() => ({ content: null })),
-            this.githubService.getChangelog(owner, repo).catch(() => ({ content: null })),
             this.githubService.getConductCode(owner, repo).catch(() => ({ content: null })),
-            this.githubService.getLicenses(owner, repo).catch(() => ({ name: null })),
-            this.githubService.getDocsContent(owner, repo).catch(() => []),
+            this.githubService.getLicenses(owner, repo).catch(() => ({ name: null, content: null })),
+            this.githubService.getGitignore(owner, repo).catch(() => ({ content: null })),
+            this.githubService.getIssueAndPrTemplates(owner, repo).catch(() => []),
         ]);
 
         const docs: { name: string; content: string | null }[] = [];
         docs.push({ name: readme?.name || 'README.md', content: readme?.content ?? null });
         docs.push({ name: 'CONTRIBUTING.md', content: contributing?.content ?? null });
-        docs.push({ name: 'CHANGELOG.md', content: changelog?.content ?? null });
         docs.push({ name: 'CODE_OF_CONDUCT.md', content: conduct?.content ?? null });
-        docs.push({ name: 'LICENSE', content: license?.name ?? null });
+        docs.push({ name: 'LICENSE', content: license?.content ?? null });
+        docs.push({ name: '.gitignore', content: gitignore?.content ?? null });
 
-        if (Array.isArray(docsContent)) {
-            for (const d of docsContent) {
-                docs.push({ name: d.name, content: d.content ?? null });
+        if (Array.isArray(templates)) {
+            for (const template of templates) {
+                docs.push({ name: template.name, content: template.content ?? null });
             }
         }
 
-        const analysis = this.docsAnalyzeService.analyzeMany(docs);
+        const analysis = await this.docsAnalyzeService.analyzeMany(docs);
+        const repoScore = this.calculateRepoScore(analysis);
+
+        try {
+            const cachedRepo = await this.prisma.githubRepoData.findUnique({
+                where: { owner_repo: { owner, repo } },
+            });
+
+            if (cachedRepo) {
+                const currentData = (cachedRepo.data as Record<string, any>) || {};
+                const updatedData = {
+                    ...currentData,
+                    score: repoScore,
+                };
+
+                await this.prisma.githubRepoData.update({
+                    where: { owner_repo: { owner, repo } },
+                    data: { data: updatedData },
+                });
+            }
+        } catch (err: any) {
+            this.logger.warn(`Falha ao atualizar score do repositório ${owner}/${repo}: ${err?.message || err}`);
+        }
+
+        await this.githubService.saveCachedRepoAnalysis(owner, repo, repoEtag, analysis);
+
         return analysis;
     }
 
@@ -159,50 +201,4 @@ export class GithubController {
         return this.githubService.getRepoTree(owner, repo);
     }
 
-    @Post('analyze') 
-    @UseGuards(JwtAuthGuard) 
-    async analyzeUserRepos(@Req() req: RequestWithUser) {
-    
-        const userId = req.user.userId;
-        const user = await this.prisma.user.findUnique({
-            where: { id: Number(userId) },
-        });
-
-        if (!user || !(user.usernameGit)) {
-            throw new NotFoundException(
-                'Usuário não encontrado ou username do GitHub não configurado no perfil.',
-            );
-        }
-        
-        const usernameToAnalyze = user.usernameGit;
-        
-        const userToken = (user as any).githubAccessToken || (user as any).token || (user as any).githubToken || undefined;
-
-        try {
-            const analysisResults = await this.githubService.analyzeUserRepos(
-                usernameToAnalyze,
-                true,
-                userToken
-            );
-            
-            return {
-                message: `Análise de ${usernameToAnalyze} concluída.`,
-                count: analysisResults.length,
-                data: analysisResults,
-            };
-
-        } catch (error: any) {
-            if (error?.original?.response?.status === 404) {
-                throw new HttpException(
-                `Usuário do GitHub "${usernameToAnalyze}" não foi encontrado.`,
-                HttpStatus.NOT_FOUND,
-                );
-            }
-            
-            throw new HttpException(
-                'Falha ao buscar dados do GitHub.',
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
-        }
-    }
 }
