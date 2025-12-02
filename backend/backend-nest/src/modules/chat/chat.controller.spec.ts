@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { ChatModule } from './chat.module';
 import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
@@ -37,7 +37,7 @@ describe('ChatController (e2e)', () => {
       .send({ message: 'teste' })
       .expect(201);
 
-    expect(response.body.response).toContain('Resposta simulada');
+    expect(response.text).toContain('Resposta simulada');
   });
 
   afterAll(async () => {
