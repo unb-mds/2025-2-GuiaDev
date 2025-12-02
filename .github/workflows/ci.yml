@@ -2,7 +2,7 @@ name: CI Pipeline (Docker Compose)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, integracaoRelease2 ]
   pull_request:
     branches: [ main ]
 
@@ -59,9 +59,9 @@ jobs:
       # - name: 🧹 Run Linter (NestJS)
       #   run: docker compose exec -T backend npm run lint
 
-      # # 7️⃣ Executa testes unitários no backend
-      # - name: 🧪 Run Tests (NestJS)
-      #   run: docker compose exec -T backend npm run test -- --passWithNoTests
+      # 7️⃣ Executa testes unitários no backend
+      - name: 🧪 Run Tests (NestJS)
+        run: docker compose exec -T backend npm run test -- --passWithNoTests
 
       # 8️⃣ (Opcional) Verifica se o front está rodando
       - name: 🌐 Check frontend container health
