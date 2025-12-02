@@ -68,9 +68,11 @@ const LoadingWave = ({ owner }) => {
 
   return (
     <div className="loading-component">
-      <span className="search-msg">
+      <div className="search-msg">
+        <span>
         <p>Buscando repositórios de "{owner}"...</p>
-      </span>
+        </span>
+      </div>
       
       <div 
         className={`wave-container ${isRunning ? 'running' : ''}`} 

@@ -1,4 +1,4 @@
-import  { useState, useEffect, useContext} from "react";
+import { useState, useEffect, useContext, useRef, useMemo } from "react";
 import "./Boxrepo.css";
 import api from "../../../services/api";
 import ReposContext from "../../contexts/ReposContext";
@@ -8,24 +8,45 @@ import commitIcon from "../../assets/commit.svg";
 import ProgressBar from "../Shared/ProgressBar";
 import LoadingWave from "../WaveLoad/WaveLoad";
 import warning from "../../assets/warning.svg"
+import img from "../../assets/cat.png"
+import img2 from "../../assets/gato.png"
 
-const ErroOwner = ({owner}) =>{
+const ErroOwner = ({ owner }) => {
   return (
-  <div className="erro-box">
-    <span className="erroIcon">
-    <img src={warning}></img>
-    </span>
+    <div className="erro-box">
 
-    <div className="erroMsg">
-    <span>
-      <p>Ops! Não conseguimos localizar este perfil.</p>
-      <p>Parece que o nome de usuário: <u>{owner}</u> está incorreto ou o perfil não existe.</p>
-    </span>
-     
+      {!owner || owner.trim() === '' ? (
+        <div className="erro-box">
+          <span className="erroIcon">
+            <img src={warning}></img>
+          </span>
+
+          <div className="erroMsg">
+            <span>
+              <p>Digite o username do GitHub no campo Username GitHub nas configurações para puxar os repositórios.</p>
+            </span>
+
+          </div>
+        </div>) : (
+        <div className="erro-box">
+          <span className="erroIcon">
+            <img src={warning}></img>
+          </span>
+
+          <div className="erroMsg">
+            <span>
+              <p>Ops! Não conseguimos localizar este perfil.</p>
+              <p>Parece que o nome de usuário: <u>{owner}</u> está incorreto ou o perfil não existe.</p>
+            </span>
+
+          </div>
+        </div>
+
+      )}
+
+
     </div>
-    
-  </div>
-);
+  );
 }
 
 const BoxStat = ({ icon, nome, num, comment }) => {
@@ -89,40 +110,80 @@ const BoxRepositorio = ({ repo, owner }) => {
 
 
 
-function BoxRepo({ owner }) {
+function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
 
   const [stats, setStats] = useState([]);
   const [repos, setRepos] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [dataOwner, setDataOwner] = useState('');
+  const [syncLoading, setSyncLoading] = useState(false);
+  const [syncError, setSyncError] = useState(null);
+  const [localRefreshKey, setLocalRefreshKey] = useState(0);
   const { getReposForOwner, setReposForOwner } = useContext(ReposContext);
+  const lastHandledRefreshKeyRef = useRef(refreshKey);
+  const ownerTrimmed = useMemo(() => (
+    typeof owner === 'string' ? owner.trim() : ''
+  ), [owner]);
 
-const [test, setTESTE] = useState(false);
+  const handleSync = async () => {
+    if (syncLoading || !ownerTrimmed) return;
+    setSyncError(null);
+    setSyncLoading(true);
+    try {
+      await api.post('/analyze');
+      setLocalRefreshKey(prev => prev + 1);
+    } catch (err) {
+      setSyncError(err?.response?.data?.message || err?.message || 'Falha ao sincronizar repositórios');
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     let alive = true;
-    if (!owner) return;
-    const cached = getReposForOwner ? getReposForOwner(owner) : null;
+    const normalizedOwner = ownerTrimmed;
+    const hasOwner = Boolean(normalizedOwner);
+
+    if (!hasOwner) {
+      setRepos([]);
+      setStats([]);
+      setError(null);
+      setLoading(false);
+      setDataOwner('');
+      return () => { alive = false; };
+    }
+
+    let refreshTriggered = refreshKey !== lastHandledRefreshKeyRef.current;
+    if (refreshTriggered) {
+      lastHandledRefreshKeyRef.current = refreshKey;
+    }
+
+    const cached = !refreshTriggered && getReposForOwner
+      ? getReposForOwner(normalizedOwner)
+      : null;
 
     setError(null);
     setLoading(true);
 
     if (cached) {
       setRepos(Array.isArray(cached) ? cached : []);
+      setDataOwner(normalizedOwner);
       setLoading(false);
-
       return () => { alive = false; };
     }
 
     (async () => {
       try {
-        const res = await api.get(`git-hub/analyze/user/${encodeURIComponent(owner)}`);
+        const res = await api.get(`github/analyze/user/${encodeURIComponent(normalizedOwner)}`);
         if (!alive) return;
         const data = res?.data ?? [];
-        setRepos(Array.isArray(data) ? data : []);
- 
-        if (setReposForOwner) setReposForOwner(owner, Array.isArray(data) ? data : []);
+        const nextRepos = Array.isArray(data) ? data : [];
+        setRepos(nextRepos);
+        setDataOwner(normalizedOwner);
+
+        if (setReposForOwner) setReposForOwner(normalizedOwner, nextRepos);
       } catch (err) {
         if (!alive) return;
         setError("Erro ao pegar os repositórios");
@@ -133,7 +194,7 @@ const [test, setTESTE] = useState(false);
     })();
 
     return () => { alive = false; };
-  }, [owner]);
+  }, [ownerTrimmed, refreshKey, localRefreshKey, getReposForOwner, setReposForOwner]);
 
 
   useEffect(() => {
@@ -163,38 +224,68 @@ const [test, setTESTE] = useState(false);
     console.log('repoObj (debug):', repos);
   }, [repos]);
 
-return (
+  useEffect(() => {
+    setSyncError(null);
+  }, [ownerTrimmed]);
+
+  const pendingOwnerData = Boolean(ownerTrimmed) && ownerTrimmed !== dataOwner;
+  const shouldShowLoading = ownerLoading || loading || pendingOwnerData;
+
+  return (
     <div className="box-repo-container">
-      
-    
-      {loading ? (
-        <LoadingWave owner={owner} />
+
+
+      {shouldShowLoading ? (
+        <LoadingWave owner={ownerTrimmed} />
       ) : (
-        
+
         <>
-       
-          {!test ? (
+
+          {repos.length === 0 && !shouldShowLoading ? (
             <div className="erro-container">
               <div className="erro-component">
-                <ErroOwner owner={owner}/>
+                <ErroOwner owner={ownerTrimmed} />
               </div>
-              
+              {!ownerTrimmed ? (
+                <span>
+                  <img src={img2} className="img" />
+                </span>
+              ) : (
+                <span>
+                  <img src={img} className="img" />
+                </span>)}
             </div>
-            
+
           ) : (
-         
+
             <div>
               <div className="dashboard-header">
                 <div>
                   <h1>Dashboard</h1>
                   <br />
+
+                  <h2>Acompanhe o progresso da documentação dos seus repositórios!</h2>
                 </div>
-                <h2>Acompanhe o progresso da documentação dos seus repositórios!</h2>
+                <div className="boxrepo-sync-actions">
+
+                  <div className="box-btn">
+                  <button
+                    className="boxrepo-sync-btn"
+                    onClick={handleSync}
+                    disabled={!ownerTrimmed || syncLoading || shouldShowLoading}
+                  >
+                    {syncLoading ? 'Sincronizando…' : 'Sincronizar'}
+                  </button>
+                  {syncError && (
+                    <span className="boxrepo-sync-error">{syncError}</span>
+                  )}
+</div>
+                </div>
               </div>
 
               <div className="scroll">
                 <div className="boxes-list">
-                  
+
                   {stats && stats.map((s) => (
                     <BoxStat
                       key={s.id}
@@ -207,22 +298,22 @@ return (
                 </div>
               </div>
 
-         
+
               <div className="repo-section">
                 <h1>Seus repositórios</h1>
 
                 <div className="repo-scroll">
                   <div className="boxes-list-repo" id="repo-list">
-                    {repos.length === 0 ? (
+                    {repos.length === 0 || !ownerTrimmed ? (
                       <span className="empty-placeholder">
-                        <p>Nenhum repositório encontrado para "{owner}". Verifique o nome e tente novamente.</p>
+                        <p>Nenhum repositório encontrado para "{ownerTrimmed}". Verifique o nome e tente novamente.</p>
                       </span>
                     ) : (
                       repos.map((repo) => (
-                        <BoxRepositorio 
-                          key={repo.id} 
-                          repo={repo} 
-                          owner={owner} 
+                        <BoxRepositorio
+                          key={repo.id}
+                          repo={repo}
+                          owner={ownerTrimmed}
                         />
                       ))
                     )}
