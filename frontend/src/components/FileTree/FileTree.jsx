@@ -18,7 +18,7 @@ export default function FileTree({
     <div className="file-tree">
       {tree.map((node, i) => (
         <TreeNode
-          key={node.name + i}
+          key={node.path || `${node.name}-${i}`}
           node={node}
           level={0}
           onFileClick={onFileClick}
@@ -169,7 +169,7 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
           {node.children &&
             node.children.map((child, i) => (
               <TreeNode
-                key={child.name + i}
+                key={child.path || `${child.name}-${level + 1}-${i}`}
                 node={child}
                 level={level + 1}
                 onFileClick={onFileClick}
