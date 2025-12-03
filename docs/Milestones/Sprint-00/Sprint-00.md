@@ -11,7 +11,8 @@
   - Filipe  
   - Phillipe  
   - Hugo  
-  - João Guilherme  
+  - João Guilherme
+  - Bruno
 
 ---
 
