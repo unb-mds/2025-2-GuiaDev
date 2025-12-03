@@ -1,4 +1,4 @@
-# Relatório da Sprint — Projeto de Software X
+# Relatório da Sprint — Projeto de Software 
 
 ## 1. Informações Gerais
 
