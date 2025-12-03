@@ -1,11 +1,11 @@
-# Relatório da Sprint — Projeto de Software X
+# Relatório da Sprint — Projeto de Software 
 
 ## 1. Informações Gerais
 
 * **Sprint:** 1  
 * **Duração:** 04/09/2025 a 07/09/2025  
-* **Product Owner:** *não definido*  
-* **Scrum Master:** *não definido*  
+* **Product Owner:** *Hugo Freitas*  
+* **Scrum Master:** *Phillipe*  
 * **Time de Desenvolvimento:**  
   - Pedro  
   - Filipe  
