@@ -4,7 +4,6 @@ import { Buffer } from 'buffer';
 import path from 'path';
 import { AxiosResponse } from 'axios';
 import { PrismaService } from '../../database/prisma.service';
-import { GithubCache, GithubRepoData } from '@prisma/client'; 
 import { randomUUID } from 'crypto'; 
 
 @Injectable()
@@ -20,9 +19,10 @@ export class GithubService {
   private readonly MAX_BYTES = Number(process.env.GH_MAX_BYTES || 200 * 1024);
   private readonly CONCURRENCY = Number(process.env.GH_CONCURRENCY || 10);
 
-  private defaultHeaders() {
+  private defaultHeaders(userToken?: string) {
     const headers: Record<string, string> = { Accept: 'application/vnd.github+json' };
-    if (this.token) headers.Authorization = `Bearer ${this.token}`;
+    const tokenToUse = userToken || this.token;
+    if (tokenToUse) headers.Authorization = `Bearer ${tokenToUse}`;
     return headers;
   }
 
@@ -53,8 +53,8 @@ export class GithubService {
     await Promise.allSettled(executing); return results;
   }
 
-  private async httpGet(url: string, headers?: Record<string, string>, timeout = 15000): Promise<AxiosResponse<any>> {
-    const finalHeaders = { ...this.defaultHeaders(), ...(headers || {}) };
+  private async httpGet(url: string, headers?: Record<string, string>, timeout = 15000, userToken?: string): Promise<AxiosResponse<any>> {
+    const finalHeaders = { ...this.defaultHeaders(userToken), ...(headers || {}) };
 
     const cachedEntry = await this.prisma.githubCache.findUnique({ 
       where: { url } 
@@ -63,7 +63,6 @@ export class GithubService {
     if (cachedEntry && cachedEntry.etag) {
       if (!finalHeaders['If-None-Match']) {
           finalHeaders['If-None-Match'] = cachedEntry.etag;
-          this.logger.debug(`[Cache DB] Usando ETag: ${cachedEntry.etag} para ${url}`);
       }
     }
 
@@ -76,14 +75,12 @@ export class GithubService {
 
     if (response.status === 304) {
         if (cachedEntry) { 
-          this.logger.debug(`[Cache DB HIT] 304 Not Modified para: ${url}`);
           return {
             ...response,
             status: 200, 
             data: cachedEntry.data as any, 
           };
         } else {
-          this.logger.warn(`[Cache DB WARN] 304 recebido sem cache local para ${url}.`);
           throw new Error(`304 Not Modified recebido, mas sem cache local para ${url}`);
         }
       }
@@ -103,12 +100,6 @@ export class GithubService {
             data: response.data 
           },
         });
-
-        if (etag) {
-          this.logger.debug(`[Cache DB SET] Novo ETag: ${etag} para: ${url}`);
-        } else {
-          this.logger.debug(`[Cache DB SET] Salvo (sem ETag) para: ${url}`);
-        }
       }
       return response;
 
@@ -130,113 +121,124 @@ export class GithubService {
     }
   }
 
-  private async _fetchDefaultBranch(owner: string, repo: string): Promise<string> {
-    try { const repoInfoUrl = `https://api.github.com/repos/${owner}/${repo}`; const repoRes = await this.httpGet(repoInfoUrl); return repoRes.data?.default_branch || 'main'; }
-    catch (err: any) { this.logger.warn(`_fetchDefaultBranch: Failed for ${owner}/${repo}: ${err?.message || err}. Assuming 'main'.`); return 'main'; }
+  private async _fetchDefaultBranch(owner: string, repo: string, userToken?: string): Promise<string> {
+    try { const repoInfoUrl = `https://api.github.com/repos/${owner}/${repo}`; const repoRes = await this.httpGet(repoInfoUrl, undefined, undefined, userToken); return repoRes.data?.default_branch || 'main'; }
+    catch (err: any) { return 'main'; }
   }
 
-  async getUserRepos(username: string) {
+  async getUserRepos(username: string, userToken?: string) {
     const per_page = 100; let page = 1; const all: any[] = [];
     while (true) {
       const url = `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=updated&direction=desc&per_page=${per_page}&page=${page}`;
-      try { const res = await this.httpGet(url); const data = res.data || []; all.push(...data); if (data.length < per_page) break; page += 1; }
-      catch (err: any) { if (err.status === 404) return []; this.logger.warn(`getUserRepos error for ${username}: ${err.message}`); throw err.original || err; }
+      try { const res = await this.httpGet(url, undefined, undefined, userToken); const data = res.data || []; all.push(...data); if (data.length < per_page) break; page += 1; }
+      catch (err: any) { if (err.status === 404) return []; throw err.original || err; }
     }
-    // Aqui extraímos os TOTAIS que o GitHub já fornece
     return all.map(repo => ({ 
       name: repo.name, 
       owner: { login: repo.owner?.login }, 
       url: repo.html_url, 
       private: !!repo.private, 
       default_branch: repo.default_branch || 'main',
-      stargazers_count: repo.stargazers_count, // Total exato
-      watchers_count: repo.watchers_count,     // Total exato
-      open_issues_count: repo.open_issues_count, // Total exato (Inclui Issues + PRs abertos)
-      forks_count: repo.forks_count            // Total exato
+      stargazers_count: repo.stargazers_count,
+      watchers_count: repo.watchers_count,
+      open_issues_count: repo.open_issues_count,
+      forks_count: repo.forks_count
     }));
   }
 
-  async getCommits(owner: string, repo: string) {
+  async getCommits(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=100`;
-    try { const res = await this.httpGet(url); return (res.data || []).map((c: any) => c.commit?.message).filter(Boolean); }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getCommits ${owner}/${repo}: ${err.message}`); return []; }
+    try { const res = await this.httpGet(url, undefined, undefined, userToken); return (res.data || []).map((c: any) => c.commit?.message).filter(Boolean); }
+    catch (err: any) { return []; }
   }
 
-  async getBranches(owner: string, repo: string) {
+  async getBranches(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/branches?per_page=100`;
-    try { const res = await this.httpGet(url); return (res.data || []).map((b: any) => b.name).filter(Boolean); }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getBranches ${owner}/${repo}: ${err.message}`); return []; }
+    try { const res = await this.httpGet(url, undefined, undefined, userToken); return (res.data || []).map((b: any) => b.name).filter(Boolean); }
+    catch (err: any) { return []; }
   }
 
-  async getPullRequests(owner: string, repo: string) {
+  async getPullRequests(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/pulls?state=all&per_page=100`;
-    try { const res = await this.httpGet(url); return (res.data || []).map((pr: any) => ({ number: pr.number, title: pr.title, state: pr.state, user: pr.user?.login })); }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getPullRequests ${owner}/${repo}: ${err.message}`); return []; }
+    try { const res = await this.httpGet(url, undefined, undefined, userToken); return (res.data || []).map((pr: any) => ({ number: pr.number, title: pr.title, state: pr.state, user: pr.user?.login })); }
+    catch (err: any) { return []; }
   }
 
-  async getContributors(owner: string, repo: string) {
+  async getContributors(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/contributors?per_page=100`;
-    try { const res = await this.httpGet(url); return (res.data || []).map((c: any) => ({ login: c.login, contributions: c.contributions })); }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getContributors ${owner}/${repo}: ${err.message}`); return []; }
+    try { const res = await this.httpGet(url, undefined, undefined, userToken); return (res.data || []).map((c: any) => ({ login: c.login, contributions: c.contributions })); }
+    catch (err: any) { return []; }
   }
 
-  async getIssues(owner: string, repo: string) {
+  async getIssues(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/issues?per_page=100`;
-    try { const res = await this.httpGet(url); return (res.data || []).filter((i: any) => !i.pull_request).map((issue: any) => ({ number: issue.number, title: issue.title, state: issue.state, user: issue.user?.login, body: issue.body })); }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getIssues ${owner}/${repo}: ${err.message}`); return []; }
+    try { const res = await this.httpGet(url, undefined, undefined, userToken); return (res.data || []).filter((i: any) => !i.pull_request).map((issue: any) => ({ number: issue.number, title: issue.title, state: issue.state, user: issue.user?.login, body: issue.body })); }
+    catch (err: any) { return []; }
   }
 
-  async getReleases(owner: string, repo: string) {
+  async getReleases(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/releases?per_page=100`;
-    try { const res = await this.httpGet(url); return (res.data || []).map((release: any) => ({ name: release.name, tag: release.tag_name, published_at: release.published_at })); }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getReleases ${owner}/${repo}: ${err.message}`); return []; }
+    try { const res = await this.httpGet(url, undefined, undefined, userToken); return (res.data || []).map((release: any) => ({ name: release.name, tag: release.tag_name, published_at: release.published_at })); }
+    catch (err: any) { return []; }
   }
 
-  async getReadme(owner: string, repo: string) {
-    try { const branch = await this._fetchDefaultBranch(owner, repo); const url = `https://api.github.com/repos/${owner}/${repo}/readme?ref=${encodeURIComponent(branch)}`; const response = await this.httpGet(url); return { name: response.data.name, path: response.data.path, content: this.decodeBase64(response.data.content) }; }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getReadme ${owner}/${repo}: ${err.message}`); return { name: 'README.md', path: 'README.md', content: null }; }
+  async getReadme(owner: string, repo: string, userToken?: string) {
+    try { const branch = await this._fetchDefaultBranch(owner, repo, userToken); const url = `https://api.github.com/repos/${owner}/${repo}/readme?ref=${encodeURIComponent(branch)}`; const response = await this.httpGet(url, undefined, undefined, userToken); return { name: response.data.name, path: response.data.path, content: this.decodeBase64(response.data.content) }; }
+    catch (err: any) { return { name: 'README.md', path: 'README.md', content: null }; }
   }
 
-  async getLicenses(owner: string, repo: string) {
+  async getLicenses(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/license`;
-    try { const res = await this.httpGet(url); const data = res.data; if (!data || !data.license) return { name: 'Unlicensed', key: 'unlicensed', fileName: data?.name || null }; return { name: data.license.name, key: data.license.spdx_id || data.license.key || null, fileName: data.name || null }; }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getLicenses ${owner}/${repo}: ${err.message}`); return { name: 'Unlicensed', key: 'unlicensed', fileName: null }; }
+    try {
+      const res = await this.httpGet(url, undefined, undefined, userToken);
+      const data = res.data;
+      if (!data || !data.license) {
+        return { name: 'Unlicensed', key: 'unlicensed', fileName: data?.name || null, content: null };
+      }
+      return {
+        name: data.license.name,
+        key: data.license.spdx_id || data.license.key || null,
+        fileName: data.name || null,
+        content: this.decodeBase64(data?.content) ?? null,
+      };
+    }
+    catch (err: any) { return { name: 'Unlicensed', key: 'unlicensed', fileName: null, content: null }; }
   }
 
-  async getGitignore(owner: string, repo: string) {
-    let effectiveBranch = 'main'; try { effectiveBranch = await this._fetchDefaultBranch(owner, repo); } catch {}
-    try { const url = `https://api.github.com/repos/${owner}/${repo}/contents/.gitignore`; const res = await this.httpGet(url); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; }
-    catch (err: any) { if (err.status === 404) { try { const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(effectiveBranch)}?recursive=1`; const treeRes = await this.httpGet(treeUrl); const entry = (treeRes.data.tree || []).find((e: any) => e.type === 'blob' && path.basename(e.path).toLowerCase() === '.gitignore'); if (!entry) return { content: null, sha: null, path: null }; const blobRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/blobs/${entry.sha}`); return { content: this.decodeBase64(blobRes.data?.content), sha: entry.sha, path: entry.path }; } catch (treeErr: any) { this.logger.warn(`getGitignore fallback error for ${owner}/${repo}@${effectiveBranch}: ${treeErr?.message || treeErr}`); return { content: null, sha: null, path: null }; } } this.logger.warn(`getGitignore error for ${owner}/${repo}: ${err.message}`); return { content: null, sha: null, path: null }; }
+  async getGitignore(owner: string, repo: string, userToken?: string) {
+    let effectiveBranch = 'main'; try { effectiveBranch = await this._fetchDefaultBranch(owner, repo, userToken); } catch {}
+    try { const url = `https://api.github.com/repos/${owner}/${repo}/contents/.gitignore`; const res = await this.httpGet(url, undefined, undefined, userToken); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; }
+    catch (err: any) { if (err.status === 404) { try { const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(effectiveBranch)}?recursive=1`; const treeRes = await this.httpGet(treeUrl, undefined, undefined, userToken); const entry = (treeRes.data.tree || []).find((e: any) => e.type === 'blob' && path.basename(e.path).toLowerCase() === '.gitignore'); if (!entry) return { content: null, sha: null, path: null }; const blobRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/blobs/${entry.sha}`, undefined, undefined, userToken); return { content: this.decodeBase64(blobRes.data?.content), sha: entry.sha, path: entry.path }; } catch (treeErr: any) { return { content: null, sha: null, path: null }; } } return { content: null, sha: null, path: null }; }
   }
 
-  async getChangelog(owner: string, repo: string) {
-    const candidates = ['CHANGELOG.md', 'changelog.md', 'CHANGELOG', 'changelog']; let branch = 'main'; try { branch = await this._fetchDefaultBranch(owner, repo); } catch {}
-    try { for (const cand of candidates) { try { const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(cand)}?ref=${encodeURIComponent(branch)}`; const res = await this.httpGet(url); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; } catch (err: any) { if (err.status !== 404) throw err; } } const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`; const treeRes = await this.httpGet(treeUrl); const entry = (treeRes.data.tree || []).find((e: any) => e.type === 'blob' && candidates.includes(path.basename(e.path).toLowerCase())); if (!entry) return { content: null, sha: null, path: null }; const blobRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/blobs/${entry.sha}`); return { content: this.decodeBase64(blobRes.data?.content), sha: entry.sha, path: entry.path }; }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getChangelog ${owner}/${repo}@${branch}: ${err.message}`); return { content: null, sha: null, path: null }; }
+  async getChangelog(owner: string, repo: string, userToken?: string) {
+    const candidates = ['CHANGELOG.md', 'changelog.md', 'CHANGELOG', 'changelog']; let branch = 'main'; try { branch = await this._fetchDefaultBranch(owner, repo, userToken); } catch {}
+    try { for (const cand of candidates) { try { const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(cand)}?ref=${encodeURIComponent(branch)}`; const res = await this.httpGet(url, undefined, undefined, userToken); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; } catch (err: any) { if (err.status !== 404) throw err; } } const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`; const treeRes = await this.httpGet(treeUrl, undefined, undefined, userToken); const entry = (treeRes.data.tree || []).find((e: any) => e.type === 'blob' && candidates.includes(path.basename(e.path).toLowerCase())); if (!entry) return { content: null, sha: null, path: null }; const blobRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/blobs/${entry.sha}`, undefined, undefined, userToken); return { content: this.decodeBase64(blobRes.data?.content), sha: entry.sha, path: entry.path }; }
+    catch (err: any) { return { content: null, sha: null, path: null }; }
   }
 
-  async getContributing(owner: string, repo: string) {
-    try { const branch = await this._fetchDefaultBranch(owner, repo); const url = `https://api.github.com/repos/${owner}/${repo}/contents/CONTRIBUTING.md?ref=${encodeURIComponent(branch)}`; const res = await this.httpGet(url); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getContributing ${owner}/${repo}: ${err.message}`); return { content: null, sha: null, path: null }; }
+  async getContributing(owner: string, repo: string, userToken?: string) {
+    try { const branch = await this._fetchDefaultBranch(owner, repo, userToken); const url = `https://api.github.com/repos/${owner}/${repo}/contents/CONTRIBUTING.md?ref=${encodeURIComponent(branch)}`; const res = await this.httpGet(url, undefined, undefined, userToken); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; }
+    catch (err: any) { return { content: null, sha: null, path: null }; }
   }
 
-  async getConductCode(owner: string, repo: string) {
-    let branch = 'main'; try { branch = await this._fetchDefaultBranch(owner, repo); } catch {}
-    try { const url = `https://api.github.com/repos/${owner}/${repo}/contents/CODE_OF_CONDUCT.md?ref=${encodeURIComponent(branch)}`; const res = await this.httpGet(url); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; }
-    catch (err: any) { if (err.status === 404) { try { const fallbackUrl = `https://api.github.com/repos/${owner}/${repo}/contents/.github/CODE_OF_CONDUCT.md?ref=${encodeURIComponent(branch)}`; const fallbackRes = await this.httpGet(fallbackUrl); return { content: this.decodeBase64(fallbackRes.data.content), sha: fallbackRes.data.sha, path: fallbackRes.data.path }; } catch (fallbackErr: any) { if (fallbackErr.status !== 404) this.logger.warn(`getConductCode fallback ${owner}/${repo}: ${fallbackErr.message}`); return { content: null, sha: null, path: null }; } } this.logger.warn(`getConductCode ${owner}/${repo}: ${err.message}`); return { content: null, sha: null, path: null }; }
+  async getConductCode(owner: string, repo: string, userToken?: string) {
+    let branch = 'main'; try { branch = await this._fetchDefaultBranch(owner, repo, userToken); } catch {}
+    try { const url = `https://api.github.com/repos/${owner}/${repo}/contents/CODE_OF_CONDUCT.md?ref=${encodeURIComponent(branch)}`; const res = await this.httpGet(url, undefined, undefined, userToken); return { content: this.decodeBase64(res.data.content), sha: res.data.sha, path: res.data.path }; }
+    catch (err: any) { if (err.status === 404) { try { const fallbackUrl = `https://api.github.com/repos/${owner}/${repo}/contents/.github/CODE_OF_CONDUCT.md?ref=${encodeURIComponent(branch)}`; const fallbackRes = await this.httpGet(fallbackUrl, undefined, undefined, userToken); return { content: this.decodeBase64(fallbackRes.data.content), sha: fallbackRes.data.sha, path: fallbackRes.data.path }; } catch (fallbackErr: any) { return { content: null, sha: null, path: null }; } } return { content: null, sha: null, path: null }; }
   }
 
-  async getDocs(owner: string, repo: string) {
+  async getDocs(owner: string, repo: string, userToken?: string) {
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/Docs/`;
     try {
-      const response = await this.httpGet(url);
+      const response = await this.httpGet(url, undefined, undefined, userToken);
       return (response.data || []).filter((item: any) => item.type === 'file').map((file: any) => ({ name: file.name, path: file.path, download_url: file.download_url }));
     }
     catch (error: any) {
       if (error.status === 404) {
         const fallbackUrl = `https://api.github.com/repos/${owner}/${repo}/contents/docs/`;
         try {
-          const fallbackResponse = await this.httpGet(fallbackUrl);
+          const fallbackResponse = await this.httpGet(fallbackUrl, undefined, undefined, userToken);
           return (fallbackResponse.data || []).filter((item: any) => item.type === 'file').map((file: any) => ({ name: file.name, path: file.path, download_url: file.download_url }));
         } catch { return []; }
       }
@@ -244,55 +246,98 @@ export class GithubService {
     }
   }
 
-  async getDocsContent(owner: string, repo: string) {
-    const files = await this.getDocs(owner, repo);
+  async getDocsContent(owner: string, repo: string, userToken?: string) {
+    const files = await this.getDocs(owner, repo, userToken);
     if (!Array.isArray(files) || files.length === 0) return [];
-    const docs: { name: string; content: string | null }[] = [];
-    for (const file of files) {
+    const limit = Math.max(1, Math.min(this.CONCURRENCY, 5));
+    const docs = await this.mapWithConcurrency(files, limit, async (file) => {
       try {
-        const response = await this.httpGet(file.download_url, { Accept: 'application/vnd.github.raw' });
-        docs.push({ name: file.name, content: response.data });
-      } catch (err: any) {
-        docs.push({ name: file.name, content: null });
+        const response = await this.httpGet(file.download_url, { Accept: 'application/vnd.github.raw' }, undefined, userToken);
+        return { name: file.name, content: response.data };
+      } catch {
+        return { name: file.name, content: null };
       }
-    } return docs;
+    });
+    return docs.filter(Boolean);
   }
 
-  async getRepoTree(owner: string, repo: string) {
+  async getIssueAndPrTemplates(owner: string, repo: string, userToken?: string) {
+    const files: { name: string; content: string | null }[] = [];
+    const fetchFile = async (path: string) => {
+      try {
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+        const res = await this.httpGet(url, undefined, undefined, userToken);
+        return { name: path.split('/').pop() || path, content: this.decodeBase64(res.data?.content) };
+      } catch {
+        return null;
+      }
+    };
+
+    const singleFiles = [
+      '.github/ISSUE_TEMPLATE.md',
+      '.github/PULL_REQUEST_TEMPLATE.md',
+      'ISSUE_TEMPLATE.md',
+      'PULL_REQUEST_TEMPLATE.md',
+    ];
+
+    for (const path of singleFiles) {
+      const result = await fetchFile(path);
+      if (result) files.push(result);
+    }
+
+    const directories = ['.github/ISSUE_TEMPLATE', '.github/PULL_REQUEST_TEMPLATE'];
+    for (const dir of directories) {
+      try {
+        const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(dir)}`;
+        const res = await this.httpGet(url, undefined, undefined, userToken);
+        const entries = Array.isArray(res.data) ? res.data : [];
+        for (const entry of entries) {
+          if (entry.type !== 'file') continue;
+          const fetched = await fetchFile(entry.path || entry.name);
+          if (fetched) files.push(fetched);
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return files;
+  }
+
+  async getRepoTree(owner: string, repo: string, userToken?: string) {
     try {
-      const branch = await this._fetchDefaultBranch(owner, repo);
+      const branch = await this._fetchDefaultBranch(owner, repo, userToken);
       const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-      const res = await this.httpGet(treeUrl);
+      const res = await this.httpGet(treeUrl, undefined, undefined, userToken);
       const tree = res.data?.tree || [];
       const result = tree.map((entry: any) => ({ path: entry.path, type: entry.type }));
       return result;
     } catch (err: any) {
-      this.logger.warn(`getRepoTree ${owner}/${repo}: ${err?.message || err}`);
       throw err.original || err;
     }
   }
 
-  async getGovernance(owner: string, repo: string) {
-    try { const branch = await this._fetchDefaultBranch(owner, repo); const patterns = ['governance.md']; const { resultsByPath } = await this.fetchChecklistMdFiles(owner, repo, patterns, branch); const result = Object.values(resultsByPath).find(r => r.content && path.basename(r.path).toLowerCase() === 'governance.md'); return { path: result?.path || null, content: result?.content || null }; }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getGovernance ${owner}/${repo}: ${err.message}`); return { path: null, content: null }; }
+  async getGovernance(owner: string, repo: string, userToken?: string) {
+    try { const branch = await this._fetchDefaultBranch(owner, repo, userToken); const patterns = ['governance.md']; const { resultsByPath } = await this.fetchChecklistMdFiles(owner, repo, patterns, branch, userToken); const result = Object.values(resultsByPath).find(r => r.content && path.basename(r.path).toLowerCase() === 'governance.md'); return { path: result?.path || null, content: result?.content || null }; }
+    catch (err: any) { return { path: null, content: null }; }
   }
 
-  async getArchitecture(owner: string, repo: string) {
-    try { const branch = await this._fetchDefaultBranch(owner, repo); const patterns = ['architecture.md', 'arquitetura.md']; const { resultsByPath } = await this.fetchChecklistMdFiles(owner, repo, patterns, branch); const result = Object.values(resultsByPath).filter(r => r.content && patterns.includes(path.basename(r.path).toLowerCase())).sort((a, b) => a.path.length - b.path.length)[0]; return { path: result?.path || null, content: result?.content || null }; }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getArchitecture ${owner}/${repo}: ${err.message}`); return { path: null, content: null }; }
+  async getArchitecture(owner: string, repo: string, userToken?: string) {
+    try { const branch = await this._fetchDefaultBranch(owner, repo, userToken); const patterns = ['architecture.md', 'arquitetura.md']; const { resultsByPath } = await this.fetchChecklistMdFiles(owner, repo, patterns, branch, userToken); const result = Object.values(resultsByPath).filter(r => r.content && patterns.includes(path.basename(r.path).toLowerCase())).sort((a, b) => a.path.length - b.path.length)[0]; return { path: result?.path || null, content: result?.content || null }; }
+    catch (err: any) { return { path: null, content: null }; }
   }
 
-  async getRoadmap(owner: string, repo: string) {
-    try { const branch = await this._fetchDefaultBranch(owner, repo); const patterns = ['roadmap.md']; const { resultsByPath } = await this.fetchChecklistMdFiles(owner, repo, patterns, branch); const result = Object.values(resultsByPath).find(r => r.content && path.basename(r.path).toLowerCase() === 'roadmap.md'); return { path: result?.path || null, content: result?.content || null }; }
-    catch (err: any) { if (err.status !== 404) this.logger.warn(`getRoadmap ${owner}/${repo}: ${err.message}`); return { path: null, content: null }; }
+  async getRoadmap(owner: string, repo: string, userToken?: string) {
+    try { const branch = await this._fetchDefaultBranch(owner, repo, userToken); const patterns = ['roadmap.md']; const { resultsByPath } = await this.fetchChecklistMdFiles(owner, repo, patterns, branch, userToken); const result = Object.values(resultsByPath).find(r => r.content && path.basename(r.path).toLowerCase() === 'roadmap.md'); return { path: result?.path || null, content: result?.content || null }; }
+    catch (err: any) { return { path: null, content: null }; }
   }
 
-  async fetchChecklistMdFiles(owner: string, repo: string, patterns: string[], branch: string) {
+  async fetchChecklistMdFiles(owner: string, repo: string, patterns: string[], branch: string, userToken?: string) {
     let tree: any[] = [];
     try {
-      try { tree = (await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`)).data.tree || []; }
-      catch { const refRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${encodeURIComponent(branch)}`); const commitSha = refRes.data.object.sha; const commitRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/commits/${commitSha}`); const treeSha = commitRes.data.tree.sha; tree = (await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/trees/${treeSha}?recursive=1`)).data.tree || []; }
-    } catch (err: any) { this.logger.warn(`fetchChecklistMdFiles: could not fetch tree for ${owner}/${repo}@${branch}: ${err?.message || err}`); return { patternResults: {}, resultsByPath: {}, summary: { totalPatterns: patterns.length, totalMdFilesMatched: 0, fetched: 0, skipped: 0 } }; }
+      try { tree = (await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`, undefined, undefined, userToken)).data.tree || []; }
+      catch { const refRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${encodeURIComponent(branch)}`, undefined, undefined, userToken); const commitSha = refRes.data.object.sha; const commitRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/commits/${commitSha}`, undefined, undefined, userToken); const treeSha = commitRes.data.tree.sha; tree = (await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/trees/${treeSha}?recursive=1`, undefined, undefined, userToken)).data.tree || []; }
+    } catch (err: any) { return { patternResults: {}, resultsByPath: {}, summary: { totalPatterns: patterns.length, totalMdFilesMatched: 0, fetched: 0, skipped: 0 } }; }
     
     const blobs = tree.filter(e => e.type === 'blob'); const allPaths = blobs.map(b => b.path); const pathMap = new Map(blobs.map(b => [b.path.toLowerCase(), b]));
     const resolvePattern = (pat: string) => { const matches = new Set<string>(); const ptrim = pat.trim(); if (ptrim === '/') { allPaths.forEach(p => matches.add(p)); } else if (ptrim.endsWith('/')) { const prefix = ptrim.replace(/^\/+|\/+$/g, '').toLowerCase() + '/'; for (const p of allPaths) if (p.toLowerCase().startsWith(prefix)) matches.add(p); } else if (ptrim.includes('*')) { const regex = new RegExp('^' + ptrim.split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$', 'i'); for (const p of allPaths) if (regex.test(p)) matches.add(p); } else { const norm = ptrim.replace(/^\/+/, '').toLowerCase(); if (pathMap.has(norm)) { const found = blobs.find(b => b.path.toLowerCase() === norm); if (found) matches.add(found.path); } for (const p of allPaths) if (path.basename(p).toLowerCase() === norm) matches.add(p); } return [...matches].filter(p => /\.md$/i.test(p)); };
@@ -301,7 +346,7 @@ export class GithubService {
     
     const worker = async (p: string) => {
       const entry = blobs.find(b => b.path === p); if (!entry) { resultsByPath[p] = { path: p, content: null, skipped: 'not_found' }; return; } if (!/\.md$/i.test(entry.path)) { resultsByPath[p] = { path: p, content: null, skipped: 'not_md' }; return; } if (entry.size > this.MAX_BYTES) { resultsByPath[p] = { path: p, sha: entry.sha, content: null, skipped: 'too_large' }; return; }
-      try { const blobRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/blobs/${entry.sha}`); const buffer = Buffer.from(blobRes.data?.content || '', 'base64'); if (buffer.length > this.MAX_BYTES) { resultsByPath[p] = { path: p, sha: entry.sha, content: null, skipped: 'too_large' }; return; } if (this.bufferIsProbablyBinary(buffer)) { resultsByPath[p] = { path: p, sha: entry.sha, content: null, skipped: 'binary' }; return; } resultsByPath[p] = { path: p, sha: entry.sha, content: buffer.toString('utf8') }; } catch (err: any) { resultsByPath[p] = { path: p, sha: entry.sha, content: null, skipped: 'error' }; }
+      try { const blobRes = await this.httpGet(`https://api.github.com/repos/${owner}/${repo}/git/blobs/${entry.sha}`, undefined, undefined, userToken); const buffer = Buffer.from(blobRes.data?.content || '', 'base64'); if (buffer.length > this.MAX_BYTES) { resultsByPath[p] = { path: p, sha: entry.sha, content: null, skipped: 'too_large' }; return; } if (this.bufferIsProbablyBinary(buffer)) { resultsByPath[p] = { path: p, sha: entry.sha, content: null, skipped: 'binary' }; return; } resultsByPath[p] = { path: p, sha: entry.sha, content: buffer.toString('utf8') }; } catch (err: any) { resultsByPath[p] = { path: p, sha: entry.sha, content: null, skipped: 'error' }; }
     };
     await this.mapWithConcurrency(allMatchedPaths, Math.min(this.CONCURRENCY, 5), worker);
     
@@ -316,9 +361,6 @@ export class GithubService {
         updatedAt: 'desc'
       }
     });
-
-    this.logger.debug(`[Cache Read] Encontrados ${allCache.length} resultados. Retornando dados formatados...`);
-    
     return allCache.map(repoData => repoData.data);
   }
 
@@ -338,20 +380,20 @@ export class GithubService {
 
       const apiLicenseValid = repo.license?.key && repo.license.key !== 'unlicensed';
 
+      const normalizedScore = typeof repo.score === 'number' ? repo.score : -1;
+
       return {
         id: index + 1, 
         nomeRepositorio: repo.repo,
-        
         commits: Array.isArray(repo.commits) ? repo.commits.length : 0,
         branches_count: Array.isArray(repo.branches) ? repo.branches.length : 0,
         prs_count: Array.isArray(repo.pullRequests) ? repo.pullRequests.length : 0,
         contributors_count: Array.isArray(repo.contributors) ? repo.contributors.length : 0,
-        
+        score: normalizedScore,
         stargazers_count: repo.stargazers_count || 0, 
         watchers_count: repo.watchers_count || 0,     
         open_issues_count: repo.open_issues_count || 0, 
         forks_count: repo.forks_count || 0,           
-        
         ultimosCommits: Array.isArray(repo.commits) ? repo.commits.slice(0, 5) : [],
         branches: Array.isArray(repo.branches) ? repo.branches.slice(0, 5) : [],
         pullRequests: Array.isArray(repo.pullRequests) ? repo.pullRequests.slice(0, 5) : [],
@@ -374,14 +416,14 @@ export class GithubService {
     });
   }
 
-  async checkRepoChanged(owner: string, repo: string, forceUpdate: boolean = false): Promise<{ changed: boolean, etag: string | null }> {
+  async checkRepoChanged(owner: string, repo: string, forceUpdate: boolean = false, userToken?: string): Promise<{ changed: boolean, etag: string | null }> {
     const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
 
     const cached = await this.prisma.githubCache.findUnique({
       where: { url: repoUrl },
     });
 
-    const headers: Record<string, string> = this.defaultHeaders();
+    const headers = this.defaultHeaders(userToken);
     
     if (!forceUpdate && cached?.etag) {
         headers['If-None-Match'] = cached.etag;
@@ -394,12 +436,9 @@ export class GithubService {
       });
 
       if (res.status === 304) {
-        this.logger.debug(`[RepoCache] ${owner}/${repo} não mudou (304).`);
-        
         if (cached) {
           return { changed: false, etag: cached.etag }; 
         } else {
-          this.logger.warn(`[RepoCache] ${owner}/${repo} retornou 304 mas não há cache local.`);
           return { changed: false, etag: null };
         }
       }
@@ -411,21 +450,16 @@ export class GithubService {
         create: { url: repoUrl, etag: newEtag, data: res.data },
       });
 
-      this.logger.debug(`[RepoCache] ${owner}/${repo} mudou (ou forceUpdate). Novo ETag: ${newEtag}`);
       return { changed: true, etag: newEtag };
     } catch (err: any) {
-      this.logger.warn(`[RepoCache] Falha ao verificar ${owner}/${repo}: ${err?.message || err}`);
-      
       if (cached) {
-        this.logger.warn(`[RepoCache] Usando ETag 'stale' para ${owner}/${repo} após falha.`);
         return { changed: false, etag: cached.etag };
       }
-
       return { changed: true, etag: null }; 
     }
   }
   
-  private async _analyzeSingleRepo(repo: { owner: { login: string }, name: string, default_branch: string, stargazers_count?: number, watchers_count?: number, open_issues_count?: number, forks_count?: number }, forceUpdate: boolean = false): Promise<any> {
+  private async _analyzeSingleRepo(repo: { owner: { login: string }, name: string, default_branch: string, stargazers_count?: number, watchers_count?: number, open_issues_count?: number, forks_count?: number }, forceUpdate: boolean = false, userToken?: string): Promise<any> {
     const owner = repo.owner.login;
     const name = repo.name; 
     const defaultBranch = repo.default_branch;
@@ -440,25 +474,21 @@ export class GithubService {
     });
 
     if (cachedRepoData && !forceUpdate) {
-      this.logger.debug(`[Analyze] Cache HIT no DB (Lazy) para ${owner}/${name}. Retornando sem verificar GitHub.`);
       return cachedRepoData.data;
     }
 
-    const { changed: repoChanged, etag: repoEtag } = await this.checkRepoChanged(owner, name, forceUpdate);
+    const { changed: repoChanged, etag: repoEtag } = await this.checkRepoChanged(owner, name, forceUpdate, userToken);
 
     if (!repoChanged && cachedRepoData && cachedRepoData.etag === repoEtag) {
-      this.logger.debug(`[Analyze] Cache HIT após verificação (304) para ${owner}/${name}.`);
       return cachedRepoData.data;
     }
     
-    this.logger.debug(`[Analyze] Cache MISS, Stale ou ForceUpdate para ${owner}/${name}. Re-analisando...`);
-
     try {
       let patterns: string[] = ['/'];
       try {
         const checklistPath = 'Docs/Milestones/Sprint-05/docsCheck-list.md';
         const chkUrl = `https://api.github.com/repos/${owner}/${name}/contents/${encodeURIComponent(checklistPath)}?ref=${encodeURIComponent(defaultBranch)}`;
-        const chkRes = await this.httpGet(chkUrl);
+        const chkRes = await this.httpGet(chkUrl, undefined, undefined, userToken);
         const chkContent = this.decodeBase64(chkRes.data.content);
         if (chkContent) {
           const lines = chkContent.split(/\r?\n/);
@@ -475,28 +505,29 @@ export class GithubService {
       } catch { }
 
       const [commitsSettled, issuesSettled, releasesSettled, readmeSettled, changelogSettled, licenseSettled, contributingSettled, conductSettled, gitignoreSettled, docsListSettled, branchesSettled, prsSettled, contributorsSettled] = await Promise.allSettled([
-        this.getCommits(owner, name), 
-        this.getIssues(owner, name), 
-        this.getReleases(owner, name), 
-        this.getReadme(owner, name), 
-        this.getChangelog(owner, name), 
-        this.getLicenses(owner, name), 
-        this.getContributing(owner, name), 
-        this.getConductCode(owner, name), 
-        this.getGitignore(owner, name), 
-        this.getDocs(owner, name),
-        this.getBranches(owner, name),
-        this.getPullRequests(owner, name),
-        this.getContributors(owner, name)
+        this.getCommits(owner, name, userToken), 
+        this.getIssues(owner, name, userToken), 
+        this.getReleases(owner, name, userToken), 
+        this.getReadme(owner, name, userToken), 
+        this.getChangelog(owner, name, userToken), 
+        this.getLicenses(owner, name, userToken), 
+        this.getContributing(owner, name, userToken), 
+        this.getConductCode(owner, name, userToken), 
+        this.getGitignore(owner, name, userToken), 
+        this.getDocs(owner, name, userToken),
+        this.getBranches(owner, name, userToken),
+        this.getPullRequests(owner, name, userToken),
+        this.getContributors(owner, name, userToken)
       ]);
       
-      const { patternResults, resultsByPath, summary } = await this.fetchChecklistMdFiles(owner, name, patterns, defaultBranch);
+      const { patternResults, resultsByPath, summary } = await this.fetchChecklistMdFiles(owner, name, patterns, defaultBranch, userToken);
       
       const docsContentArray = Object.values(resultsByPath).map(r => ({ name: path.basename(r.path), content: r.content, path: r.path, skipped: r.skipped }));
       
       const analysisResult = {
         owner: owner,
         repo: name, 
+        score: (cachedRepoData?.data as any)?.score ?? -1,
         stargazers_count: repo.stargazers_count,
         watchers_count: repo.watchers_count,
         open_issues_count: repo.open_issues_count, 
@@ -504,7 +535,6 @@ export class GithubService {
         branches: branchesSettled.status === 'fulfilled' ? branchesSettled.value : [],
         pullRequests: prsSettled.status === 'fulfilled' ? prsSettled.value : [],
         contributors: contributorsSettled.status === 'fulfilled' ? contributorsSettled.value : [],
-        
         commits: commitsSettled.status === 'fulfilled' ? commitsSettled.value : [], 
         issues: issuesSettled.status === 'fulfilled' ? issuesSettled.value : [], 
         releases: releasesSettled.status === 'fulfilled' ? releasesSettled.value : [], 
@@ -543,12 +573,6 @@ export class GithubService {
         }
       });
 
-      try {
-        await this.prisma.githubCache.delete({ where: { url: `analysis_v1/${owner}/${name}` }});
-      } catch (e) {
-        // Ignora
-      }
-
       return formattedData;
 
     } catch (err: any) { 
@@ -557,16 +581,16 @@ export class GithubService {
     }
   }
 
-  async analyzeUserRepos(username: string, forceUpdate: boolean = false) {
-    let repos = await this.getUserRepos(username);
+  async analyzeUserRepos(username: string, forceUpdate: boolean = false, userToken?: string) {
+    let repos = await this.getUserRepos(username, userToken);
     repos = repos.slice(0, 45); 
 
-    this.logger.debug(`[Analyze] Iniciando análise paralela para ${repos.length} repositórios (ForceUpdate: ${forceUpdate})...`);
+    this.logger.debug(`[Analyze] Iniciando análise paralela para ${repos.length} repositórios...`);
 
     const allResults = await this.mapWithConcurrency(
       repos,
       this.CONCURRENCY,
-      (repo) => this._analyzeSingleRepo(repo, forceUpdate)
+      (repo) => this._analyzeSingleRepo(repo, forceUpdate, userToken)
     );
 
     this.logger.debug(`[Analyze] Análise paralela concluída. ${allResults.length} resultados.`);
@@ -616,5 +640,19 @@ export class GithubService {
   private extractRepo(url: string): string {
     const match = url.match(/repos\/[^/]+\/([^/?]+)/) || url.match(/analysis_v1\/[^/]+\/([^/?]+)/);
     return match ? match[1] : '';
+  }
+
+  async getCachedRepoAnalysis(owner: string, repo: string) {
+    return this.prisma.githubCache.findUnique({
+      where: { url: `analysis_v1/${owner}/${repo}` },
+    });
+  }
+
+  async saveCachedRepoAnalysis(owner: string, repo: string, etag: string | null, data: any) {
+    await this.prisma.githubCache.upsert({
+      where: { url: `analysis_v1/${owner}/${repo}` },
+      update: { data, etag },
+      create: { url: `analysis_v1/${owner}/${repo}`, data, etag },
+    });
   }
 }

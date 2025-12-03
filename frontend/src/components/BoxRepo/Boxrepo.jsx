@@ -10,6 +10,7 @@ import LoadingWave from "../WaveLoad/WaveLoad";
 import warning from "../../assets/warning.svg"
 import img from "../../assets/cat.png"
 import img2 from "../../assets/gato.png"
+import accept from "../../assets/accept.svg"
 
 const ErroOwner = ({ owner }) => {
   return (
@@ -117,28 +118,11 @@ function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dataOwner, setDataOwner] = useState('');
-  const [syncLoading, setSyncLoading] = useState(false);
-  const [syncError, setSyncError] = useState(null);
-  const [localRefreshKey, setLocalRefreshKey] = useState(0);
-  const { getReposForOwner, setReposForOwner } = useContext(ReposContext);
+  const { reposByOwner, setReposForOwner } = useContext(ReposContext);
   const lastHandledRefreshKeyRef = useRef(refreshKey);
   const ownerTrimmed = useMemo(() => (
     typeof owner === 'string' ? owner.trim() : ''
   ), [owner]);
-
-  const handleSync = async () => {
-    if (syncLoading || !ownerTrimmed) return;
-    setSyncError(null);
-    setSyncLoading(true);
-    try {
-      await api.post('/analyze');
-      setLocalRefreshKey(prev => prev + 1);
-    } catch (err) {
-      setSyncError(err?.response?.data?.message || err?.message || 'Falha ao sincronizar repositórios');
-    } finally {
-      setSyncLoading(false);
-    }
-  };
 
 
   useEffect(() => {
@@ -155,14 +139,15 @@ function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
       return () => { alive = false; };
     }
 
-    let refreshTriggered = refreshKey !== lastHandledRefreshKeyRef.current;
-    if (refreshTriggered) {
+    let refreshTriggered = false;
+
+    if (refreshKey !== lastHandledRefreshKeyRef.current) {
+      refreshTriggered = true;
       lastHandledRefreshKeyRef.current = refreshKey;
     }
 
-    const cached = !refreshTriggered && getReposForOwner
-      ? getReposForOwner(normalizedOwner)
-      : null;
+    const cachedRepos = reposByOwner?.[normalizedOwner];
+    const cached = !refreshTriggered ? cachedRepos : null;
 
     setError(null);
     setLoading(true);
@@ -194,7 +179,7 @@ function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
     })();
 
     return () => { alive = false; };
-  }, [ownerTrimmed, refreshKey, localRefreshKey, getReposForOwner, setReposForOwner]);
+  }, [ownerTrimmed, refreshKey, reposByOwner, setReposForOwner]);
 
 
   useEffect(() => {
@@ -210,10 +195,15 @@ function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
       return sum + (Number.isFinite(n) ? n : 0);
     }, 0);
 
+    const perfectScoreCount = repos.reduce((count, r) => {
+      const score = Number(r?.score);
+      return Number.isFinite(score) && score === 100 ? count + 1 : count;
+    }, 0);
+
     const statsArr = [
       { id: 'repos', icon: <IconRepositorios className="repo-icon" />, nome: 'Repositórios', num: repoCount, comment: 'Total de repositórios analisados' },
       { id: 'commits', icon: <img src={commitIcon} className="commit-icon" alt="Commits" />, nome: 'Commits Total', num: totalCommits, comment: 'Total de commits em todos os repositórios' },
-      { id: 'placeholder', nome: 'Outro', num: 0, comment: 'Estatística adicional (a definir)' },
+      { id: 'perfect-score', icon: <img src={accept} />, nome: 'Score 100', num: perfectScoreCount, comment: 'Repositórios com score máximo' },
     ];
 
     setStats(statsArr);
@@ -224,23 +214,17 @@ function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
     console.log('repoObj (debug):', repos);
   }, [repos]);
 
-  useEffect(() => {
-    setSyncError(null);
-  }, [ownerTrimmed]);
+
 
   const pendingOwnerData = Boolean(ownerTrimmed) && ownerTrimmed !== dataOwner;
   const shouldShowLoading = ownerLoading || loading || pendingOwnerData;
 
   return (
     <div className="box-repo-container">
-
-
       {shouldShowLoading ? (
         <LoadingWave owner={ownerTrimmed} />
       ) : (
-
         <>
-
           {repos.length === 0 && !shouldShowLoading ? (
             <div className="erro-container">
               <div className="erro-component">
@@ -255,37 +239,20 @@ function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
                   <img src={img} className="img" />
                 </span>)}
             </div>
-
           ) : (
-
             <div>
               <div className="dashboard-header">
                 <div>
                   <h1>Dashboard</h1>
                   <br />
-
                   <h2>Acompanhe o progresso da documentação dos seus repositórios!</h2>
                 </div>
-                <div className="boxrepo-sync-actions">
-
-                  <div className="box-btn">
-                  <button
-                    className="boxrepo-sync-btn"
-                    onClick={handleSync}
-                    disabled={!ownerTrimmed || syncLoading || shouldShowLoading}
-                  >
-                    {syncLoading ? 'Sincronizando…' : 'Sincronizar'}
-                  </button>
-                  {syncError && (
-                    <span className="boxrepo-sync-error">{syncError}</span>
-                  )}
-</div>
-                </div>
+                
+  
               </div>
 
               <div className="scroll">
                 <div className="boxes-list">
-
                   {stats && stats.map((s) => (
                     <BoxStat
                       key={s.id}
@@ -297,7 +264,6 @@ function BoxRepo({ owner, refreshKey = 0, ownerLoading = false }) {
                   ))}
                 </div>
               </div>
-
 
               <div className="repo-section">
                 <h1>Seus repositórios</h1>

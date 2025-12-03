@@ -1,76 +1,85 @@
-# 🚀 Sprint 04  
-**Período:** 22/09/2025 a 26/09/2025  
+# Relatório da Sprint — Projeto de Software GuiaDev
+
+## 1. Informações Gerais
+
+* **Sprint:** 4  
+* **Duração:** 22/09/2025 a 26/09/2025  
+* **Product Owner:** *Hugo Freitas*  
+* **Scrum Master:** *Phillipe*  
+* **Time de Desenvolvimento:**  
+  - Pedro  
+  - Filipe  
+  - Phillipe  
+  - Hugo  
+  - João Guilherme
+  - Bruno
 
 ---
 
-## 📌 Descrição  
-Nesta sprint o time se concentrou no desenvolvimento das funcionalidades de autenticação (login e cadastro), na criação de páginas do front-end e na construção do protótipo de alta fidelidade no Figma.  
+## 2. Objetivos da Sprint
+
+* Implementar página de **login** no front-end.  
+* Desenvolver funcionalidade de **cadastro** no back-end.  
+* Implementar **login** no back-end.  
+* Criar página **principal (main)** no front-end.  
+* Preencher e finalizar o **protótipo de alta fidelidade** no Figma.  
 
 ---
 
-## 🎯 Objetivos  
-- Implementar página de login no front-end  
-- Desenvolver cadastro no back-end  
-- Implementar login no back-end  
-- Criar página principal (main) no front-end  
-- Preencher e finalizar protótipo de alta fidelidade no Figma  
+## 3. Backlog da Sprint
+
+| Item | História de Usuário | Critério de Aceitação | Status |
+|-----|----------------------|--------------------|--------|
+| 1 | Como usuário, quero fazer login para acessar o sistema. | Tela de login funcional no front-end. | Concluído |
+| 2 | Como novo usuário, quero me cadastrar no sistema. | Endpoint de cadastro implementado. | Concluído |
+| 3 | Como usuário cadastrado, quero realizar login no sistema. | Endpoint de login funcionando corretamente. | Concluído |
+| 4 | Como usuário autenticado, quero acessar a página principal. | Página principal criada e navegável. | Concluído |
+| 5 | Como equipe, queremos finalizar o protótipo de alta fidelidade. | Protótipo 100% preenchido no Figma. | Concluído |
 
 ---
 
-## 📅 Reuniões  
+## 4. Entregas (Review)
 
-### Reunião 1  
-- **Data:** 22/09/2025  
-- **Local:** Discord  
-- **Início:** 20:00  
-- **Encerramento:** 21:00  
-
-**Assuntos tratados:**  
-- Issue: Página de login no front-end  
-- Issue: Cadastro no back-end  
+* Página de **login** implementada no front-end.  
+* Funcionalidade de **cadastro** desenvolvida no back-end.  
+* Funcionalidade de **login** concluída no back-end.  
+* Página **principal (main)** criada no front-end.  
+* Protótipo de **alta fidelidade no Figma** finalizado e validado.  
+* Testes básicos realizados para validar o fluxo entre front-end e back-end.  
 
 ---
 
-### Reunião 2  
-- **Data:** 24/09/2025  
-- **Local:** Discord  
-- **Início:** 20:00  
-- **Encerramento:** 21:00  
+## 5. Métricas da Sprint
 
-**Assuntos tratados:**  
-- Issue: Login no back-end  
-- Issue: Página principal no front-end  
+* **Velocity:** 5 histórias concluídas / 5 planejadas.  
+* **Burn-down Chart:** Sprint completada sem débitos.  
+* **Qtd. de histórias concluídas / planejadas:** 5 / 5  
 
 ---
 
-### Reunião 3  
-- **Data:** 26/09/2025  
-- **Local:** Discord  
-- **Início:** 20:00  
-- **Encerramento:** 21:00  
+## 6. Retrospectiva
 
-**Assuntos tratados:**  
-- Preenchimento do protótipo de alta fidelidade no Figma  
-- Validação das issues concluídas  
-- Planejamento da próxima sprint  
+### O que funcionou bem 
 
----
+* Todas as issues da sprint foram concluídas.  
+* Integração entre front-end e back-end funcionando corretamente.  
+* Reuniões objetivas e alinhadas com o foco do desenvolvimento.  
 
-## ✅ Finalização  
-Nesta Sprint foram concluídas:  
-- Página de login no front-end  
-- Cadastro no back-end  
-- Login no back-end  
-- Página principal no front-end  
-- Protótipo de alta fidelidade preenchido no Figma  
+### O que pode melhorar 
 
-**Não houve tarefas postergadas para a próxima sprint.**
+* Melhorar o tempo de resposta dos testes entre front e back.  
+* Documentar melhor os endpoints já finalizados.
+
+### Ações de melhoria 
+
+* Criar documentação inicial da API.  
+* Criar testes automatizados básicos para validação do fluxo de autenticação.  
 
 ---
 
-## 📝 Observações  
-- O protótipo de alta fidelidade no Figma foi finalizado e validado com o time.  
-- Todas as issues planejadas para a sprint foram tratadas e concluídas.  
-- O fluxo entre front e back-end está mais estável após testes realizados durante as reuniões.  
+## Observações
 
----
+* O protótipo de alta fidelidade foi revisado e aprovado por toda a equipe.  
+* A sprint foi concluída sem tarefas postergadas.  
+* O sistema agora possui o fluxo inicial completo de autenticação.  
+

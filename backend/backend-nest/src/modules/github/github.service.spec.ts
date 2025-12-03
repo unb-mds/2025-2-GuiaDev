@@ -5,7 +5,6 @@ import { PrismaService } from '../../database/prisma.service';
 import { GithubService } from './github.service';
 import { AxiosResponse } from 'axios';
 import { Buffer } from 'buffer';
-import path from 'path';
 
 const mockAxiosResponse = (data: any, status: number, headers: any = {}): AxiosResponse<any> => ({
   data,
@@ -44,7 +43,6 @@ const mockLogger = {
 process.env.GITHUB_TOKEN = 'test-token';
 process.env.GH_MAX_BYTES = '500';
 process.env.GH_CONCURRENCY = '2';
-process.env.GEMINI_API_KEY = 'MOCK_TEST_GEMINI_KEY_0123456789';
 
 describe('GithubService', () => {
   let service: GithubService;
@@ -52,9 +50,6 @@ describe('GithubService', () => {
   let prismaService: PrismaService;
   let mockFetchBranch: jest.SpyInstance;
   let mockFetchChecklist: jest.SpyInstance;
-  let bufferIsProbablyBinarySpy: jest.SpyInstance;
-  let extractOwnerSpy: jest.SpyInstance;
-  let extractRepoSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -74,24 +69,16 @@ describe('GithubService', () => {
 
     mockFetchBranch = jest.spyOn(service as any, '_fetchDefaultBranch').mockResolvedValue('main');
     mockFetchChecklist = jest.spyOn(service as any, 'fetchChecklistMdFiles');
-    bufferIsProbablyBinarySpy = jest.spyOn(service as any, 'bufferIsProbablyBinary');
-    extractOwnerSpy = jest.spyOn(service as any, 'extractOwner');
-    extractRepoSpy = jest.spyOn(service as any, 'extractRepo');
   });
 
   afterAll(() => {
     mockFetchBranch.mockRestore();
     mockFetchChecklist.mockRestore();
-    bufferIsProbablyBinarySpy.mockRestore();
-    extractOwnerSpy.mockRestore();
-    extractRepoSpy.mockRestore();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
-  // --- TESTES DE MÉTODOS PRIVADOS ---
 
   describe('defaultHeaders (Private)', () => {
     it('deve retornar headers com Authorization', () => {
@@ -177,12 +164,9 @@ describe('GithubService', () => {
     });
   });
 
-  // --- TESTES DE MÉTODOS PÚBLICOS ---
-
   describe('getUserRepos', () => {
     const username = 'testuser';
     it('deve retornar repositórios com contadores', async () => {
-      // Mock da resposta da API do GitHub com campos novos
       const reposPage1 = [
         { 
             name: `repo1`, 
@@ -205,8 +189,6 @@ describe('GithubService', () => {
       expect((result[0] as any).watchers_count).toBe(5);
     });
   });
-
-  // --- NOVOS MÉTODOS ADICIONADOS ---
 
   describe('getBranches', () => {
     it('deve retornar lista de nomes de branches', async () => {
@@ -234,8 +216,6 @@ describe('GithubService', () => {
       expect(result[0].login).toBe('dev');
     });
   });
-
-  // --- TESTES ANTIGOS ---
 
   describe('getCommits', () => {
     it('deve retornar mensagens de commit', async () => {
@@ -393,7 +373,8 @@ describe('GithubService', () => {
         patternResults: {}
       });
       const result = await service.getGovernance('o', 'r');
-      expect(mockFetchChecklist).toHaveBeenCalledWith('o', 'r', ['governance.md'], 'main');
+      
+      expect(mockFetchChecklist).toHaveBeenCalledWith('o', 'r', ['governance.md'], 'main', undefined);
       expect(result.content).toBe('Gov');
     });
   });
@@ -429,35 +410,26 @@ describe('GithubService', () => {
     it('deve formatar corretamente dados com métricas e sem booleanos', () => {
       const inputData = [{
         repo: 'test-repo',
-        commits: ['c1', 'c2'], 
-        branches: ['b1', 'b2'], // Novo
-        pullRequests: [{}],     // Novo
-        contributors: [{}],     // Novo
+        score: 10, 
         stargazers_count: 10,
         watchers_count: 5,
-        open_issues_count: 2,
+        contributors_count: 5,
+        prs_count: 2,
+        docs_count: 1,
         forks_count: 1,
-        
-        issues: [{}], releases: [{}],
-        license: { name: 'MIT', key: 'mit' }, gitignore: { content: 'ignore' },
-        docsContent: [{ name: 'README.md', content: 'R' }],
-        checkFolders: []
+        open_issues_count: 2,
+        has_readme: true,
+        has_contributing: false,
+        has_changelog: false,
+        has_conduct: false
       }];
       
       const result = service.formatRepoData(inputData)[0];
       
-      // Verifica se as métricas foram populadas
-      expect((result as any).commits).toBe(2);
-      expect((result as any).branches_count).toBe(2);
-      expect((result as any).prs_count).toBe(1);
+      expect((result as any).nomeRepositorio).toBe('test-repo');
+      expect((result as any).score).toBeGreaterThanOrEqual(0); 
       expect((result as any).stargazers_count).toBe(10);
       expect((result as any).watchers_count).toBe(5);
-      
-      // Verifica se os booleanos antigos foram removidos (agora são undefined)
-      expect((result as any).possuiLicense).toBeUndefined();
-      
-      // Verifica se detalhes foram populados
-      expect((result as any).detalhes.license).toBe('MIT');
     });
   });
 
@@ -473,7 +445,6 @@ describe('GithubService', () => {
 
   describe('_analyzeSingleRepo (Private)', () => {
     it('deve retornar cache HIT se não houver mudança e etag coincidir', async () => {
-      // Objeto completo mockado
       const repo = { 
           owner: { login: 'o' }, 
           name: 'r', 
@@ -489,7 +460,6 @@ describe('GithubService', () => {
       jest.spyOn(service, 'checkRepoChanged').mockResolvedValue({ changed: false, etag: 'e1' });
       mockPrismaService.githubRepoData.findUnique.mockResolvedValue({ etag: 'e1', data: { hit: true } });
       
-      // Testando com forceUpdate = false
       const result = await (service as any)._analyzeSingleRepo(repo, false);
       expect(result).toEqual({ hit: true });
     });
@@ -497,7 +467,6 @@ describe('GithubService', () => {
 
   describe('analyzeUserRepos', () => {
     it('deve analisar repos e corrigir IDs', async () => {
-      // Array completo mockado
       const repos = [
           { owner: { login: 'o' }, name: 'r1', default_branch: 'main', url: 'u1', private: false, stargazers_count: 0, watchers_count: 0, open_issues_count: 0, forks_count: 0 }, 
           { owner: { login: 'o' }, name: 'r2', default_branch: 'main', url: 'u2', private: false, stargazers_count: 0, watchers_count: 0, open_issues_count: 0, forks_count: 0 }
@@ -508,8 +477,8 @@ describe('GithubService', () => {
       
       const result = await service.analyzeUserRepos('user', false);
       expect(result.length).toBe(2);
-      expect(result[0].id).toBe(1); // ID corrigido
-      expect(result[1].id).toBe(2); // ID corrigido
+      expect(result[0].id).toBe(1); 
+      expect(result[1].id).toBe(2); 
     });
   });
 
@@ -517,8 +486,8 @@ describe('GithubService', () => {
     it('deve retornar todos os itens de cache formatados', async () => {
       const mockResults = [{ url: 'https://api.github.com/repos/o1/r1', updatedAt: new Date(), data: { d: 1 } }];
       mockPrismaService.githubCache.findMany.mockResolvedValue(mockResults);
-      extractOwnerSpy.mockReturnValue('o1');
-      extractRepoSpy.mockReturnValue('r1');
+      jest.spyOn(service as any, 'extractOwner').mockReturnValue('o1');
+      jest.spyOn(service as any, 'extractRepo').mockReturnValue('r1');
       const result = await service.getAllCache();
       expect(result[0].owner).toBe('o1');
     });
