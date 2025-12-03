@@ -1,7 +1,7 @@
 # Documento de requisitos de software para o projeto "GuiaDev"
 
-## Versão 1.1 (06/11/2025) Autor: Filipe Brito
-Segunda versão do documento. Alterações de requisitos funcionais e não-funcionais.
+## Versão 1.2 (06/11/2025) Autor: Filipe Brito
+terceira versão do documento. Alterações de requisitos funcionais e não-funcionais.
 
 
 ## Introdução
@@ -92,7 +92,7 @@ RF-03: O usuário deverá ser capaz de editar seus dados pessoais.
 RF-04: O usuário deverá ser capaz de excluir sua conta do sistema.
 
 
-RF-05: O usuário deverá ser capaz de realizar login social com google e github.
+RF-05: O usuário deverá ser capaz de realizar login social com e github.
 
 
 RF-06: O sistema deverá ser capaz de analisar um projeto por meio do link do repositório do projeto.
@@ -114,31 +114,28 @@ RF-11: A aplicação deverá apresentar uma análise automática do projeto em t
 (ex.: README, CONTRIBUTING, LICENSE, CHANGELOG, docs/)
 
 
-RF-12: O sistema deve permitir que o usuário exporte um relatório em PDF para cada projeto analisado.
+RF-12: O sistema deve exibir de forma visual o nível de completude das práticas recomendadas, para cada projeto analisado.
 
 
-RF-13: O sistema deve exibir de forma visual o nível de completude das práticas recomendadas, para cada projeto analisado.
+RF-13: O sistema deve avisar o usuário de forma visual de que a análise do projeto está em andamento.
 
 
-RF-14: O sistema deve avisar o usuário de forma visual de que a análise do projeto está em andamento.
+RF-14: O sistema deve possuir persistência de dados com relação aos projetos acessados.
 
 
-RF-15: O sistema deve possuir persistência de dados com relação aos projetos acessados.
+RF-15: O sistema deve possuir uma barra de pesquisa para buscar os projetos acessados.
 
 
-RF-16: O sistema deve possuir uma barra de pesquisa para buscar os projetos acessados.
+RF-16: O sistema deverá possuir uma seção de aprendizado com elementos interativos.
 
 
-RF-17: O sistema deverá possuir uma seção de aprendizado com elementos interativos.
+RF-17: A seção de aprendizado deve possuir um campo de texto para tirar dúvidas com o agente de IA.
 
 
-RF-18: A seção de aprendizado deve possuir um campo de texto para tirar dúvidas com o agente de IA.
+RF-18: O sistema deverá fornecer o contexto de aprendizado ao agente de IA e retornar a resposta da dúvida.
 
 
-RF-19: O sistema deverá fornecer o contexto de aprendizado ao agente de IA e retornar a resposta da dúvida.
-
-
-RF-20: O sistema deve retornar a análise de um projeto no formato de  texto, evidenciando cada ponto do checklist utilizado para tal.
+RF-19: O sistema deve retornar a análise de um projeto no formato de  texto, evidenciando cada ponto do checklist utilizado para tal.
 
 
 ## Requisitos não-funcionais
