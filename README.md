@@ -273,21 +273,21 @@ Após a inicialização:
         <img src="https://avatars.githubusercontent.com/u/174053010?s=150" width="100px;" alt="Filipe"/><br>
         <sub><b>Filipe Brito</b></sub>
       </a><br>
-      <sub>Desenvolvedor</sub>
+      <sub>Arquitetura/DevOps</sub>
     </td>
     <td align="center">
       <a href="https://github.com/HugoFreitass">
         <img src="https://avatars.githubusercontent.com/u/130880914?s=150" width="100px;" alt="Hugo"/><br>
         <sub><b>Hugo Freitas</b></sub>
       </a><br>
-      <sub>Desenvolvedor</sub>
+      <sub>Product manager (PO)</sub>
     </td>
     <td align="center">
       <a href="https://github.com/Phill-Chill">
         <img src="https://avatars.githubusercontent.com/u/164696319?s=150" width="100px;" alt="Phill"/><br>
-        <sub><b>Phill Chill</b></sub>
+        <sub><b>Philipe Amancio</b></sub>
       </a><br>
-      <sub>Desenvolvedor</sub>
+      <sub>Scrum Master (lider)</sub>
     </td>
   </tr>
   <tr>
@@ -301,16 +301,16 @@ Após a inicialização:
     <td align="center">
       <a href="https://github.com/PedroGTG">
         <img src="https://avatars.githubusercontent.com/u/192148248?s=150" width="100px;" alt="Pedro"/><br>
-        <sub><b>Pedro Tavares</b></sub>
+        <sub><b>Pedro Henrique</b></sub>
       </a><br>
-      <sub>Desenvolvedor</sub>
+      <sub>Arquitetura/DevOps</sub>
     </td>
     <td align="center">
       <a href="https://github.com/BGrangeiro">
         <img src="https://avatars.githubusercontent.com/u/197856263?s=150" width="100px;" alt="Bruno"/><br>
         <sub><b>Bruno Grangeiro</b></sub>
       </a><br>
-      <sub>Desenvolvedor</sub>
+      <sub>Designer</sub>
     </td>
   </tr>
 </table>
