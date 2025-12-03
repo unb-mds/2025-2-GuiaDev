@@ -1,26 +1,614 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Milestones — GuiaDev</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roadmap & Docs - GuiaDev</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    /* --- CSS Base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --background: hsl(222, 47%, 6%);
+      --foreground: hsl(210, 40%, 96%);
+      --card: hsl(222, 47%, 9%);
+      --card-hover: hsl(222, 47%, 12%);
+      --primary: hsl(174, 72%, 56%);
+      --primary-foreground: hsl(222, 47%, 6%);
+      --secondary: hsl(222, 30%, 14%);
+      --muted: hsl(222, 30%, 14%);
+      --muted-foreground: hsl(215, 20%, 55%);
+      --border: hsl(222, 30%, 18%);
+      --radius: 0.75rem;
+      --gradient-start: hsl(174, 72%, 56%);
+      --gradient-end: hsl(199, 89%, 48%);
+    }
+    
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    
+    /* Utilities */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .code-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      background-color: var(--secondary);
+      color: var(--primary);
+
+    }
+
+    .animate-fade-up { animation: fade-up 0.6s ease-out forwards; }
+    @keyframes fade-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    
+    /* Header */
+    .header {
+      position: sticky; top: 0; left: 0; right: 0; z-index: 50;
+      background-color: hsla(222, 47%, 6%, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 4rem;
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+    .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.25rem; }
+    .logo-icon {
+      width: 32px; height: 32px; border-radius: 0.5rem;
+      background-color: hsla(174, 72%, 56%, 0.1);
+      border: 1px solid hsla(174, 72%, 56%, 0.3);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--primary);
+    }
+    .logo span { color: var(--primary); }
+    
+    .nav { display: none; align-items: center; gap: 0.25rem; }
+    @media (min-width: 1024px) { .nav { display: flex; } }
+    
+    .nav-link {
+      padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500;
+      color: var(--muted-foreground); transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--foreground); }
+    
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500;
+      border-radius: var(--radius); border: none; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary { background-color: var(--primary); color: var(--primary-foreground); }
+    .btn-primary:hover { background-color: hsl(174, 72%, 50%); }
+    .btn-ghost { background-color: transparent; color: var(--muted-foreground); }
+    .btn-ghost:hover { color: var(--foreground); background-color: var(--secondary); }
+    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+
+    /* Sections General */
+    .section { padding: 6rem 0; position: relative; }
+    .section-header { text-align: center; margin-bottom: 4rem; }
+    .section-title { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .section-subtitle { color: var(--muted-foreground); max-width: 42rem; margin: 0 auto; }
+    
+    /* Story Map & Organization Cards */
+    .objectives-box {
+      background-color: var(--card); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;
+    }
+    .epic-header { margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+    .epic-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    
+    .us-grid { display: grid; gap: 1rem; }
+    @media (min-width: 768px) { .us-grid { grid-template-columns: repeat(3, 1fr); } }
+    
+    .card {
+      padding: 1.5rem; border-radius: var(--radius); background-color: hsla(222, 47%, 6%, 0.3);
+      border: 1px solid var(--border); transition: all 0.3s ease-out; height: 100%;
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--primary); }
+    .card-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem; }
+    .card-text { font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 1rem; }
+    .criteria { font-size: 0.75rem; color: var(--primary); border-top: 1px dashed var(--border); padding-top: 0.5rem; }
+
+    /* Team/Topics Grid */
+    .topics-grid { display: grid; gap: 1.5rem; margin-bottom: 4rem; }
+    @media (min-width: 768px) { .topics-grid { grid-template-columns: repeat(2, 1fr); } }
+    
+    .steps-grid { display: grid; gap: 1.5rem; }
+    @media (min-width: 640px) { .steps-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .steps-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .step-card {
+      padding: 1.5rem; border-radius: var(--radius); background-color: var(--card);
+      border: 1px solid var(--border); position: relative;
+    }
+    .role-badge { 
+      position: absolute; top: 1.5rem; right: 1.5rem; 
+      font-size: 0.75rem; color: var(--muted-foreground); 
+    }
+    .step-icon {
+      width: 2.5rem; height: 2.5rem; border-radius: 50%;
+      background-color: hsla(174, 72%, 56%, 0.1); color: var(--primary);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;
+    }
+
+    /* --- Docs Viewer Styles (Integrated) --- */
+    .docs-container {
+      display: flex;
+      height: 800px; /* Altura fixa para o explorer */
+      max-height: 85vh;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background-color: var(--background);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 1rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted-foreground);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .folder-list { list-style: none; padding: 0.5rem; }
+
+    .folder-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem; border-radius: 0.5rem;
+      cursor: pointer; color: var(--muted-foreground);
+      font-size: 0.9rem; transition: all 0.2s; margin-bottom: 2px;
+    }
+    .folder-item:hover { background-color: var(--card-hover); color: var(--foreground); }
+    .folder-item.active { background-color: hsla(174, 72%, 56%, 0.1); color: var(--primary); font-weight: 500; }
+    
+    .viewer {
+      flex: 1;
+      padding: 2rem 3rem;
+      overflow-y: auto;
+      background-color: var(--background);
+    }
+
+    /* Markdown Body */
+    .markdown-body { max-width: 800px; margin: 0 auto; }
+    .markdown-body h1 { font-size: 2rem; margin-bottom: 1.5rem; color: var(--foreground); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    .markdown-body h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem; color: var(--foreground); }
+    .markdown-body h3 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--primary); }
+    .markdown-body p { margin-bottom: 1rem; color: #b0b8c4; line-height: 1.7; }
+    .markdown-body ul { margin-bottom: 1rem; padding-left: 1.5rem; color: #b0b8c4; }
+    .markdown-body li { margin-bottom: 0.25rem; }
+    .markdown-body code { 
+      background-color: var(--secondary); padding: 0.2rem 0.4rem; 
+      border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: var(--primary);
+    }
+    .markdown-body pre {
+      background-color: var(--card); padding: 1rem; border-radius: 0.5rem;
+      overflow-x: auto; margin-bottom: 1.5rem; border: 1px solid var(--border);
+    }
+    .markdown-body pre code { background-color: transparent; padding: 0; color: var(--foreground); }
+    .markdown-body blockquote {
+      border-left: 4px solid var(--primary); padding-left: 1rem; margin-left: 0;
+      color: var(--muted-foreground); font-style: italic;
+    }
+    .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+    .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+    .markdown-body th { background-color: var(--secondary); }
+
+    .loading { text-align: center; padding: 2rem; color: var(--muted-foreground); }
+    .error-msg { 
+      padding: 1.5rem; background-color: hsla(0, 70%, 50%, 0.1); 
+      border: 1px solid hsla(0, 70%, 50%, 0.3); border-radius: 0.5rem; color: #ff6b6b; 
+    }
+
+    /* Footer */
+    .footer { border-top: 1px solid var(--border); background-color: hsla(222, 47%, 9%, 0.5); padding: 3rem 0; margin-top: 4rem; }
+    .footer-bottom { text-align: center; color: var(--muted-foreground); font-size: 0.875rem; }
+    
+    /* Mobile Menu */
+    .mobile-menu-btn { display: flex; padding: 0.5rem; background: none; border: none; color: var(--muted-foreground); cursor: pointer; }
+    @media (min-width: 1024px) { .mobile-menu-btn { display: none; } }
+
+  </style>
 </head>
 <body>
-  <main class="container">
-    <h1>Milestones</h1>
-    <div id="md-content" class="markdown-body">Carregando...</div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m18 16 4-4-4-4" />
+            <path d="m6 8-4 4 4 4" />
+            <path d="m14.5 4-5 16" />
+          </svg>
+        </div>
+        <span class="logo-text">Guia<span>Dev</span></span>
+      </a>
+
+      <nav class="nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="diagrama-c4.html" class="nav-link">Estrutura</a>
+        <a href="milestones.html" class="nav-link">Milestones</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="#" class="btn btn-ghost btn-sm">Roadmap</a>
+        <a href="https://github.com/unb-mds/2025-2-GuiaDev" target="_blank"
+          class="btn btn-primary btn-sm glow">GitHub</a>
+      </div>
+
+      <button class="mobile-menu-btn" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12" />
+          <line x1="4" x2="20" y1="6" y2="6" />
+          <line x1="4" x2="20" y1="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    
+    <section class="section" style="padding-bottom: 2rem; padding-top: 4rem;">
+      <div class="container">
+        <div class="section-header animate-fade-up">
+          <span class="code-badge">// planejamento & docs</span>
+          <h1 class="section-title">Roadmap e <span class="gradient-text">Gestão</span></h1>
+          <p class="section-subtitle">Visão completa do projeto: Épicos, Metodologia, Time e Documentação detalhada das Sprints.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="story-map" class="section" style="padding-top: 0;">
+      <div class="container">
+        
+        <div class="objectives-box animate-fade-up">
+          <div class="epic-header">
+            <span class="code-badge">Épico 1</span>
+            <h3 class="epic-title">Autenticação de Usuários</h3>
+            <p style="color: var(--muted-foreground);">Feature: Login por formulário ou GitHub</p>
+          </div>
+          <div class="us-grid">
+            <div class="card">
+              <h4 class="card-title">US01 - Login no site</h4>
+              <p class="card-text">Como usuário, quero fazer login usando GitHub ou conta local para acessar funcionalidades.</p>
+              <div class="criteria">Critério: Validar credenciais via API/Banco e tratar erros.</div>
+            </div>
+            <div class="card">
+              <h4 class="card-title">US02 - Redirecionamento</h4>
+              <p class="card-text">Como usuário, quero ser redirecionado para o app de forma segura após o login.</p>
+              <div class="criteria">Critério: Redirecionar para Home/Dashboard após sucesso.</div>
+            </div>
+            <div class="card">
+              <h4 class="card-title">US03 - Persistência</h4>
+              <p class="card-text">Como usuário, quero permanecer logado mesmo após fechar o app.</p>
+              <div class="criteria">Critério: Implementação de JWT com expiração.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="objectives-box animate-fade-up delay-100">
+          <div class="epic-header">
+            <span class="code-badge">Épico 2</span>
+            <h3 class="epic-title">Cadastro de Usuários</h3>
+            <p style="color: var(--muted-foreground);">Feature: Cadastro com GitHub ou Formulário</p>
+          </div>
+          <div class="us-grid">
+            <div class="card">
+              <h4 class="card-title">US04 - Cadastro GitHub</h4>
+              <p class="card-text">Como dev, quero usar meu GitHub para integrar perfil e projetos automaticamente.</p>
+            </div>
+
+            <div class="card">
+              <h4 class="card-title">US05 - Cadastro Formulário</h4>
+              <p class="card-text">Como usuário, quero cadastro independente com e-mail e senha.</p>
+              <div class="criteria">Critério: Senha armazenada com criptografia (Hash).</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="objectives-box animate-fade-up delay-200">
+          <div class="epic-header">
+            <span class="code-badge">Épico 3</span>
+            <h3 class="epic-title">Acesso de Repositórios</h3>
+            <p style="color: var(--muted-foreground);">Feature: Acesso via link ou token</p>
+          </div>
+          <div class="us-grid">
+            <div class="card">
+              <h4 class="card-title">US06 - Listagem</h4>
+              <p class="card-text">Como usuário, quero listar todos meus repositórios conectados.</p>
+              <div class="criteria">Critério: Buscar repos públicos da conta vinculada.</div>
+            </div>
+            <div class="card">
+              <h4 class="card-title">US07 - Detalhes</h4>
+              <p class="card-text">Como usuário, quero visualizar estatísticas de um repositório específico.</p>
+            </div>
+            <div class="card">
+              <h4 class="card-title">US08 - Sugestões</h4>
+              <p class="card-text">Como usuário, quero receber sugestões de melhorias via IA.</p>
+              <div class="criteria">Critério: Análise via Agente IA (identificar docs faltantes).</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="objectives-box animate-fade-up delay-200">
+            <div class="epic-header">
+              <span class="code-badge">Épico 4</span>
+              <h3 class="epic-title">Documentação de Repositório</h3>
+              <p style="color: var(--muted-foreground);">Feature: Avaliação e orientação de docs</p>
+            </div>
+            <div class="us-grid">
+              <div class="card">
+                <h4 class="card-title">US09 - Checklist</h4>
+                <p class="card-text">Como usuário, quero ver progresso visual de boas práticas.</p>
+                <div class="criteria">Critério: Exibição visual de completude (Barra/Score).</div>
+              </div>
+              <div class="card">
+                <h4 class="card-title">US10 - Orientações</h4>
+                <p class="card-text">Como usuário, quero saber exatamente quais documentos faltam.</p>
+              </div>
+              <div class="card">
+                <h4 class="card-title">US11 - Templates</h4>
+                <p class="card-text">Como usuário, quero exemplos de estrutura para corrigir meu repo.</p>
+                <div class="criteria">Critério: Fornecer templates baseados em padrões.</div>
+              </div>
+            </div>
+          </div>
+
+      </div>
+    </section>
+
+    <section id="gestao" class="section" style="background: linear-gradient(to bottom, transparent, hsla(222, 47%, 9%, 0.5));">
+      <div class="container">
+        <div class="section-header">
+            <span class="code-badge">// organização</span>
+            <h2 class="section-title">Metodologia e <span class="gradient-text">Ferramentas</span></h2>
+        </div>
+
+        <div class="topics-grid">
+            <div class="card animate-fade-up">
+                <div class="step-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m7.8 16.2-2.9 2.9"/><path d="M2 12h4"/><path d="m7.8 7.8-2.9-2.9"/><circle cx="12" cy="12" r="3"/></svg></div>
+                <h3 class="card-title">Modelo Ágil (Scrum/XP)</h3>
+                <p class="card-text">Ciclos iterativos com foco na entrega contínua de valor.</p>
+                <ul style="font-size: 0.875rem; color: var(--muted-foreground); padding-left: 1rem; list-style: disc;">
+                    <li><strong>Sprint Planning:</strong> Definição de backlog e objetivos.</li>
+                    <li><strong>Sprint Review:</strong> Validação de entregas (Protótipos, API).</li>
+                    <li><strong>Retrospectivas:</strong> Melhoria contínua e planos de ação.</li>
+                </ul>
+            </div>
+
+            <div class="card animate-fade-up delay-100">
+                <div class="step-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                <h3 class="card-title">Tech Stack & Ferramentas</h3>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+                    <span class="code-badge">Git/GitHub</span>
+                    <span class="code-badge">CI/CD Actions</span>
+                    <span class="code-badge">Docker</span>
+                    <span class="code-badge">Figma</span>
+                    <span class="code-badge">Selenium</span>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div id="time" class="section-header" style="margin-top: 4rem; margin-bottom: 2rem;">
+            <h3 class="section-title" style="font-size: 1.5rem;">Squad 3</h3>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card animate-fade-up">
+                <div class="step-icon">HF</div>
+                <span class="role-badge">DevOps/Back</span>
+                <h3 class="card-title">Hugo Freitas</h3>
+                <p class="card-text">Foco em CI/CD, Docker e Regras de Negócio.</p>
+            </div>
+            <div class="step-card animate-fade-up">
+                <div class="step-icon">FB</div>
+                <span class="role-badge">Back/Docs</span>
+                <h3 class="card-title">Filipe Brito</h3>
+                <p class="card-text">Testes, refatoração e documentação técnica.</p>
+            </div>
+            <div class="step-card animate-fade-up">
+                <div class="step-icon">J</div>
+                <span class="role-badge">Front/Design</span>
+                <h3 class="card-title">João</h3>
+                <p class="card-text">Protótipos Figma, UI e testes frontend.</p>
+            </div>
+            <div class="step-card animate-fade-up">
+                <div class="step-icon">P</div>
+                <span class="role-badge">Fullstack</span>
+                <h3 class="card-title">Philipe</h3>
+                <p class="card-text">Integração, ChatBot e componentes UI.</p>
+            </div>
+            <div class="step-card animate-fade-up">
+                <div class="step-icon">B</div>
+                <span class="role-badge">Front/QA</span>
+                <h3 class="card-title">Bruno</h3>
+                <p class="card-text">Boas práticas e testes automatizados (Selenium).</p>
+            </div>
+            <div class="step-card animate-fade-up">
+                <div class="step-icon">PE</div>
+                <span class="role-badge">Back/DB</span>
+                <h3 class="card-title">Pedro</h3>
+                <p class="card-text">Otimização de cache, banco dinâmico e dados.</p>
+            </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="sprints-docs" class="section">
+      <div class="container">
+        
+        <div class="section-header animate-fade-up">
+          <span class="code-badge">// documentação</span>
+          <h2 class="section-title">Docs das <span class="gradient-text">Sprints</span></h2>
+          <p class="section-subtitle">Acompanhe detalhadamente o que foi entregue e discutido em cada ciclo.</p>
+        </div>
+
+        <div class="docs-container animate-fade-up delay-100">
+            <aside class="sidebar">
+                <div class="sidebar-header">Milestones</div>
+                <ul class="folder-list" id="sprint-list">
+                    </ul>
+            </aside>
+
+            <main class="viewer">
+                <div id="content-area" class="markdown-body">
+                    <div style="text-align: center; padding-top: 6rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        <p style="margin-top: 1rem; color: var(--muted-foreground);">Selecione uma Sprint na barra lateral.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>© 2025 GuiaDev — Documentação de Gestão</p>
+    </div>
+  </footer>
+
   <script>
-    const mdURL = 'https://raw.githubusercontent.com/unb-mds/2025-2-GuiaDev/main/Milestones/Sprint-00/Sprint-00.md';
-    fetch(mdURL).then(r => r.text()).then(md => {
-      document.getElementById('md-content').innerHTML = marked.parse(md);
-    }).catch(err => {
-      document.getElementById('md-content').textContent = 'Erro ao carregar milestones.';
-      console.error(err);
+    /* --- Sprint Docs Logic --- */
+    const sprints = [
+      { id: '00', label: 'Sprint 00' },
+      { id: '01', label: 'Sprint 01' },
+      { id: '02', label: 'Sprint 02' },
+      { id: '03', label: 'Sprint 03' },
+      { id: '04', label: 'Sprint 04' },
+      { id: '05', label: 'Sprint 05' },
+      { id: '06', label: 'Sprint 06' },
+      { id: '07', label: 'Sprint 07' },
+      { id: '08', label: 'Sprint 08' },
+      { id: '09', label: 'Sprint 09' },
+      { id: '10', label: 'Sprint 10' },
+      { id: '11', label: 'Sprint 11' },
+      { id: '12', label: 'Sprint 12' },
+      { id: 'docs-checklist', label: 'Checklist de Docs', file: 'docsCheck-list.md', type: 'doc' },
+    ];
+
+    const listContainer = document.getElementById('sprint-list');
+    const contentArea = document.getElementById('content-area');
+
+    const folderIconSvg = `
+      <svg class="folder-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+    `;
+
+    const docIconSvg = `
+      <svg class="folder-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    `;
+
+    function renderSidebar() {
+      listContainer.innerHTML = '';
+      sprints.forEach(sprint => {
+        const li = document.createElement('li');
+        const isDoc = sprint.type === 'doc';
+        li.className = `folder-item${isDoc ? ' doc-item' : ''}`;
+        li.dataset.id = sprint.id;
+        li.onclick = () => loadSprint(sprint.id);
+        
+        li.innerHTML = `
+          ${isDoc ? docIconSvg : folderIconSvg}
+          ${sprint.label}
+        `;
+        listContainer.appendChild(li);
+      });
+    }
+
+    async function loadSprint(id) {
+      const sprintConfig = sprints.find(sprint => sprint.id === id);
+      document.querySelectorAll('.folder-item').forEach(el => el.classList.remove('active'));
+      const activeItem = document.querySelector(`.folder-item[data-id="${id}"]`);
+      if(activeItem) activeItem.classList.add('active');
+
+      contentArea.innerHTML = '<div class="loading">Carregando documentação...</div>';
+
+      const filePath = sprintConfig?.file ?? `Milestones/Sprint-${id}/Sprint-${id}.md`;
+
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) throw new Error(`Arquivo não encontrado`);
+        const markdownText = await response.text();
+        contentArea.innerHTML = marked.parse(markdownText);
+      } catch (error) {
+        console.error(error);
+        contentArea.innerHTML = `
+          <div class="error-msg">
+            <h3>Erro ao carregar Sprint-${id}</h3>
+            <p>Arquivo <code>${filePath}</code> não encontrado ou erro de CORS.</p>
+          </div>
+        `;
+      }
+    }
+
+    /* --- Mobile Menu Toggle --- */
+    const mobileMenuButton = document.querySelector('.mobile-menu-btn');
+    const nav = document.querySelector('.nav');
+
+    mobileMenuButton?.addEventListener('click', () => {
+      const isOpen = nav?.style.display === 'flex';
+      if (!nav) return;
+      
+      if (!isOpen) {
+        nav.style.display = 'flex';
+        nav.style.flexDirection = 'column';
+        nav.style.position = 'absolute';
+        nav.style.top = '100%';
+        nav.style.left = '0';
+        nav.style.right = '0';
+        nav.style.backgroundColor = 'var(--background)';
+        nav.style.padding = '1rem';
+        nav.style.borderBottom = '1px solid var(--border)';
+      } else {
+        nav.style.display = 'none';
+        nav.removeAttribute('style'); // Reseta para o CSS controlar no desktop
+      }
     });
+
+    // Init
+    renderSidebar();
   </script>
+
 </body>
 </html>
