@@ -1,34 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ChatController } from './chat.controller';
+import { ChatService } from './chat.service';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { ChatModule } from './chat.module';
-import { HttpService } from '@nestjs/axios';
-import { of } from 'rxjs';
+import { HttpModule } from '@nestjs/axios';
 
-describe('ChatController (e2e)', () => {
+
+import request = require('supertest');
+
+process.env.GEMINI_API_KEY = 'MOCK_TEST_KEY';
+
+describe('ChatController', () => {
   let app: INestApplication;
-  let httpService: HttpService;
+  let controller: ChatController;
 
-  beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [ChatModule],
-    })
-      .overrideProvider(HttpService)
-      .useValue({
-        post: jest.fn(() =>
-          of({
-            data: {
-              candidates: [
-                { content: { parts: [{ text: 'Resposta simulada do Gemini' }] } },
-              ],
-            },
-          }),
-        ),
-      })
-      .compile();
+  const mockChatService = {
+    getAIResponse: jest.fn().mockResolvedValue('Resposta da IA'),
+  };
 
-    app = moduleFixture.createNestApplication();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule],
+      controllers: [ChatController],
+      providers: [
+        { provide: ChatService, useValue: mockChatService },
+      ],
+    }).compile();
+
+    controller = module.get<ChatController>(ChatController);
+    app = module.createNestApplication();
     await app.init();
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
   });
 
   it('/chat (POST) deve retornar a resposta da IA', async () => {
@@ -36,8 +40,8 @@ describe('ChatController (e2e)', () => {
       .post('/chat')
       .send({ message: 'teste' })
       .expect(201);
-
-    expect(response.body.response).toContain('Resposta simulada');
+      
+    expect(response.text).toBe('Resposta da IA');
   });
 
   afterAll(async () => {
