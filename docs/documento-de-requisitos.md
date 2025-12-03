@@ -5,7 +5,7 @@ terceira versão do documento. Alterações de requisitos funcionais e não-func
 
 
 ## Introdução
-Este documento especifica os requisitos que o sistema "portal para escrita técnica em software" deve atender, fornecendo aos desenvolvedores as informações necessárias para o projeto de implementação, realização dos testes e homologação do sistema. O "Portal para escrita técnica em software" é um sistema desenvolvido para realizar uma varredura em um repositório do Github e fazer recomendações e manutenção da documentação para o mesmo.
+Este documento especifica os requisitos que o sistema "GuiaDev" deve atender, fornecendo aos desenvolvedores as informações necessárias para o projeto de implementação, realização dos testes e homologação do sistema. O "GuiaDev" é um sistema desenvolvido para realizar uma varredura em um repositório do Github e fazer recomendações e manutenção da documentação para o mesmo.
 
 ## Visão geral do documento
 O documento de requisitos descreve os requisitos funcionais e não funcionais que o sstema deve atender: ele apresenta os seguintes tópicos abaixo:
@@ -28,7 +28,7 @@ A análise de portais técnicos amplamente utilizados (como **GitLab Handbook**,
 Esses pontos foram considerados na definição dos requisitos a seguir, adaptados à stack React + NestJS + Prisma.
 
 ## Descrição geral do sistema
-O "Portal para escrita técnica  em software" será desenvolvido com o objetivo de melhorar o processo de criação de um produto de software através de um guia pronto de documentação para software e recomendações de possíveis documentações que podem ser implementadas no repositório, auxiliando o público-alvo a atingir um desenvolvimento mais produtivo e preciso. As recomendações são feitas por meio de uma varredura no repositório alvo com agentes de IA, após essa varredura, comparar com uma checklist para análise das documentações presentes e faltantes. O sistema será desenvolvido em linguagem HTML,CSS, javascript e framework REACT para frontend. Para backend será desenvolvido com Typescript e framework NestJS, utilizará banco de dados postgreSQL e prisma como ORM e será hospedado em Github pages.
+O "GuiaDev" será desenvolvido com o objetivo de melhorar o processo de criação de um produto de software através de um guia pronto de documentação para software e recomendações de possíveis documentações que podem ser implementadas no repositório, auxiliando o público-alvo a atingir um desenvolvimento mais produtivo e preciso. As recomendações são feitas por meio de uma varredura no repositório alvo com agentes de IA, após essa varredura, comparar com uma checklist para análise das documentações presentes e faltantes. O sistema será desenvolvido em linguagem HTML,CSS, javascript e framework REACT para frontend. Para backend será desenvolvido com Typescript e framework NestJS, utilizará banco de dados postgreSQL e prisma como ORM e será hospedado em Github pages.
 
 ## Descrição do público-alvo
 
