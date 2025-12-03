@@ -60,8 +60,8 @@ jobs:
         run: docker compose exec -T nest-app npm run lint
 
       # 7️⃣ Executa testes unitários no backend
-      - name: 🧪 Run Tests (NestJS)
-        run: docker compose exec -T nest-app npm run test -- --passWithNoTests --runInBand
+      - name: 🧪 Run Tests (NestJS) — with coverage
+        run: docker compose exec -T nest-app npm run test -- --coverage --coverageReporters=text --passWithNoTests --runInBand
 
       # 8️⃣ (Opcional) Verifica se o front está rodando
       - name: 🌐 Check frontend container health
