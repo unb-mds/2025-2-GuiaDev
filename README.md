@@ -334,7 +334,7 @@ Este projeto foi desenvolvido para fins educacionais na disciplina de Métodos d
 
 [https://two025-2-guiadev-1-frontend.onrender.com/](https://two025-2-guiadev-1-frontend.onrender.com/)
 
-[https://two025-2-guiadev.onrender.com/](https://two025-2-guiadev-1-frontend.onrender.com/)
+[https://two025-2-guiadev.onrender.com/](https://two025-2-guiadev.onrender.com/)
 
 ---
 
