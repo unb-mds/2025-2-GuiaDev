@@ -144,8 +144,8 @@ graph TB
     D --> F[Gemini]
     D --> G[GitHub API]
     
-    style A fill:#61DAFB
-    style C fill:#61DAFB
+    style A fill:#4169E1
+    style C fill:#4169E1
     style D fill:#E0234E
     style E fill:#4169E1
 ```
@@ -327,6 +327,14 @@ Após a inicialização:
 ## 📄 Licença
 
 Este projeto foi desenvolvido para fins educacionais na disciplina de Métodos de Desenvolvimento de Software da UnB.
+
+---
+
+## 🟢 Deploy
+
+[https://two025-2-guiadev-1-frontend.onrender.com/](https://two025-2-guiadev-1-frontend.onrender.com/)
+
+[https://two025-2-guiadev.onrender.com/](https://two025-2-guiadev-1-frontend.onrender.com/)
 
 ---
 
