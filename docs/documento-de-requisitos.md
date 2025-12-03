@@ -1,11 +1,11 @@
 # Documento de requisitos de software para o projeto "GuiaDev"
 
-## Versão 1.1 (06/11/2025) Autor: Filipe Brito
-Segunda versão do documento. Alterações de requisitos funcionais e não-funcionais.
+## Versão 1.2 (06/11/2025) Autor: Filipe Brito
+terceira versão do documento. Alterações de requisitos funcionais e não-funcionais.
 
 
 ## Introdução
-Este documento especifica os requisitos que o sistema "portal para escrita técnica em software" deve atender, fornecendo aos desenvolvedores as informações necessárias para o projeto de implementação, realização dos testes e homologação do sistema. O "Portal para escrita técnica em software" é um sistema desenvolvido para realizar uma varredura em um repositório do Github e fazer recomendações e manutenção da documentação para o mesmo.
+Este documento especifica os requisitos que o sistema "GuiaDev" deve atender, fornecendo aos desenvolvedores as informações necessárias para o projeto de implementação, realização dos testes e homologação do sistema. O "GuiaDev" é um sistema desenvolvido para realizar uma varredura em um repositório do Github e fazer recomendações e manutenção da documentação para o mesmo.
 
 ## Visão geral do documento
 O documento de requisitos descreve os requisitos funcionais e não funcionais que o sstema deve atender: ele apresenta os seguintes tópicos abaixo:
@@ -28,7 +28,7 @@ A análise de portais técnicos amplamente utilizados (como **GitLab Handbook**,
 Esses pontos foram considerados na definição dos requisitos a seguir, adaptados à stack React + NestJS + Prisma.
 
 ## Descrição geral do sistema
-O "Portal para escrita técnica  em software" será desenvolvido com o objetivo de melhorar o processo de criação de um produto de software através de um guia pronto de documentação para software e recomendações de possíveis documentações que podem ser implementadas no repositório, auxiliando o público-alvo a atingir um desenvolvimento mais produtivo e preciso. As recomendações são feitas por meio de uma varredura no repositório alvo com agentes de IA, após essa varredura, comparar com uma checklist para análise das documentações presentes e faltantes. O sistema será desenvolvido em linguagem HTML,CSS, javascript e framework REACT para frontend. Para backend será desenvolvido com Typescript e framework NestJS, utilizará banco de dados postgreSQL e prisma como ORM e será hospedado em Github pages.
+O "GuiaDev" será desenvolvido com o objetivo de melhorar o processo de criação de um produto de software através de um guia pronto de documentação para software e recomendações de possíveis documentações que podem ser implementadas no repositório, auxiliando o público-alvo a atingir um desenvolvimento mais produtivo e preciso. As recomendações são feitas por meio de uma varredura no repositório alvo com agentes de IA, após essa varredura, comparar com uma checklist para análise das documentações presentes e faltantes. O sistema será desenvolvido em linguagem HTML,CSS, javascript e framework REACT para frontend. Para backend será desenvolvido com Typescript e framework NestJS, utilizará banco de dados postgreSQL e prisma como ORM e será hospedado em Github pages.
 
 ## Descrição do público-alvo
 
@@ -92,7 +92,7 @@ RF-03: O usuário deverá ser capaz de editar seus dados pessoais.
 RF-04: O usuário deverá ser capaz de excluir sua conta do sistema.
 
 
-RF-05: O usuário deverá ser capaz de realizar login social com google e github.
+RF-05: O usuário deverá ser capaz de realizar login social com e github.
 
 
 RF-06: O sistema deverá ser capaz de analisar um projeto por meio do link do repositório do projeto.
@@ -114,31 +114,28 @@ RF-11: A aplicação deverá apresentar uma análise automática do projeto em t
 (ex.: README, CONTRIBUTING, LICENSE, CHANGELOG, docs/)
 
 
-RF-12: O sistema deve permitir que o usuário exporte um relatório em PDF para cada projeto analisado.
+RF-12: O sistema deve exibir de forma visual o nível de completude das práticas recomendadas, para cada projeto analisado.
 
 
-RF-13: O sistema deve exibir de forma visual o nível de completude das práticas recomendadas, para cada projeto analisado.
+RF-13: O sistema deve avisar o usuário de forma visual de que a análise do projeto está em andamento.
 
 
-RF-14: O sistema deve avisar o usuário de forma visual de que a análise do projeto está em andamento.
+RF-14: O sistema deve possuir persistência de dados com relação aos projetos acessados.
 
 
-RF-15: O sistema deve possuir persistência de dados com relação aos projetos acessados.
+RF-15: O sistema deve possuir uma barra de pesquisa para buscar os projetos acessados.
 
 
-RF-16: O sistema deve possuir uma barra de pesquisa para buscar os projetos acessados.
+RF-16: O sistema deverá possuir uma seção de aprendizado com elementos interativos.
 
 
-RF-17: O sistema deverá possuir uma seção de aprendizado com elementos interativos.
+RF-17: A seção de aprendizado deve possuir um campo de texto para tirar dúvidas com o agente de IA.
 
 
-RF-18: A seção de aprendizado deve possuir um campo de texto para tirar dúvidas com o agente de IA.
+RF-18: O sistema deverá fornecer o contexto de aprendizado ao agente de IA e retornar a resposta da dúvida.
 
 
-RF-19: O sistema deverá fornecer o contexto de aprendizado ao agente de IA e retornar a resposta da dúvida.
-
-
-RF-20: O sistema deve retornar a análise de um projeto no formato de  texto, evidenciando cada ponto do checklist utilizado para tal.
+RF-19: O sistema deve retornar a análise de um projeto no formato de  texto, evidenciando cada ponto do checklist utilizado para tal.
 
 
 ## Requisitos não-funcionais
