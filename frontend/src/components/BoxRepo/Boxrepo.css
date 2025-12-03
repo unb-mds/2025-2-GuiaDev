@@ -123,8 +123,8 @@
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   /* min-width: 200px; Largura mínima da caixa */
-  width: 270px;
-  height: 280px;
+  width: 250px;
+  height: 270px;
 
   display: flex;
   flex-direction: column;
