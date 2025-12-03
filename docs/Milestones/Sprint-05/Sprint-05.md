@@ -1,54 +1,80 @@
-# **🏁** Sprint 05
+# Relatório da Sprint — Projeto Guiadev
 
-Período: 29/09/2025 a 05/10/2025
+# **Sprint 05**
 
-## Descrição
+## 1. Informações Gerais
 
-Essa sprint foi dedicada à preparação e revisão do projeto para a primeira release, revisando todas as documentações e terminando de implementar funcionalidades.
-
-## Objetivos
-
-* Revisar toda a documentação feita do projeto até o momento da release
-* Criar release notes
-* Terminar implementação faltante
-* Preparar para começar as implementações de código para a release 2
-
-## Reuniões
-
-### Reunião 1
-
-**Data:** 29/09/2025  
-**Local:** ambiente virtual(discord)  
-**Inicio:** 20:00  
-**Encerramento:** 22:00
-
-**Assuntos:**
-
-* Decisão de tarefas e qual integrante iria fazer cada uma  
-* Preenchimento do Figma  
-* Discussão do que é necessário para entregar na release 1
-
-### Reunião 2
-
-**Data:** 01/10/2025  
-**Local:** ambiente virtual(discord)  
-**Inicio:** 20:00  
-**Encerramento:** 22:30
-
-**Assuntos:**
-
-* Finalização de implementações restantes  
-* Integração  
-* Checagem do andamento das tarefas propostas para apresentar a release 1  
-* Preparação da apresentação para a release 1
-
-## Finalização
-
-O objetivo principal desta sprint foi revisar e preparar o projeto para apresentação da release 1. As documentações foram atualizadas, as implementações restantes foram finalizadas e a apresentação foi estruturada.  
-As próximas tarefas, como o início das implementações da release 2, serão realizadas na próxima sprint.
+* **Sprint:** 05
+* **Duração:** 29/09/2025 a 05/10/2025
+* **Product Owner:*Hugo* —
+* **Scrum Master:*Phillipe* —
+* **Time de Desenvolvimento:**
+* **Equipe Guiadev:**
+* João Guilherme S. de Oliveira*
+* Hugo Freitas*
+* Phillipe*
+* Pedro*
+* Felipe Brito*
+* Bruno*
+  
 
 ---
 
-**Observações:**
+## 2. Objetivos da Sprint
 
-A sprint ocorreu de forma eficiente, com todas as tarefas principais concluídas e validações feitas em grupo durante as reuniões.
+* Revisar toda a documentação produzida até a primeira release.
+* Criar as release notes.
+* Finalizar implementações pendentes.
+* Preparar a base para o início do desenvolvimento da Release 2.
+
+---
+
+## 3. Backlog da Sprint
+
+| Item | História de Usuário                                                                 | Critério de Aceite                              | Status     |
+| ---- | ------------------------------------------------------------------------------------ | ------------------------------------------------ | ---------- |
+| 1    | Como usuário, quero visualizar a documentação atualizada                             | Documentos revisados e atualizados               | Concluído  |
+| 2    | Como desenvolvedor, quero finalizar features pendentes da release                    | Issues finalizadas                                | Concluído  |
+| 3    | Como PO, quero ter release notes organizadas                                         | Release notes criadas                             | Concluído  |
+
+---
+
+## 4. Entregas (Review)
+
+* Documentação revisada e atualizada.
+* Release notes finalizadas.
+* Funcionalidades restantes da release 1 concluídas.
+* Projeto pronto para apresentação da Release 1.
+
+---
+
+## 5. Métricas da Sprint
+
+* **Velocity:** Não informado
+* **Qtd. de histórias concluídas / planejadas:** 3 / 3
+* **Burn-down Chart:** Não registrado
+
+---
+
+## 6. Retrospectiva
+
+### O que funcionou bem 
+
+* Boa organização para revisão da release.
+* Comunicação eficiente entre os membros.
+* Tarefas bem distribuídas.
+
+### O que pode melhorar 
+
+* Melhor definição de responsabilidades individuais.
+* Controle de tempo pré-release.
+
+### Ações de melhoria 
+
+* Criar padrões para documentação e releases.
+* Melhorar estimativas das próximas sprints.
+
+---
+
+---
+
