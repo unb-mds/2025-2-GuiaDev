@@ -1,4 +1,4 @@
-# **🏁** Sprint 09
+# **🏁** Sprint 09 - Análises e exportação
 
 Período: 29/10/2025 a 02/11/2025
 
