@@ -8,7 +8,6 @@ import { authModule } from 'src/modules/auth/auth.module';
 import { GithubModule } from 'src/modules/github/github.module';
 import { ChatModule } from 'src/modules/chat/chat.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

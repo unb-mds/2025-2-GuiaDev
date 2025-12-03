@@ -14,13 +14,15 @@
   display: grid;
   align-items: center;
   padding-left: 2rem;
+  /* padding-right: 1rem; */
   background-color: white;
   width: 16vw;
   min-width: 180px; /* evita que o card encolha demais */
   flex: 1 1 16vw; /* permite encolher/expandir — base 16vw */
   height: 110px;
-  border: solid 1px black;
+  border: solid 1px rgb(148, 148, 148);
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .nameMetrics {
@@ -34,6 +36,7 @@
 .numMetrics {
   font-size: 20px;
   padding-bottom: 1rem;
+  padding-right: 1rem;
   font-weight: 600;
 }
 

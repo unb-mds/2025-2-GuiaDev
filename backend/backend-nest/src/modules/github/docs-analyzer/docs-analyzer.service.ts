@@ -1,6 +1,11 @@
 // file: docs-analyzer.service.ts
 import { Injectable, Logger } from '@nestjs/common';
-import { GoogleGenerativeAI, SchemaType, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import {
+  GoogleGenerativeAI,
+  SchemaType,
+  HarmCategory,
+  HarmBlockThreshold,
+} from '@google/generative-ai';
 
 export type DocAnalysis = {
   name: string;
@@ -9,18 +14,20 @@ export type DocAnalysis = {
   summary: string;
   suggestions: string[];
   // compatível para frente: opcional; quem não usar, ignora
- // content_evidence?: {
-   // non_empty: boolean;
-   // length: number;
-   // sha256: string;
- // };
+  // content_evidence?: {
+  // non_empty: boolean;
+  // length: number;
+  // sha256: string;
+  // };
 };
 
 @Injectable()
 export class DocsAnalyzerService {
   private readonly logger = new Logger(DocsAnalyzerService.name);
   private readonly apiKey = process.env.GEMINI_API_KEY ?? '';
-  private readonly model = (process.env.GEMINI_MODEL || 'gemini-2.5-flash').replace(/^models\//, '');
+  private readonly model = (
+    process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+  ).replace(/^models\//, '');
 
   private client: GoogleGenerativeAI | null = null;
 
@@ -29,13 +36,13 @@ export class DocsAnalyzerService {
       try {
         this.client = new GoogleGenerativeAI(this.apiKey);
       } catch (err) {
-        this.logger.warn('Falha ao inicializar cliente Gemini', err as any);
+        this.logger.warn('Falha ao inicializar cliente Gemini', err);
         this.client = null;
       }
     }
   }
 
-  //  utils 
+  //  utils
   private normalizeNewlines(s: string) {
     return s.replace(/\r\n/g, '\n');
   }
@@ -49,7 +56,7 @@ export class DocsAnalyzerService {
     return n === 'license' || n === 'license.md';
   }
 
-  //  prompt (1 arquivo - OBJETO) 
+  //  prompt (1 arquivo - OBJETO)
   private buildPrompt(name: string, content: string) {
     return [
       'Assunto: Análise de Documentação de Repositório de Software',
@@ -78,9 +85,12 @@ export class DocsAnalyzerService {
     ].join('\n');
   }
 
-  //  parser tolerante 
+  //  parser tolerante
   private stripFences(text: string) {
-    return text.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
+    return text
+      .replace(/```json\s*/gi, '')
+      .replace(/```/g, '')
+      .trim();
   }
   private extractJson(text: string): any {
     if (!text) return {};
@@ -99,7 +109,11 @@ export class DocsAnalyzerService {
     const candidate = start >= 0 ? raw.slice(start) : raw;
 
     const tryParse = (s: string) => {
-      try { return JSON.parse(s); } catch { return null; }
+      try {
+        return JSON.parse(s);
+      } catch {
+        return null;
+      }
     };
 
     let parsed = tryParse(candidate);
@@ -113,23 +127,31 @@ export class DocsAnalyzerService {
     }
     return {};
   }
-  private normalizeParsed(parsed: any): { score: number; summary: string; suggestions: string[] } {
+  private normalizeParsed(parsed: any): {
+    score: number;
+    summary: string;
+    suggestions: string[];
+  } {
     const obj = Array.isArray(parsed) ? parsed[0] : parsed || {};
     const scoreNum = Number(obj.score);
     const summaryStr = typeof obj.summary === 'string' ? obj.summary : '';
-    const suggArr = Array.isArray(obj.suggestions) ? obj.suggestions.filter((s: any) => typeof s === 'string') : [];
+    const suggArr = Array.isArray(obj.suggestions)
+      ? obj.suggestions.filter((s: any) => typeof s === 'string')
+      : [];
 
-    const score = Number.isFinite(scoreNum) ? Math.max(0, Math.min(100, scoreNum)) : 0;
+    const score = Number.isFinite(scoreNum)
+      ? Math.max(0, Math.min(100, scoreNum))
+      : 0;
     const summary = summaryStr.slice(0, 1000);
     const suggestions = suggArr.slice(0, 8);
 
     return { score, summary, suggestions };
   }
 
-  //  chamada ao Gemini 
+  //  chamada ao Gemini
   private async analyzeWithGemini(
     name: string,
-    content: string
+    content: string,
   ): Promise<Pick<DocAnalysis, 'score' | 'summary' | 'suggestions'>> {
     const prompt = this.buildPrompt(name, content);
 
@@ -149,16 +171,31 @@ export class DocsAnalyzerService {
           properties: {
             score: { type: SchemaType.NUMBER },
             summary: { type: SchemaType.STRING },
-            suggestions: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+            suggestions: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+            },
           },
           required: ['score', 'summary', 'suggestions'],
         } as any,
       },
       safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
       ],
     });
 
@@ -182,14 +219,22 @@ export class DocsAnalyzerService {
   }
 
   //   API pública
-  async analyzeText(name: string, content: string | null): Promise<DocAnalysis> {
+  async analyzeText(
+    name: string,
+    content: string | null,
+  ): Promise<DocAnalysis> {
     // Regra LICENSE binária
     if (this.isLicense(name)) {
       if (content === null) {
         return {
-          name, exists: false, score: 0, summary: '',
-          suggestions: ['Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários.'],
-         // content_evidence: { non_empty: false, length: 0, sha256: '' },
+          name,
+          exists: false,
+          score: 0,
+          summary: '',
+          suggestions: [
+            'Adicionar um arquivo LICENSE para garantir a clareza legal e proteger o projeto e seus usuários.',
+          ],
+          // content_evidence: { non_empty: false, length: 0, sha256: '' },
         };
       }
       const normalized = this.normalizeNewlines(content);
@@ -200,19 +245,27 @@ export class DocsAnalyzerService {
         sha256: trimmed.length > 0 ? this.sha256Hex(normalized) : '',
       };
       return {
-        name, exists: true, score: 100,
-        summary: 'Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído.',
+        name,
+        exists: true,
+        score: 100,
+        summary:
+          'Define os termos legais, permissões e limitações sob os quais o software pode ser usado, modificado e distribuído.',
         suggestions: ['Documento OK.'],
-       // content_evidence: evidence,
+        // content_evidence: evidence,
       };
     }
 
     // Não existe
     if (content === null) {
       return {
-        name, exists: false, score: 0, summary: '',
-        suggestions: ['Sugerir adicionar este documento ao repositório atendendo às boas práticas de escrita técnica.'],
-       // content_evidence: { non_empty: false, length: 0, sha256: '' },
+        name,
+        exists: false,
+        score: 0,
+        summary: '',
+        suggestions: [
+          'Sugerir adicionar este documento ao repositório atendendo às boas práticas de escrita técnica.',
+        ],
+        // content_evidence: { non_empty: false, length: 0, sha256: '' },
       };
     }
 
@@ -227,14 +280,17 @@ export class DocsAnalyzerService {
     // Existe mas vazio
     if (!evidence.non_empty) {
       return {
-        name, exists: true, score: 0,
-        summary: 'O arquivo existe, porém está vazio ou contém conteúdo mínimo.',
+        name,
+        exists: true,
+        score: 0,
+        summary:
+          'O arquivo existe, porém está vazio ou contém conteúdo mínimo.',
         suggestions: [
           'Adicionar uma visão geral clara do documento e seu objetivo',
           'Incluir seções essenciais conforme o tipo do documento',
           'Fornecer exemplos práticos e links úteis quando aplicável',
         ],
-       // content_evidence: evidence,
+        // content_evidence: evidence,
       };
     }
 
@@ -247,14 +303,17 @@ export class DocsAnalyzerService {
         this.logger.warn(`[LLM ERROR] ${e?.message || e}`);
       }
       return {
-        name, exists: true, score: 20,
-        summary: 'Documento presente; a análise automática falhou. Recomenda-se revisão manual das seções essenciais.',
+        name,
+        exists: true,
+        score: 20,
+        summary:
+          'Documento presente; a análise automática falhou. Recomenda-se revisão manual das seções essenciais.',
         suggestions: [
           'Adicionar/confirmar seção de objetivos/escopo',
           'Incluir instruções de instalação/uso (se aplicável)',
           'Referenciar licença e diretrizes de contribuição',
         ],
-       // content_evidence: evidence,
+        // content_evidence: evidence,
       };
     }
 
@@ -271,14 +330,16 @@ export class DocsAnalyzerService {
     }
 
     return {
-      name, exists: true, score,
+      name,
+      exists: true,
+      score,
       summary: summary || 'Documento presente; resumo ausente.',
       suggestions,
-     // content_evidence: evidence,
+      // content_evidence: evidence,
     };
   }
 
   async analyzeMany(docs: { name: string; content: string | null }[]) {
-    return Promise.all(docs.map(d => this.analyzeText(d.name, d.content)));
+    return Promise.all(docs.map((d) => this.analyzeText(d.name, d.content)));
   }
 }

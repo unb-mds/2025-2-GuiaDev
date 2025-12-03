@@ -39,7 +39,7 @@ const BoxRepoInfo = ({
             </div>
           </div>
 
-          <div className="descripLang">Projeto desenvolvido em:{languages}</div>
+          {/* <div className="descripLang">Projeto desenvolvido em:{languages}</div> */}
         </div>
       </div>
 

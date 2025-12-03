@@ -2,7 +2,7 @@ name: CI Pipeline (Docker Compose)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, integracaoRelease2 ]
   pull_request:
     branches: [ main ]
 
@@ -51,17 +51,17 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           NODE_ENV: production
-        run: docker compose up -d --build || docker compose logs
+        run: docker compose up -d --build || docker compose logsse vox
 
         
 
       # 6️⃣ Aplica o linter no backend (ajuste o caminho se necessário)
-      # - name: 🧹 Run Linter (NestJS)
-      #   run: docker compose exec -T backend npm run lint
+      - name: 🧹 Run Linter (NestJS)
+        run: docker compose exec -T nest-app npm run lint
 
-      # # 7️⃣ Executa testes unitários no backend
-      # - name: 🧪 Run Tests (NestJS)
-      #   run: docker compose exec -T backend npm run test -- --passWithNoTests
+      # 7️⃣ Executa testes unitários no backend
+      - name: 🧪 Run Tests (NestJS) — with coverage
+        run: docker compose exec -T nest-app npm run test -- --coverage --coverageReporters=text --passWithNoTests --runInBand
 
       # 8️⃣ (Opcional) Verifica se o front está rodando
       - name: 🌐 Check frontend container health
