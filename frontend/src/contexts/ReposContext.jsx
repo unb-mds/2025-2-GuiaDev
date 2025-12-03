@@ -1,8 +1,7 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const ReposContext = createContext({
   reposByOwner: {},
-  getReposForOwner: () => null,
   setReposForOwner: () => {},
 });
 
@@ -24,14 +23,21 @@ export function ReposProvider({ children }) {
     }
   }, [reposByOwner]);
 
-  const setReposForOwner = (owner, repos) => {
-    setReposByOwner(prev => ({ ...prev, [owner]: repos }));
-  };
+  const setReposForOwner = useCallback((owner, nextValue) => {
+    setReposByOwner(prev => {
+      const previousRepos = prev[owner] ?? [];
+      const resolved = typeof nextValue === 'function' ? nextValue(previousRepos) : nextValue;
+      return { ...prev, [owner]: resolved };
+    });
+  }, [setReposByOwner]);
 
-  const getReposForOwner = (owner) => reposByOwner[owner] ?? null;
+  const contextValue = useMemo(() => ({
+    reposByOwner,
+    setReposForOwner,
+  }), [reposByOwner, setReposForOwner]);
 
   return (
-    <ReposContext.Provider value={{ reposByOwner, getReposForOwner, setReposForOwner }}>
+    <ReposContext.Provider value={contextValue}>
       {children}
     </ReposContext.Provider>
   );

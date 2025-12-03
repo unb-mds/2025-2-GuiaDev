@@ -1,74 +1,345 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GuiaDev — Guias e tutoriais do curso</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GuiaDev - Documentação para Desenvolvedores</title>
+  <meta name="description" content="Documentação e materiais práticos para estudantes e colaboradores. Construa projetos organizados, bem documentados e escaláveis.">
+  <meta name="author" content="GuiaDev">
+  <meta name="keywords" content="documentação, desenvolvedores, boas práticas, arquitetura de software, GitHub">
+  
+  <meta property="og:title" content="GuiaDev - Documentação para Desenvolvedores">
+  <meta property="og:description" content="Documentação e materiais práticos para estudantes e colaboradores.">
+  <meta property="og:type" content="website">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-
-  <header class="site-header">
+  <!-- Header -->
+  <header class="header">
     <div class="container header-inner">
-      <img  alt="GuiaDev" height="40" />
-      <span class="brand-text">GuiaDev</span>
+      <a href="index.html" class="logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+        </div>
+        <span class="logo-text">Guia<span>Dev</span></span>
+      </a>
 
-      <nav id="site-nav" class="site-nav">
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="diagrama-c4.html" rel="noopener">Diagrama C4 (PDF)</a></li>
-          <li><a href="" class="indisponivel">Milestones</a></li>
-          <li><a href="sobre.html">Sobre</a></li>
-          <li><a href="como-contribuir.html">Como contribuir</a></li>
-          <li><a href="guias.html">Docs</a></li>
-          <li><a href="" class="indisponivel">Roadmap</a></li>
-        </ul>
+      <nav class="nav">
+        <a href="#home" class="nav-link">Home</a>
+        <a href="diagrama-c4.html" class="nav-link">Estrutura</a>
+        <a href="milestones.html" class="nav-link">Milestones</a>
       </nav>
+
+      <div class="header-actions">
+        <a href="#" class="btn btn-ghost btn-sm">Roadmap</a>
+        <a href="https://github.com/unb-mds/2025-2-GuiaDev" target="_blank" class="btn btn-primary btn-sm glow">GitHub</a>
+      </div>
+
+      <button class="mobile-menu-btn" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
     </div>
   </header>
 
-  <main id="main" class="container">
+  <main>
+    <!-- Hero Section -->
     <section id="home" class="hero">
-      <h1>GuiaDev — Materiais, guias e exemplos para o curso</h1>
-      <p class="lede">
-        Documentação e materiais práticos para estudantes e colaboradores. Veja como contribuir,
-        consulte o checklist de docs e o documento de requisitos, ou abra o diagrama C4 do projeto.
-      </p>
+      <div class="hero-bg">
+        <div class="hero-bg-circle-1"></div>
+        <div class="hero-bg-circle-2"></div>
+        <div class="hero-bg-gradient"></div>
+      </div>
+
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-badge animate-fade-up">
+            <span class="hero-badge-dot animate-glow-pulse"></span>
+            <span class="hero-badge-text">Documentação para desenvolvedores</span>
+          </div>
+
+          <h1 class="hero-title animate-fade-up delay-100">
+            Construa projetos <span class="gradient-text glow-text">organizados</span><br>e bem documentados
+          </h1>
+
+          <p class="hero-subtitle animate-fade-up delay-200">
+            Documentação e materiais práticos para estudantes e colaboradores. 
+            Veja como contribuir, consulte o checklist de docs e o documento de requisitos.
+          </p>
+
+          <div class="hero-cta animate-fade-up delay-300">
+            <a href="#visao-geral" class="btn btn-primary btn-lg glow">
+              Começar Agora
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a href="milestones.html" class="btn btn-outline btn-lg">Ver Documentação</a>
+          </div>
+
+          <div class="hero-features animate-fade-up delay-400">
+            <div class="card">
+              <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="M8 11h8"/><path d="M8 7h6"/></svg>
+              </div>
+              <h3 class="card-title">Documentação Completa</h3>
+              <p class="card-text">Guias detalhados e exemplos práticos para todas as funcionalidades</p>
+            </div>
+
+            <div class="card">
+              <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="3" x2="9" y1="12" y2="12"/><line x1="15" x2="21" y1="12" y2="12"/><line x1="12" x2="12" y1="3" y2="9"/><line x1="12" x2="12" y1="15" y2="21"/></svg>
+              </div>
+              <h3 class="card-title">Integração GitHub</h3>
+              <p class="card-text">Conecte seus repositórios e analise a estrutura automaticamente</p>
+            </div>
+
+            <div class="card">
+              <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+              <h3 class="card-title">Boas Práticas</h3>
+              <p class="card-text">Aprenda padrões de arquitetura e documentação de qualidade</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="features">
-      <article>
-        <h2>Documentação presente</h2>
-        <p>Os principais arquivos de projeto estão na pasta Docs: check-list, documento de requisitos e diagrama C4.</p>
-        <p><a href="docs-checklist.html">Abrir Docs Check-list</a></p>
-      </article>
+    <!-- Overview Section -->
+    <section id="visao-geral" class="section">
+      <div class="section-bg"></div>
+      <div class="container" style="position: relative; z-index: 10;">
+        <div class="section-header">
+          <span class="code-badge">// overview</span>
+          <h2 class="section-title">Visão <span class="gradient-text">Geral</span></h2>
+          <p class="section-subtitle">Entenda o contexto, motivação e objetivos por trás do GuiaDev</p>
+        </div>
 
-      <article>
-        <h2>Fluxo de contribuição</h2>
-        <p>Consulte <a href="como-contribuir.html">Como Contribuir</a> e o arquivo <code>CONTRIBUTING.md</code>.</p>
-      </article>
+        <div class="topics-grid">
+          <article class="topic-card animate-fade-up">
+            <div class="topic-inner">
+              <div class="topic-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+              </div>
+              <div>
+                <h3 class="topic-title">Contextualização do Problema</h3>
+                <p class="topic-text">A engenharia de software evoluiu de modelos rígidos e sequenciais para novas abordagens que buscam otimizar processos e reduzir riscos. No entanto, um dos maiores desafios atuais nesses projetos é a falta de documentação. Sistemas mal documentados dificultam o entendimento do projeto, comprometem a colaboração entre as equipes e aumentam significativamente o risco de retrabalho.</p>
+              </div>
+            </div>
+          </article>
 
-      <article>
-        <h2>Documentação e exemplos</h2>
-        <p>Veja <a href="guias.html" >Docs</a>, <a href="" class="indisponivel">Projetos</a> e o <a href="" class="indisponivel">Roadmap</a>.</p>
-      </article>
+          <article class="topic-card animate-fade-up delay-100">
+            <div class="topic-inner">
+              <div class="topic-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+              </div>
+              <div>
+                <h3 class="topic-title">Motivação</h3>
+                <p class="topic-text">O projeto Guia Dev surge motivado pela necessidade de apoiar desenvolvedores na criação e gestão de projetos de forma sustentável. A principal intenção é promover a manutenibilidade do software através de práticas organizadas, bem documentadas e fundamentadas em uma arquitetura consistente.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="topic-card animate-fade-up delay-200">
+            <div class="topic-inner">
+              <div class="topic-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              </div>
+              <div>
+                <h3 class="topic-title">Objetivo Geral</h3>
+                <p class="topic-text">O objetivo central do sistema é ser uma aplicação que auxilia desenvolvedores no desenvolvimento de projetos organizados, bem documentados e escaláveis. Fornecendo análises automáticas, feedback visual, educação interativa e integração com plataformas como GitHub.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="topic-card animate-fade-up delay-300">
+            <div class="topic-inner">
+              <div class="topic-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              </div>
+              <div>
+                <h3 class="topic-title">Escopo Inicial</h3>
+                <p class="topic-text">Gestão de usuários com login social, integração com GitHub, motor de análise com IA (Gemini) para verificar arquitetura e documentação, interface de aprendizado com chat IA, e histórico de projetos acessados.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="objectives-box">
+          <h3 class="objectives-title">Objetivos Específicos</h3>
+          <div class="objectives-grid">
+            <div class="objective-item animate-fade-up">
+              <div class="objective-number">1</div>
+              <h4 class="objective-title">Análise Automatizada</h4>
+              <p class="objective-text">Verificação de README, CONTRIBUTING, LICENSE e boas práticas</p>
+            </div>
+
+            <div class="objective-item animate-fade-up delay-100">
+              <div class="objective-number">2</div>
+              <h4 class="objective-title">Feedback Visual</h4>
+              <p class="objective-text">Exibição do nível de completude das práticas recomendadas</p>
+            </div>
+
+            <div class="objective-item animate-fade-up delay-200">
+              <div class="objective-number">3</div>
+              <h4 class="objective-title">Educação Interativa</h4>
+              <p class="objective-text">Seção de aprendizado com agente de IA</p>
+            </div>
+
+            <div class="objective-item animate-fade-up delay-300">
+              <div class="objective-number">4</div>
+              <h4 class="objective-title">Integração GitHub</h4>
+              <p class="objective-text">Cadastro e busca direta de repositórios para análise</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contribute Section -->
+    <section id="contribuir" class="contribute">
+      <div class="container">
+        <div class="contribute-wrapper">
+          <div class="contribute-bg"></div>
+          <div class="contribute-bg-glow"></div>
+
+          <div class="contribute-content">
+            <div class="section-header">
+              <span class="code-badge">// contribute</span>
+              <h2 class="section-title">Como <span class="gradient-text">Contribuir</span></h2>
+              <p class="section-subtitle">Junte-se à comunidade e ajude a melhorar o GuiaDev</p>
+            </div>
+
+            <div class="steps-grid">
+              <div class="step-card animate-fade-up">
+                <div class="step-number">1</div>
+                <div class="step-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>
+                </div>
+                <h3 class="step-title">Fork o Repositório</h3>
+                <p class="step-text">Crie uma cópia do projeto em sua conta GitHub</p>
+              </div>
+
+              <div class="step-card animate-fade-up delay-100">
+                <div class="step-number">2</div>
+                <div class="step-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="m9 9.5 2 2 4-4"/></svg>
+                </div>
+                <h3 class="step-title">Leia a Documentação</h3>
+                <p class="step-text">Consulte o CONTRIBUTING.md para guias de contribuição</p>
+              </div>
+
+              <div class="step-card animate-fade-up delay-200">
+                <div class="step-number">3</div>
+                <div class="step-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                </div>
+                <h3 class="step-title">Abra uma Issue</h3>
+                <p class="step-text">Discuta suas ideias antes de implementar mudanças</p>
+              </div>
+
+              <div class="step-card animate-fade-up delay-300">
+                <div class="step-number">4</div>
+                <div class="step-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 22h2c.5 0 1-.2 1.4-.6.4-.4.6-.9.6-1.4V7.5L14.5 2H6c-.5 0-1 .2-1.4.6C4.2 3 4 3.5 4 4v3"/><polyline points="14 2 14 8 20 8"/><circle cx="8" cy="16" r="6"/><path d="M9.5 17.5 8 16.25V14"/></svg>
+                </div>
+                <h3 class="step-title">Envie um PR</h3>
+                <p class="step-text">Submeta suas alterações para revisão da equipe</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>
 
-  <footer class="site-footer">
-    <div class="footer">
-      <nav>
-        <ul id="footer-links">
-          <li><a href="changelog.html">Changelog</a></li>
-          <li><a href="security.html">Security</a></li>
-          <li><a href="privacy.html">Privacidade</a></li>
-        </ul>
-      </nav>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#home" class="logo" style="margin-bottom: 1rem;">
+            <div class="logo-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+            </div>
+            <span class="logo-text">Guia<span>Dev</span></span>
+          </a>
+          <p>Documentação e materiais práticos para desenvolvedores construírem projetos organizados.</p>
+          <a href="https://github.com/unb-mds/2025-2-GuiaDev" target="_blank" class="footer-github-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+            Ver no GitHub
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          </a>
+        </div>
 
-      <p class="copyright">© 2025 GuiaDev — Licença: MIT</p>
+        <div class="footer-section">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="changelog.html">Changelog</a></li>
+            <li><a href="security.html">Security</a></li>
+            <li><a href="privacy.html">Privacidade</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Recursos</h4>
+          <ul>
+            <li><a href="guias.html">Documentação</a></li>
+            <li><a href="diagrama-c4.html">Diagrama C4</a></li>
+            <li><a href="docs-checklist.html">Checklist</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Comunidade</h4>
+          <ul>
+            <li>
+              <a href="https://github.com/unb-mds/2025-2-GuiaDev" target="_blank">
+                GitHub
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+              </a>
+            </li>
+            <li><a href="#contribuir">Contribuir</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2025 GuiaDev — Licença: MIT</p>
+        <p>Projeto da disciplina MDS/UnB</p>
+      </div>
     </div>
   </footer>
 
+  <script>
+    // Simple mobile menu toggle (optional enhancement)
+    document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+      const nav = document.querySelector('.nav');
+      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+      nav.style.flexDirection = 'column';
+      nav.style.position = 'absolute';
+      nav.style.top = '100%';
+      nav.style.left = '0';
+      nav.style.right = '0';
+      nav.style.backgroundColor = 'var(--background)';
+      nav.style.padding = '1rem';
+      nav.style.borderBottom = '1px solid var(--border)';
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
 </body>
 </html>

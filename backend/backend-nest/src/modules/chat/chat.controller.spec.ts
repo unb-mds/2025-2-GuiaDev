@@ -1,11 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ChatController } from './chat.controller';
+import { ChatService } from './chat.service';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { ChatModule } from './chat.module';
 import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
 
-describe('ChatController (e2e)', () => {
+
+import request = require('supertest');
+
+process.env.GEMINI_API_KEY = 'MOCK_TEST_KEY';
+
+describe('ChatController', () => {
   let app: INestApplication;
   let httpService: HttpService;
 
@@ -31,6 +38,10 @@ describe('ChatController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
   });
 
   it('/chat (POST) deve retornar a resposta da IA', async () => {

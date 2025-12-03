@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useEffect, useContext } from "react";
 import api from "../../../services/api";
 import "./Analysis.css";
 import Overview from "../../components/Overview/Overview";
@@ -6,11 +6,13 @@ import MetricsRepo from "../../components/Overview/MetricsRepo";
 import Summary from "../../components/Overview/Summary";
 import Details from "../../components/AnalysisDetails/Details";
 import { useParams, useLocation } from 'react-router-dom';
+import ReposContext from "../../contexts/ReposContext";
 
 const AnalysisPage = () => {
 
   const params = useParams();        
   const location = useLocation();    
+  const { setReposForOwner } = useContext(ReposContext);
 
   const owner = params.owner;
   const repo = params.repo || location.state?.repo?.nomeRepositorio;
@@ -51,12 +53,50 @@ const AnalysisPage = () => {
 
 useEffect(() => {
   let alive = true;
+
+  const calculateScore = (docsArray) => {
+    if (!Array.isArray(docsArray) || docsArray.length === 0) return -1;
+    const numericScores = docsArray
+      .map((doc) => (typeof doc.score === 'number' ? doc.score : null))
+      .filter((value) => value !== null && Number.isFinite(value));
+    if (numericScores.length === 0) return -1;
+    const avg = numericScores.reduce((sum, value) => sum + value, 0) / numericScores.length;
+    return Math.round(avg);
+  };
+
+  const updateRepoCache = (analysisDocs) => {
+    if (!setReposForOwner) return;
+    if (!owner || !repo) return;
+
+    const normalizedRepo = repo.toLowerCase();
+    const newScore = calculateScore(analysisDocs);
+    setReposForOwner(owner, (currentRepos = []) => {
+      return currentRepos.map((entry) => {
+        const entryName = (entry?.nomeRepositorio || entry?.repo || '').toLowerCase();
+        if (entryName !== normalizedRepo) return entry;
+
+        return {
+          ...entry,
+          score: newScore,
+          detalhes: {
+            ...(entry?.detalhes || {}),
+            docs: analysisDocs,
+          },
+        };
+      });
+    });
+  };
+
   const fetchAnalysis = async () => {
     if (!owner || !repo) return;
     try {
       const res = await api.get(`github/analyze/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
       if (!alive) return;
-      setRepoObjt(res?.data ?? null);
+      const docsAnalysis = res?.data ?? null;
+      setRepoObjt(docsAnalysis);
+      if (docsAnalysis) {
+        updateRepoCache(docsAnalysis);
+      }
     } catch (err) {
       console.error('Erro ao buscar análise do repositório:', err);
       if (alive) setRepoObjt(null);
@@ -66,7 +106,7 @@ useEffect(() => {
   fetchAnalysis();
 
   return () => { alive = false; };
-}, [owner, repo]);
+}, [owner, repo, setReposForOwner]);
 
   return (
     <div className="page">

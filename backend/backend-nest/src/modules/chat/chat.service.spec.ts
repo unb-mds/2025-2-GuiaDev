@@ -1,27 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatService } from './chat.service';
-import { HttpService } from '@nestjs/axios';
-import { of } from 'rxjs';
+import { HttpModule } from '@nestjs/axios';
+
+process.env.GEMINI_API_KEY = 'MOCK_TEST_KEY';
 
 describe('ChatService', () => {
   let service: ChatService;
-  let httpService: HttpService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ChatService,
-        {
-          provide: HttpService,
-          useValue: {
-            post: jest.fn(),
-          },
-        },
-      ],
+      imports: [HttpModule],
+      providers: [ChatService],
     }).compile();
 
     service = module.get<ChatService>(ChatService);
-    httpService = module.get<HttpService>(HttpService);
   });
 
   it('deve retornar a resposta da IA corretamente', async () => {

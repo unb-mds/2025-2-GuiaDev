@@ -16,10 +16,6 @@
   
   /* background-color: red; */
   width: 100%;
-  /* min-height: 100vh; */
-  /* background-color: aqua; */
-  /* margin-left: auto; */
-  /* justify-content: center; */
 }
 
 .inputLink{
@@ -35,7 +31,7 @@
 .home-notice{
   display: inline-block;
   background: #fff8c4; /* amarelo claro */
-  color: #222;
+  color: #222;  /* Dark gray */
   padding: 0.6rem 0.9rem;
   border-radius: 6px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
