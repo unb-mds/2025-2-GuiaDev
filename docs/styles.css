@@ -1,6 +1,6 @@
 :root {
-    --bg: #0b1220;
-    --text: #e6eef8;
+    --bg: #e6eef8;
+    --text: #0b1220;
     --muted: #9aa9bd;
     --muted-2: #98a8bd;
     --accent: #2b9cff;
@@ -81,7 +81,8 @@ a:hover {
 
 .site-nav {
     margin: 0 auto;
-    display: block
+    display: block;
+    background: rgba(37, 99, 235);
 }
 
 .site-nav ul {
@@ -103,8 +104,9 @@ a:hover {
 
 .site-nav a:hover,
 .site-nav a:focus {
-    background: rgba(37, 99, 235, 0.06);
-    color: var(--accent)
+    /* background: rgba(37, 99, 235); */
+    opacity: 0.7;
+    color: var(--accent);
 }
 
 
