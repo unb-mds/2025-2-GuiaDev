@@ -107,7 +107,7 @@ React 18.x + TypeScript + Vite
 - ⚛️  React com Hooks modernos
 - 📘 TypeScript para type-safety
 - ⚡ Vite para build ultrarrápido
-- 🎨 Tailwind CSS para estilização
+- 🎨 CSS para estilização
 - 📱 Design responsivo e acessível
 ```
 
@@ -126,7 +126,7 @@ NestJS 9.x + Prisma + PostgreSQL
 Docker + CI/CD + Cloud
 - 🐳 Docker & Docker Compose
 - 🚀 CI/CD com GitHub Actions
-- ☁️  Deploy: Vercel + Railway/Render
+- ☁️  Deploy: Render
 - 📈 Monitoring e logs estruturados
 ```
 
