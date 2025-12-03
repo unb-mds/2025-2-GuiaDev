@@ -138,11 +138,10 @@ Nossa arquitetura segue o **modelo C4** para máxima clareza e escalabilidade:
 
 ```mermaid
 graph TB
-    A[Cliente Web] -->|HTTPS| B[Load Balancer]
-    B --> C[Frontend - React]
+    A[Cliente Web] --> C[Frontend - React]
     C -->|API REST| D[Backend - NestJS]
     D --> E[PostgreSQL]
-    D --> F[Redis Cache]
+    D --> F[Gemini]
     D --> G[GitHub API]
     
     style A fill:#61DAFB
