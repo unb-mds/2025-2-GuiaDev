@@ -1,85 +1,116 @@
 # Contribuindo para o GuiaDev
 
-Obrigado por considerar contribuir para o GuiaDev! Suas contribuições são muito importantes para a evolução do projeto.
-Este documento te ajudará a entender como contribuir para o projeto de maneira simples e eficaz.
+Obrigado por considerar contribuir para o GuiaDev! Suas contribuições são essenciais para a evolução do projeto. Este documento explica como você pode participar de maneira simples e eficaz.
 
-## Como posso contribuir?
+---
 
-### Relatar problemas ou bugs
+## 📋 Como posso contribuir?
 
-Se você encontrar um bug, por favor entre em contato conosco.
+### 🐛 Relatar problemas ou bugs
 
-1. Certifique-se se esse problema(bug) ja foi relatado antes, verificando os [issues abertos](https://github.com/unb-mds/2025-2-GuiaDev/issues)
-2. Se for um novo bug, abra um novo issue utilizando nosso issue template (ao clicar em new issue,selecione "custom issue template") e forneça as informações necessárias:
+Encontrou um bug? Ajude-nos a corrigi-lo!
 
-* Descrição completa do problema encontrado (toda a descrição do contexto do problema,por que é importante que ele seja consertado?)
-* O(s) responsável pela issue e pela correção do problema e um revisor (algum dos membros da equipe do projeto)
-* A prioridade dessa issue: se é um bug urgente ou não
-* As tarefas a serem feitas para consertar o bug
-* as definições de pronto e de feito
-* Mostrar o resultado da correção do bug 
+**Antes de abrir um novo issue:**
+1. Verifique se o problema já foi relatado nos [issues abertos](https://github.com/unb-mds/2025-2-GuiaDev/issues)
 
-### Sugerir melhorias
+**Se for um novo bug:**
+1. Abra um novo issue clicando em "New Issue"
+2. Selecione o template "Custom Issue Template"
+3. Preencha as seguintes informações:
+   - **Descrição completa do problema:** Contextualize o bug e explique por que é importante corrigi-lo
+   - **Responsáveis:** Defina quem será responsável pela issue, pela correção e quem será o revisor (membros da equipe)
+   - **Prioridade:** Indique se é um bug urgente ou não
+   - **Tarefas:** Liste as ações necessárias para corrigir o problema
+   - **Definições de Pronto e Feito:** Estabeleça os critérios de conclusão
+   - **Resultado:** Mostre o resultado esperado após a correção
 
-Encontrou algo que pode ser melhorado? Estamos sempre abertos a sugestões e melhorias para o projeto!
+---
 
-1. verifique se essa melhoria ja foi discutida, verificando os [issues abertos](https://github.com/unb-mds/2025-2-GuiaDev/issues)
-2. Se for uma nova sugestão de melhoria, abra um novo issue utilizando nosso issue template (ao clicar em new issue,selecione "custom issue template") e forneça as informações necessárias:
+### 💡 Sugerir melhorias
 
-* Descrição completa da sugestão de melhoria (Todo o contexto por trás da sugestão,por que essa melhoria é importante,o que ela resolve?)
-* O(s) responsável pela issue e pela melhoria proposta e um revisor (algum dos membros da equipe do projeto)
-* A prioridade dessa issue: Se é uma melhoria imprescíndivel ou não
-* As tarefas a serem realizadas durante a issue
-* Definições de pronto e de feito
-* mostrar o resultado da melhoria proposta
+Tem uma ideia para melhorar o projeto? Adoraríamos ouvir!
 
-## Contribuir com código
+**Antes de sugerir:**
+1. Verifique se a melhoria já foi discutida nos [issues abertos](https://github.com/unb-mds/2025-2-GuiaDev/issues)
 
-Se você deseja contribuir com código, siga as seguintes etapas:
+**Se for uma nova sugestão:**
+1. Abra um novo issue clicando em "New Issue"
+2. Selecione o template "Custom Issue Template"
+3. Preencha as seguintes informações:
+   - **Descrição completa da melhoria:** Contextualize a sugestão e explique sua importância e o que ela resolve
+   - **Responsáveis:** Defina quem será responsável pela issue, pela implementação e quem será o revisor (membros da equipe)
+   - **Prioridade:** Indique se é uma melhoria imprescindível ou não
+   - **Tarefas:** Liste as ações necessárias para implementar a melhoria
+   - **Definições de Pronto e Feito:** Estabeleça os critérios de conclusão
+   - **Resultado:** Mostre o resultado esperado após a implementação
 
-1. **Fork o repositório:** Clique em "Fork" no topo da página do GitHub para criar uma cópia do repositório em sua conta.
-2. **Clone o repositório**: 
+---
+
+## 💻 Contribuir com código
+
+Se você deseja contribuir com código, siga estas etapas:
+
+### 1. Fork o repositório
+Clique em "Fork" no topo da página do GitHub para criar uma cópia do repositório em sua conta.
+
+### 2. Clone o repositório
 ```sh
 git clone https://github.com/seu-usuario/seu-repositorio.git
-
 ```
-3. ** Crie uma branch para a alteração:**
+
+### 3. Crie uma branch para sua alteração
 ```sh
 git checkout -b minha-contribuicao
-
 ```
-4. **Faça as alterações necessárias**: Implemente as mudanças desejadas no código.
-5. **Adicione commits utilizando nosso [padrão de commits](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/Docs/Milestones/Sprint-04/padr%C3%A3o_commits.md) e com uma mensagem clara. exemplo:
+
+### 4. Faça as alterações necessárias
+Implemente as mudanças desejadas no código.
+
+### 5. Adicione commits seguindo nosso padrão
+Utilize nosso [padrão de commits](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/Docs/Milestones/Sprint-04/padr%C3%A3o_commits.md) com mensagens claras:
 ```sh
 git commit -m "feat: descrição clara da nova funcionalidade implementada"
-
 ```
-6. **Envie as alterações para o seu repositório forked**:
+
+### 6. Envie as alterações para seu fork
 ```sh
 git push origin minha-contribuicao
-
 ```
-7. **Abra um Pull Request**: clique em "New Pull Request". Descreva suas alterações detalhadamente utilizando nosso [pull request template](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/.github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md)
 
-### Padrões de Codificação
+### 7. Abra um Pull Request
+Clique em "New Pull Request" e descreva suas alterações detalhadamente utilizando nosso [Pull Request Template](https://github.com/unb-mds/2025-2-GuiaDev/blob/main/.github/PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md).
 
-- Siga as convenções de código do projeto.
-- Certifique-se de que seu código está bem comentado.
-- Utilize os padrões de nomenclatura adequados.
-- ** para não quebrar funcionalidades que ja existem, certifique-se que foram escritos testes para todas as funcionalidades criadas (testes unitários, de integração e se possível automatizados)**
+---
 
-### Documentação
+## 📝 Padrões de Codificação
 
-Se sua alteração afetar a documentação, por favor, atualize-a. A documentação está localizada na pasta `docs`.
+Para manter a qualidade do código, siga estas diretrizes:
 
-## Feedback
+- Siga as convenções de código do projeto
+- Certifique-se de que seu código está bem comentado
+- Utilize os padrões de nomenclatura adequados
+- **Escreva testes para todas as funcionalidades criadas** (testes unitários, de integração e, se possível, automatizados) para garantir que funcionalidades existentes não sejam quebradas
 
-Se você tem perguntas ou precisa de ajuda, sinta-se à vontade para abrir um issue ou entrar em contato com a equipe de desenvolvimento.
+---
 
-## Código de Conduta
+## 📚 Documentação
+
+Se sua alteração afetar a documentação, lembre-se de atualizá-la. A documentação está localizada na pasta `docs`.
+
+---
+
+## 💬 Precisa de ajuda?
+
+Se você tem perguntas ou precisa de suporte, sinta-se à vontade para abrir um issue ou entrar em contato com a equipe de desenvolvimento.
+
+---
+
+## 📜 Código de Conduta
 
 Por favor, leia nosso [Código de Conduta](./code-of-conduct.html) para entender as expectativas em relação ao comportamento ao contribuir para o GuiaDev.
 
-## Agradecimentos
+---
 
-Agradecemos a todos os nossos colaboradores e aqueles que consideram contribuir para o GuiaDev!
+## 🙏 Agradecimentos
+
+Agradecemos a todos os nossos colaboradores e àqueles que consideram contribuir para o GuiaDev!
