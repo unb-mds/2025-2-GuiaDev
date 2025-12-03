@@ -1,6 +1,6 @@
 .structerProject {
-  width: 100%;
-  border: solid 1px black;
+  width: 68vw;/*100%*/
+  border: solid 1px rgb(148, 148, 148);
   border-radius: 12px;
   padding: 2rem;
 }

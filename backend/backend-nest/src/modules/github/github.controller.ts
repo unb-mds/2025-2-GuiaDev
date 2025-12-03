@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, Logger, HttpException, HttpStatus, Post, Req } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { PrismaService } from 'src/database/prisma.service';
 import { DocsAnalyzerService } from './docs-analyzer/docs-analyzer.service';
@@ -195,6 +195,21 @@ export class GithubController {
 
         return analysis;
     }
+
+        @Post('analyze')
+        async analyzeUserRepos(@Req() req: any) {
+            const userRecord = await this.prisma.user.findUnique({ where: { id: req.user?.userId } });
+            if (!userRecord || !userRecord.usernameGit) {
+                throw new HttpException('Usuário não encontrado ou sem usernameGit', HttpStatus.NOT_FOUND);
+            }
+
+            const results = await this.githubService.analyzeUserRepos(userRecord.usernameGit, false);
+            return {
+                message: 'Análise concluída',
+                count: Array.isArray(results) ? results.length : 0,
+                data: results,
+            };
+        }
 
     @Get('tree/:owner/:repo')
     async getRepoTree(@Param('owner') owner: string, @Param('repo') repo: string) {

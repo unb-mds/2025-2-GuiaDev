@@ -2,33 +2,42 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { INestApplication } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
+import request from 'supertest';
+import { ChatModule } from './chat.module';
+import { HttpService } from '@nestjs/axios';
+import { of } from 'rxjs';
 
-
-import request = require('supertest');
 
 process.env.GEMINI_API_KEY = 'MOCK_TEST_KEY';
 
 describe('ChatController', () => {
   let app: INestApplication;
   let controller: ChatController;
+  let httpService: HttpService;
 
-  const mockChatService = {
-    getAIResponse: jest.fn().mockResolvedValue('Resposta da IA'),
-  };
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [ChatModule],
+    })
+      .overrideProvider(HttpService)
+      .useValue({
+        post: jest.fn(() =>
+          of({
+            data: {
+              candidates: [
+                {
+                  content: { parts: [{ text: 'Resposta simulada do Gemini' }] },
+                },
+              ],
+            },
+          }),
+        ),
+      })
+      .compile();
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
-      controllers: [ChatController],
-      providers: [
-        { provide: ChatService, useValue: mockChatService },
-      ],
-    }).compile();
-
-    controller = module.get<ChatController>(ChatController);
-    app = module.createNestApplication();
+    app = moduleFixture.createNestApplication();
     await app.init();
+    controller = app.get<ChatController>(ChatController);
   });
 
   it('should be defined', () => {
@@ -40,8 +49,8 @@ describe('ChatController', () => {
       .post('/chat')
       .send({ message: 'teste' })
       .expect(201);
-      
-    expect(response.text).toBe('Resposta da IA');
+
+    expect(response.text).toContain('Resposta simulada');
   });
 
   afterAll(async () => {

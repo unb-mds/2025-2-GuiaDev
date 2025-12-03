@@ -2,7 +2,7 @@
     
     width: 68vw;
     /* background-color: rebeccapurple; */
-    border: solid 1px black;
+    border: solid 1px rgb(148, 148, 148);
     border-radius: 12px;
     color: black;
 }
@@ -15,6 +15,6 @@
     height: 45px;
     /* background-color: red; */
     margin: 2rem;
-    border-bottom: solid 1px black;
+    border-bottom: solid 1px rgb(148, 148, 148);
     color: black;
 }
