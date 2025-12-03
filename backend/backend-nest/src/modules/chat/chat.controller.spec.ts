@@ -8,12 +8,11 @@ import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
 
 
-import request = require('supertest');
-
 process.env.GEMINI_API_KEY = 'MOCK_TEST_KEY';
 
 describe('ChatController', () => {
   let app: INestApplication;
+  let controller: ChatController;
   let httpService: HttpService;
 
   beforeAll(async () => {
@@ -38,6 +37,7 @@ describe('ChatController', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    controller = app.get<ChatController>(ChatController);
   });
 
   it('should be defined', () => {

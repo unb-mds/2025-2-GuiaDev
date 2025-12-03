@@ -615,6 +615,7 @@ describe('GithubService', () => {
         'r',
         ['governance.md'],
         'main',
+        undefined,
       );
       expect(result.content).toBe('Gov');
     });

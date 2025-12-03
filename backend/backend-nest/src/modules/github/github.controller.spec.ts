@@ -31,7 +31,12 @@ const mockGithub = {
   getChangelog: jest.fn(),
   getConductCode: jest.fn(),
   getLicenses: jest.fn(),
+  getGitignore: jest.fn().mockResolvedValue({ content: null }),
   getDocsContent: jest.fn(),
+  getCachedRepoAnalysis: jest.fn().mockResolvedValue(null),
+  checkRepoChanged: jest.fn().mockResolvedValue({ changed: true, etag: null }),
+  getIssueAndPrTemplates: jest.fn().mockResolvedValue([]),
+  saveCachedRepoAnalysis: jest.fn().mockResolvedValue(null),
 };
 
 const mockDocs = { analyzeMany: jest.fn().mockReturnValue({ analyzed: true }) };
