@@ -6,18 +6,21 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
-  // Ignora a pasta de build
+  // Ignorar saídas e dependências
   globalIgnores(["dist", "node_modules", "coverage"]),
 
   {
     files: ["**/*.{js,jsx}"],
-    ignores: ["vite.config.js"], // evita lintar configs internas
+    ignores: [
+      "vite.config.*",
+      "eslint.config.*",
+      "**/*.config.*",
+    ],
 
-    // Configurações base e plugins recomendados
     extends: [
-      js.configs.recommended, // regras JS padrão
-      reactHooks.configs["recommended-latest"], // boas práticas React Hooks
-      reactRefresh.configs.vite, // integração com Vite e React Refresh
+      js.configs.recommended,
+      reactHooks.configs["recommended-latest"],
+      reactRefresh.configs.vite,
     ],
 
     languageOptions: {
@@ -25,7 +28,7 @@ export default defineConfig([
       sourceType: "module",
       globals: {
         ...globals.browser,
-        ...globals.node, // útil para projetos com scripts Node (ex: vite.config)
+        ...globals.node,
       },
       parserOptions: {
         ecmaFeatures: { jsx: true },
@@ -33,20 +36,38 @@ export default defineConfig([
     },
 
     rules: {
-      // ⚙️ Boas práticas gerais
-      "no-unused-vars": ["warn", { varsIgnorePattern: "^[A-Z_]" }],
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      // Boas práticas gerais
+      "no-unused-vars": [
+        "warn",
+        {
+          varsIgnorePattern: "^[A-Z_]", // ex: constantes em maiúsculo
+          argsIgnorePattern: "^_", // parâmetros não usados começando com _
+        },
+      ],
+      "no-console": [
+        process.env.NODE_ENV === "production" ? "warn" : "off",
+        { allow: ["warn", "error"] },
+      ],
 
-      // ⚛️ React Hooks
+      // React Hooks
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
-      // 🔄 Código mais limpo e consistente
+      // Limpeza e consistência
       "prefer-const": "warn",
       "no-var": "error",
-      "eqeqeq": ["error", "always"],
-      "curly": ["error", "all"],
+      eqeqeq: ["error", "always"],
+      curly: ["error", "all"],
       "no-trailing-spaces": "warn",
+    },
+  },
+
+  // Opcional: regras mais suaves pra testes
+  {
+    files: ["**/*.test.{js,jsx}", "**/*.spec.{js,jsx}"],
+    rules: {
+      "no-console": "off",
+      "no-unused-expressions": "off",
     },
   },
 ]);

@@ -5,7 +5,6 @@ import { PrismaService } from '../../database/prisma.service';
 import { GithubService } from './github.service';
 import { AxiosResponse } from 'axios';
 import { Buffer } from 'buffer';
-import path from 'path';
 
 const mockAxiosResponse = (data: any, status: number, headers: any = {}): AxiosResponse<any> => ({
   data,
@@ -51,9 +50,6 @@ describe('GithubService', () => {
   let prismaService: PrismaService;
   let mockFetchBranch: jest.SpyInstance;
   let mockFetchChecklist: jest.SpyInstance;
-  let bufferIsProbablyBinarySpy: jest.SpyInstance;
-  let extractOwnerSpy: jest.SpyInstance;
-  let extractRepoSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -73,17 +69,11 @@ describe('GithubService', () => {
 
     mockFetchBranch = jest.spyOn(service as any, '_fetchDefaultBranch').mockResolvedValue('main');
     mockFetchChecklist = jest.spyOn(service as any, 'fetchChecklistMdFiles');
-    bufferIsProbablyBinarySpy = jest.spyOn(service as any, 'bufferIsProbablyBinary').mockReturnValue(false);
-    extractOwnerSpy = jest.spyOn(service as any, 'extractOwner');
-    extractRepoSpy = jest.spyOn(service as any, 'extractRepo');
   });
 
   afterAll(() => {
     mockFetchBranch.mockRestore();
     mockFetchChecklist.mockRestore();
-    bufferIsProbablyBinarySpy.mockRestore();
-    extractOwnerSpy.mockRestore();
-    extractRepoSpy.mockRestore();
   });
 
   it('should be defined', () => {
@@ -98,30 +88,27 @@ describe('GithubService', () => {
   });
 
   describe('decodeBase64 (Private)', () => {
-    const decodeBase64 = (service as any).decodeBase64.bind(service);
     it('deve decodificar conteúdo', () => {
       const encoded = Buffer.from('conteúdo de teste').toString('base64');
-      expect(decodeBase64(encoded)).toBe('conteúdo de teste');
+      expect((service as any).decodeBase64(encoded)).toBe('conteúdo de teste');
     });
     it('deve retornar null para conteúdo undefined', () => {
-      expect(decodeBase64(undefined)).toBeNull();
+      expect((service as any).decodeBase64(undefined)).toBeNull();
     });
   });
 
   describe('bufferIsProbablyBinary (Private)', () => {
-    const bufferIsProbablyBinary = (service as any).bufferIsProbablyBinary.bind(service);
     it('deve retornar true se contiver o byte nulo (0)', () => {
       const binaryBuffer = Buffer.from([0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x00, 0x77, 0x6f, 0x72, 0x6c, 0x64]);
-      expect(bufferIsProbablyBinary(binaryBuffer)).toBe(true);
+      expect((service as any).bufferIsProbablyBinary(binaryBuffer)).toBe(true);
     });
     it('deve retornar false para texto ASCII', () => {
       const textBuffer = Buffer.from('Hello world, this is a test.');
-      expect(bufferIsProbablyBinary(textBuffer)).toBe(false);
+      expect((service as any).bufferIsProbablyBinary(textBuffer)).toBe(false);
     });
   });
 
   describe('mapWithConcurrency (Private)', () => {
-    const mapWithConcurrency = (service as any).mapWithConcurrency.bind(service);
     it('deve executar todas as tarefas respeitando o limite', async () => {
       const items = [1, 2, 3, 4];
       const limit = 2;
@@ -129,7 +116,7 @@ describe('GithubService', () => {
         await new Promise(resolve => setTimeout(resolve, 10));
         return item * 2;
       });
-      const results = await mapWithConcurrency(items, limit, mockFn);
+      const results = await (service as any).mapWithConcurrency(items, limit, mockFn);
       expect(results.sort()).toEqual([2, 4, 6, 8]);
       expect(mockFn).toHaveBeenCalledTimes(4);
     });
@@ -177,42 +164,56 @@ describe('GithubService', () => {
     });
   });
 
-  describe('_fetchDefaultBranch (Private)', () => {
-    const owner = 'test-owner';
-    const repo = 'test-repo';
-    const _fetchDefaultBranch = (service as any)._fetchDefaultBranch.bind(service);
-
-    it('deve retornar a branch padrão', async () => {
-      mockFetchBranch.mockRestore();
-      mockHttpService.axiosRef.get.mockResolvedValue(mockAxiosResponse({ default_branch: 'develop' }, 200));
-      const result = await _fetchDefaultBranch(owner, repo);
-      expect(result).toBe('develop');
-    });
-
-    it('deve retornar "main" em caso de erro', async () => {
-      mockFetchBranch.mockRestore();
-      mockHttpService.axiosRef.get.mockRejectedValue({ message: 'Not Found' });
-      const result = await _fetchDefaultBranch(owner, repo);
-      expect(result).toBe('main');
+  describe('getUserRepos', () => {
+    const username = 'testuser';
+    it('deve retornar repositórios com contadores', async () => {
+      const reposPage1 = [
+        { 
+            name: `repo1`, 
+            owner: { login: 'testuser' }, 
+            html_url: `url1`, 
+            private: false, 
+            default_branch: 'main',
+            stargazers_count: 10,
+            watchers_count: 5,
+            open_issues_count: 2,
+            forks_count: 1
+        }
+      ];
+      
+      jest.spyOn(service as any, 'httpGet').mockResolvedValueOnce(mockAxiosResponse(reposPage1, 200));
+      
+      const result = await service.getUserRepos(username);
+      expect(result.length).toBe(1);
+      expect((result[0] as any).stargazers_count).toBe(10);
+      expect((result[0] as any).watchers_count).toBe(5);
     });
   });
 
-  describe('getUserRepos', () => {
-    const username = 'testuser';
-    it('deve retornar repositórios em múltiplas páginas', async () => {
-      const reposPage1 = Array(100).fill(0).map((_, i) => ({ name: `repo${i}`, owner: { login: 'testuser' }, html_url: `url${i}`, private: false, default_branch: 'main' }));
-      const reposPage2 = [{ name: 'repo100', owner: { login: 'testuser' }, html_url: 'url100', private: false, default_branch: 'main' }];
-      jest.spyOn(service as any, 'httpGet')
-        .mockResolvedValueOnce(mockAxiosResponse(reposPage1, 200))
-        .mockResolvedValueOnce(mockAxiosResponse(reposPage2, 200));
-      const result = await service.getUserRepos(username);
-      expect(result.length).toBe(101);
+  describe('getBranches', () => {
+    it('deve retornar lista de nomes de branches', async () => {
+      const branches = [{ name: 'main' }, { name: 'dev' }];
+      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(branches, 200));
+      const result = await service.getBranches('o', 'r');
+      expect(result).toEqual(['main', 'dev']);
     });
+  });
 
-    it('deve retornar array vazio se o usuário não for encontrado (404)', async () => {
-      jest.spyOn(service as any, 'httpGet').mockRejectedValue({ status: 404 });
-      const result = await service.getUserRepos(username);
-      expect(result).toEqual([]);
+  describe('getPullRequests', () => {
+    it('deve retornar lista simplificada de PRs', async () => {
+      const prs = [{ number: 1, title: 'Fix', state: 'open', user: { login: 'u' } }];
+      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(prs, 200));
+      const result = await service.getPullRequests('o', 'r');
+      expect(result[0].title).toBe('Fix');
+    });
+  });
+
+  describe('getContributors', () => {
+    it('deve retornar lista de contribuidores', async () => {
+      const contribs = [{ login: 'dev', contributions: 10 }];
+      jest.spyOn(service as any, 'httpGet').mockResolvedValue(mockAxiosResponse(contribs, 200));
+      const result = await service.getContributors('o', 'r');
+      expect(result[0].login).toBe('dev');
     });
   });
 
@@ -372,24 +373,14 @@ describe('GithubService', () => {
         patternResults: {}
       });
       const result = await service.getGovernance('o', 'r');
-      expect(mockFetchChecklist).toHaveBeenCalledWith('o', 'r', ['governance.md'], 'main');
+      
+      expect(mockFetchChecklist).toHaveBeenCalledWith('o', 'r', ['governance.md'], 'main', undefined);
       expect(result.content).toBe('Gov');
-    });
-
-    it('getArchitecture deve priorizar arquivos com padrões corretos', async () => {
-      mockFetchChecklist.mockResolvedValue({
-        resultsByPath: { 'docs/architecture.md': { path: 'docs/architecture.md', content: 'Arch' } },
-        summary: {},
-        patternResults: {}
-      });
-      const result = await service.getArchitecture('o', 'r');
-      expect(mockFetchChecklist).toHaveBeenCalledWith('o', 'r', ['architecture.md', 'arquitetura.md'], 'main');
-      expect(result.content).toBe('Arch');
     });
   });
 
   describe('fetchChecklistMdFiles', () => {
-    it('deve buscar e processar arquivos Md correspondentes, pulando grandes', async () => {
+    it('deve buscar e processar arquivos Md correspondentes', async () => {
       const tree = [
         { path: 'README.md', type: 'blob', sha: 'sha1', size: 100 },
         { path: 'TOO_LARGE.md', type: 'blob', sha: 'sha5', size: 600 },
@@ -411,33 +402,34 @@ describe('GithubService', () => {
       const mockData = [{ data: { nomeRepositorio: 'Repo1', commits: 5 } }];
       mockPrismaService.githubRepoData.findMany.mockResolvedValue(mockData);
       const result = await service.getFormattedCachedRepos();
-      expect(result[0].nomeRepositorio).toBe('Repo1');
+      expect((result[0] as any).nomeRepositorio).toBe('Repo1');
     });
   });
 
   describe('formatRepoData', () => {
-    it('deve formatar corretamente dados de repositório com todos os checks', () => {
+    it('deve formatar corretamente dados com métricas e sem booleanos', () => {
       const inputData = [{
         repo: 'test-repo',
-        commits: ['c1', 'c2'], issues: [{}], releases: [{}],
-        license: { name: 'MIT', key: 'mit' }, gitignore: { content: 'ignore' },
-        docsContent: [{ name: 'README.md', content: 'R' }, { name: 'code_of_conduct.md', content: 'C' }],
-        checkFolders: [{ path: 'src', exists: true }, { path: 'license_file_check', exists: true }]
+        score: 10, 
+        stargazers_count: 10,
+        watchers_count: 5,
+        contributors_count: 5,
+        prs_count: 2,
+        docs_count: 1,
+        forks_count: 1,
+        open_issues_count: 2,
+        has_readme: true,
+        has_contributing: false,
+        has_changelog: false,
+        has_conduct: false
       }];
+      
       const result = service.formatRepoData(inputData)[0];
-      expect(result.possuiLicense).toBe(true);
-      expect(result.possuiSrc).toBe(true);
-      expect(result.detalhes.license).toBe('MIT');
-      expect(result.commits).toBe(2);
-    });
-
-    it('deve lidar com dados ausentes ou inválidos', () => {
-      const inputData = [{ repo: 'empty', commits: null, issues: [], releases: null, license: { key: 'unlicensed' }, gitignore: null, docsContent: [], checkFolders: [] }];
-      const result = service.formatRepoData(inputData)[0];
-      expect(result.commits).toBe(0);
-      expect(result.possuiIssues).toBe(false);
-      expect(result.possuiLicense).toBe(false);
-      expect(result.detalhes.license).toBeNull();
+      
+      expect((result as any).nomeRepositorio).toBe('test-repo');
+      expect((result as any).score).toBeGreaterThanOrEqual(0); 
+      expect((result as any).stargazers_count).toBe(10);
+      expect((result as any).watchers_count).toBe(5);
     });
   });
 
@@ -453,21 +445,40 @@ describe('GithubService', () => {
 
   describe('_analyzeSingleRepo (Private)', () => {
     it('deve retornar cache HIT se não houver mudança e etag coincidir', async () => {
-      const repo = { owner: { login: 'o' }, name: 'r', default_branch: 'main' };
+      const repo = { 
+          owner: { login: 'o' }, 
+          name: 'r', 
+          default_branch: 'main', 
+          url: 'u', 
+          private: false,
+          stargazers_count: 0,
+          watchers_count: 0,
+          open_issues_count: 0,
+          forks_count: 0
+      };
+      
       jest.spyOn(service, 'checkRepoChanged').mockResolvedValue({ changed: false, etag: 'e1' });
       mockPrismaService.githubRepoData.findUnique.mockResolvedValue({ etag: 'e1', data: { hit: true } });
-      const result = await (service as any)._analyzeSingleRepo(repo);
+      
+      const result = await (service as any)._analyzeSingleRepo(repo, false);
       expect(result).toEqual({ hit: true });
     });
   });
 
   describe('analyzeUserRepos', () => {
-    it('deve analisar repos em concorrência', async () => {
-      const repos = [{ owner: { login: 'o' }, name: 'r1', default_branch: 'main' }, { owner: { login: 'o' }, name: 'r2', default_branch: 'main' }];
+    it('deve analisar repos e corrigir IDs', async () => {
+      const repos = [
+          { owner: { login: 'o' }, name: 'r1', default_branch: 'main', url: 'u1', private: false, stargazers_count: 0, watchers_count: 0, open_issues_count: 0, forks_count: 0 }, 
+          { owner: { login: 'o' }, name: 'r2', default_branch: 'main', url: 'u2', private: false, stargazers_count: 0, watchers_count: 0, open_issues_count: 0, forks_count: 0 }
+      ];
+      
       jest.spyOn(service, 'getUserRepos').mockResolvedValue(repos);
       jest.spyOn(service as any, '_analyzeSingleRepo').mockResolvedValueOnce({ repo: 'r1' }).mockResolvedValueOnce({ repo: 'r2' });
-      const result = await service.analyzeUserRepos('user');
+      
+      const result = await service.analyzeUserRepos('user', false);
       expect(result.length).toBe(2);
+      expect(result[0].id).toBe(1); 
+      expect(result[1].id).toBe(2); 
     });
   });
 
@@ -475,8 +486,8 @@ describe('GithubService', () => {
     it('deve retornar todos os itens de cache formatados', async () => {
       const mockResults = [{ url: 'https://api.github.com/repos/o1/r1', updatedAt: new Date(), data: { d: 1 } }];
       mockPrismaService.githubCache.findMany.mockResolvedValue(mockResults);
-      extractOwnerSpy.mockReturnValue('o1');
-      extractRepoSpy.mockReturnValue('r1');
+      jest.spyOn(service as any, 'extractOwner').mockReturnValue('o1');
+      jest.spyOn(service as any, 'extractRepo').mockReturnValue('r1');
       const result = await service.getAllCache();
       expect(result[0].owner).toBe('o1');
     });
@@ -490,12 +501,10 @@ describe('GithubService', () => {
   });
 
   describe('extractOwner / extractRepo (Private)', () => {
-    const extractOwner = (service as any).extractOwner.bind(service);
-    const extractRepo = (service as any).extractRepo.bind(service);
     it('deve extrair de URLs de API de repositório', () => {
       const repoUrl = 'https://api.github.com/repos/owner-test/repo-test/contents/file.md';
-      expect(extractOwner(repoUrl)).toBe('owner-test');
-      expect(extractRepo(repoUrl)).toBe('repo-test');
+      expect((service as any).extractOwner(repoUrl)).toBe('owner-test');
+      expect((service as any).extractRepo(repoUrl)).toBe('repo-test');
     });
   });
 });

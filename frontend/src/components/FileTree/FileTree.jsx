@@ -18,7 +18,7 @@ export default function FileTree({
     <div className="file-tree">
       {tree.map((node, i) => (
         <TreeNode
-          key={node.name + i}
+          key={node.path || `${node.name}-${i}`}
           node={node}
           level={0}
           onFileClick={onFileClick}
@@ -29,7 +29,7 @@ export default function FileTree({
   );
 }
 
-// Converte um valor para porcentagem (aceita número ou string com '%')
+
 function parsePercent(value) {
   if (!value) return null;
   if (typeof value === "number")
@@ -41,19 +41,19 @@ function parsePercent(value) {
   return null;
 }
 
-// Calcula progresso: arquivos usam node.meta.badge; pastas usam badge próprio ou média dos filhos
+
 function getProgress(node) {
   if (!node) return null;
-  // se for arquivo, retorna o badge (se houver)
+
   if (node.type === "file") {
     return parsePercent(node.meta && node.meta.badge);
   }
-  // se for pasta, prefira o badge da própria pasta
+
   const fromMeta = parsePercent(node.meta && node.meta.badge);
   if (fromMeta !== null) return fromMeta;
-  // se não houver filhos, não há progresso
+
   if (!node.children || node.children.length === 0) return null;
-  // calcula média apenas com valores válidos
+  
   const childValues = node.children
     .map(getProgress)
     .filter((v) => v !== null && v !== undefined);
@@ -102,7 +102,7 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
           </span>
           <span className="node-name">{node.name}</span>
         </div>
-  {/* Badge e barra de progresso: pastas usam node.meta.badge ou média dos filhos */}
+  
         {isFolder &&
           (() => {
             const fromMeta = node.meta && node.meta.badge;
@@ -128,7 +128,7 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
                 </div>
               );
             }
-            // fallback: mostra badge de texto se existir
+           
             if (fromMeta) {
               return (
                 <div className="node-meta">
@@ -139,47 +139,20 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
             return null;
           })()}
 
-  {/* Badge de status à direita: só para arquivos. usa classes .status.Ativo / .status.Parcial */}
-        {node.type === "file" && (
+  
+        {node.type === "file" && node.meta && node.meta.doc && (
           <div className="node-status-wrap">
             {(() => {
-              // procura no resumo por entrada que combine por path ou nome
-              const match =
-                summary &&
-                summary.find((s) => {
-                  if (!s) return false;
-                  if (s.path && node.path) return s.path === node.path;
-                  if (s.name) return s.name === node.name;
-                  return false;
-                });
+              const doc = node.meta.doc;
+              const score = typeof doc?.score === "number" ? Math.round(doc.score) : null;
 
-              const pctFromMeta = parsePercent(node.meta && node.meta.badge);
-              const pctAgg = getProgress(node);
-              const pct =
-                pctFromMeta !== null
-                  ? pctFromMeta
-                  : pctAgg !== null
-                  ? pctAgg
-                  : null;
+              const isComplete = score !== null && score >= 100;
+              const isPartial = doc?.exists && score !== null && score !== 0 && score < 100;
 
-              const statusFromSummary =
-                match && (match.status || match.state || match.result);
-              const isComplete = (() => {
-                if (typeof statusFromSummary === "string") {
-                  const s = statusFromSummary.toLowerCase();
-                  return (
-                    s === "completo" ||
-                    s === "complete" ||
-                    s === "done" ||
-                    s === "finished"
-                  );
-                }
-                if (typeof pct === "number") return pct >= 100;
-                return false;
-              })();
+              if (!isComplete && !isPartial) return null; 
 
               const label = isComplete ? "Completo" : "Parcial";
-              const cls = isComplete ? "status Ativo" : "status Parcial"; // classes from Overview.css
+              const cls = isComplete ? "status Ativo" : "status Parcial";
 
               return (
                 <div className={cls} aria-hidden>
@@ -196,7 +169,7 @@ function TreeNode({ node, level, onFileClick, summary = [] }) {
           {node.children &&
             node.children.map((child, i) => (
               <TreeNode
-                key={child.name + i}
+                key={child.path || `${child.name}-${level + 1}-${i}`}
                 node={child}
                 level={level + 1}
                 onFileClick={onFileClick}

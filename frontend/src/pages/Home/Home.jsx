@@ -1,20 +1,20 @@
-// src/pages/Home/Home.jsx
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BoxRepo from "../../components/BoxRepo/Boxrepo";
 import "./Home.css";
-// import GitHubAPI from "../../../services/github";
 import api from "../../../services/api";
 
 const Home = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  const [ownerInput, setOwnerInput] = useState("");
+  
   const [owner, setOwner] = useState("");
-  const [search, setSearch] = useState(false);
+  const [ownerLoading, setOwnerLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('authToken') || "");
   const urlToken = searchParams.get("token");
-  // const [repo, setRepos] = useState("");
+ 
 
   const handleToken = async (token) => {
     try {
@@ -36,6 +36,8 @@ const Home = () => {
       token = localStorage.getItem("authToken");
     }
 
+    setAuthToken(token || "");
+
     // se ainda não houver token, redireciona pro login
     if (!token) {
       navigate("/login");
@@ -45,36 +47,63 @@ const Home = () => {
 
   }, [urlToken, navigate]);
 
+  useEffect(()=>{
+    let mounted = true;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();                // evita reload
-    const clean = ownerInput.trim();
-    if (!clean) return;                // evita submit vazio
-    setOwner(clean);                   // congela o valor p/ BoxRepo
-  };
+    const fetchProfile = async () => {
+      try {
+        if (!authToken) {
+          if (mounted) setOwnerLoading(false);
+          return; // sem token não há profile
+        }
+
+        if (mounted) setOwnerLoading(true);
+        const res = await api.get('/auth/profile');
+        
+        if (!mounted) return;
+        const payload = res.data?.user ?? res.data ?? {};
+        const username = payload.usernameGit || payload.username || '';
+        if (username) {
+          setOwner(username);
+          setRefreshKey((prev) => prev + 1);
+        }
+        setOwnerLoading(false);
+      } catch (err) {
+        console.error('Falha ao obter perfil:', err);
+        if (mounted) setOwnerLoading(false);
+      }
+    };
+
+    fetchProfile();
+    // listen for profile updates from the Config modal and update owner live
+    const onProfileUpdated = (ev) => {
+      try {
+        const payload = ev?.detail ?? {};
+        const username = payload.usernameGit || payload.username || '';
+        if (mounted) {
+          if (typeof username === 'string') {
+            setOwner(username);
+          }
+          setOwnerLoading(false);
+          setRefreshKey((prev) => prev + 1);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    window.addEventListener('profileUpdated', onProfileUpdated);
+    return () => {
+      mounted = false;
+      window.removeEventListener('profileUpdated', onProfileUpdated);
+    };
+  }, [authToken]);
 
   return (
     <div className="Boxrepo">
-      <div className="inputLink">
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Username (GitHub)"
-            value={ownerInput}
-            onChange={(e) => setOwnerInput(e.target.value)}
-          />
-          <button type="submit">Buscar</button>
-        </form>
-      </div>
-
+      
       <div className="center">
-        {!owner && (
-          <div className="home-notice" style={{ marginBottom: 16, textAlign: 'center' }}>
-            <strong>Digite o username do GitHub e clique em "Buscar" para carregar seus repositórios.</strong>
-          </div>
-        )}
 
-        <BoxRepo owner={owner} />
+        <BoxRepo owner={owner} refreshKey={refreshKey} ownerLoading={ownerLoading} />
       </div>
     </div>
   );

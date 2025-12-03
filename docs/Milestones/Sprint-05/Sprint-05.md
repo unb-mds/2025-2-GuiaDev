@@ -1,52 +1,80 @@
-# **🏁** Sprint 05
+# Relatório da Sprint — Projeto Guiadev
 
-Período: 29/09/2025 a 05/10/2025
+# **Sprint 05**
 
-## Descrição
+## 1. Informações Gerais
 
+* **Sprint:** 05
+* **Duração:** 29/09/2025 a 05/10/2025
+* **Product Owner:*Hugo* —
+* **Scrum Master:*Phillipe* —
+* **Time de Desenvolvimento:**
+* **Equipe Guiadev:**
+* João Guilherme S. de Oliveira*
+* Hugo Freitas*
+* Phillipe*
+* Pedro*
+* Felipe Brito*
+* Bruno*
+  
 
-Essa sprint foi dedicada à preparação e revisão do projeto para a primeira release, revisando todas as documentações e terminando de implementar funcionalidades.
-## Objetivos
+---
 
-* Revisar toda a documentação feita do projeto até o momento da release
-* Criar release notes
-* terminar implementação faltante
-* preparar para começar as implementações de código para a release 2
+## 2. Objetivos da Sprint
 
+* Revisar toda a documentação produzida até a primeira release.
+* Criar as release notes.
+* Finalizar implementações pendentes.
+* Preparar a base para o início do desenvolvimento da Release 2.
 
-## Reuniões
+---
 
-### Reunião 1
+## 3. Backlog da Sprint
 
-**Data:** 29/09/2025  
-**Local:** ambiente virtual(discord)
-**Inicio:** 20:00  
-**Encerramento:** 22:00
+| Item | História de Usuário                                                                 | Critério de Aceite                              | Status     |
+| ---- | ------------------------------------------------------------------------------------ | ------------------------------------------------ | ---------- |
+| 1    | Como usuário, quero visualizar a documentação atualizada                             | Documentos revisados e atualizados               | Concluído  |
+| 2    | Como desenvolvedor, quero finalizar features pendentes da release                    | Issues finalizadas                                | Concluído  |
+| 3    | Como PO, quero ter release notes organizadas                                         | Release notes criadas                             | Concluído  |
 
-**Assuntos:**
+---
 
-* decisão de tarefas e qual integrante iria fazer cada uma 
-* preenchimento do figma
-* discussão do que se precisa para entregar na release 1
+## 4. Entregas (Review)
 
-### Reunião 2
+* Documentação revisada e atualizada.
+* Release notes finalizadas.
+* Funcionalidades restantes da release 1 concluídas.
+* Projeto pronto para apresentação da Release 1.
 
-**Data:** 01/10/2025  
-**Local:** ambiente virtual(discord)
-**Inicio:** 20:00  
-**Encerramento:** 22:30
+---
 
-**Assuntos:**
+## 5. Métricas da Sprint
 
-* finalização de implementações restantes 
-* integração 
-* checagem do andamento das tarefas propostas para apresentar a release 1
-* preparação da apresentação para release 1
+* **Velocity:** Não informado
+* **Qtd. de histórias concluídas / planejadas:** 3 / 3
+* **Burn-down Chart:** Não registrado
 
-## Finalização
+---
 
-> A Sprint deve ser finalizada com um resumo do que realmente foi feito e quais tarefas foram postergadas para a próxima Sprint.
-> A sprint 5 foi realizada com sucesso, preparando e revisando o necessário para apresentar tudo o que foi feito na release 1. Os próximos passos serão pensar na implementação de código para construção do Guiadev.
+## 6. Retrospectiva
+
+### O que funcionou bem 
+
+* Boa organização para revisão da release.
+* Comunicação eficiente entre os membros.
+* Tarefas bem distribuídas.
+
+### O que pode melhorar 
+
+* Melhor definição de responsabilidades individuais.
+* Controle de tempo pré-release.
+
+### Ações de melhoria 
+
+* Criar padrões para documentação e releases.
+* Melhorar estimativas das próximas sprints.
+
+---
 
 ---
 

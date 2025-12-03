@@ -9,8 +9,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Instala as dependências usando NPM.
-# 'npm ci' é otimizado para ambientes de automação como o Docker.
-RUN npm ci
+RUN npm install --no-audit --no-fund
 
 # Copia o resto do código da sua aplicação
 COPY . .

@@ -83,7 +83,7 @@
 
 .docsExplain {
   /* display: grid; */
-  height: 50vh;
+  height: auto;
   border: 1px solid #e2e8f0;
   width: 95%;
   border-radius: 12px;
